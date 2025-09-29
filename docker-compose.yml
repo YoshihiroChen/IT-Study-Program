@@ -1,0 +1,51 @@
+# docker-compose.yml
+services:
+  backend:
+    build: ./backend
+    container_name: codingjp-backend
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: codingjp-postgres
+    environment:
+      POSTGRES_USER: codingjp
+      POSTGRES_PASSWORD: codingjp_pass
+      POSTGRES_DB: codingjp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: codingjp-redis
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: codingjp-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_BASE=http://backend:8000
+      # 如果热更新不生效，可打开文件轮询：
+      # - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+

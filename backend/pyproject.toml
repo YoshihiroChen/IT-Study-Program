@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "codingjp-backend"
+version = "0.1.0"
+description = "FastAPI backend for codingjp"
+authors = ["you <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.30.0"}
+pydantic = "^2.9.0"
+sqlalchemy = "^2.0.32"
+psycopg = {extras = ["binary"], version = "^3.2.1"}
+redis = "^5.0.8"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.0"
+black = "^24.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
