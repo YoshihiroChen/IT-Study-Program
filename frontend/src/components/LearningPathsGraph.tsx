@@ -22,8 +22,14 @@ type Step = {
   id: string;
   label: string;
   href?: string;
-  summary?: string;     // ← 在这里填“说明文字”
+  summary?: string;
+
+  // ↓ 可选：分支定位
+  col?: number;     // 覆盖水平“列”（从 0 开始；不填则用 steps 的索引）
+  row?: number;     // 垂直偏移行：0=本行，-1=上面一行，+1=下面一行
+  chain?: boolean;  // 参与默认左右相邻连线；分支节点设为 false
 };
+
 
 type Track = {
   key: "web" | "sier" | "consulting";
@@ -31,6 +37,13 @@ type Track = {
   color: string;
   steps: Step[];
 };
+
+const ACCENTS: Record<Track['key'], string> = {
+  web: "bg-sky-500",
+  sier: "bg-amber-500",
+  consulting: "bg-violet-500",
+};
+
 
 const tracks: Track[] = [
   {
@@ -54,6 +67,15 @@ const tracks: Track[] = [
       { id: "web-4", label: "開発ツールと流れの紹介", href: "/paths/web/deploy", summary: "アジャイル開発、Vs Code" },
       { id: "web-5", label: "開発フレームワークの紹介", href: "/paths/web/deploy", summary: "Next.js、React、FastApi" },
       // …可以继续添加更多步骤
+      {
+        id: "web-2a",
+        label: "補講：フロント環境 & ES Modules",
+        href: "/paths/web/ts-bootcamp",
+        summary: "Node.js/npm, bundler 入門, 開発環境の整え方",
+        col: 1,     // ← 和 web-2 同一“列”（web-1 是 0，web-2 是 1）
+        row: -1,    // ← 放在该路线的上一行（可改为 +1 放在下方）
+        chain: false, // ← 不参与默认左右相邻连线（只走我们手动加的分支线）
+      }
     ],
   },
   {
@@ -84,33 +106,63 @@ const tracks: Track[] = [
 type ExtraEdge = { source: string; target: string; animated?: boolean };
 const extraEdges: ExtraEdge[] = [
   // { source: "web-2", target: "con-3" },
+  { source: "web-2",  target: "web-2a", animated: true }, // 从 TS 主节点分支到补讲卡片
+
 ];
 
 /** ---------- Layout constants ---------- */
 const LANE_HEIGHT = 220;
+const ROW_HEIGHT = 160; // 同一路线内“分支行”的上下间距
+
 const NODE_W = 280;
 const GAP_X = 120;
 const START_X = 80;
 const START_Y = 80;
 
-/** ---------- Custom Node: StepNode（显示标题+说明） ---------- */
-function StepNode({ data }: NodeProps<{ label: string; summary?: string; href?: string; color?: string }>) {
+
+import { /* ... */ NodeProps } from "reactflow";
+
+/** 泳道标题用的小牌子节点（不带连线端点） */
+function LaneLabelNode({ data }: NodeProps<{ title: string }>) {
   return (
-    <div className="rounded-2xl border bg-white/90 dark:bg-zinc-900/90 dark:border-zinc-700 shadow-sm p-3 md:p-4 max-w-[320px]">
-      {/* 左侧彩色竖条（按路线着色） */}
-      <div className={`absolute -left-1 top-2 h-6 w-1 rounded bg-${data.color || "sky-500"}`}></div>
-      <div className="text-[15px] md:text-base font-semibold leading-tight">{data.label}</div>
+    <div
+      className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
+      style={{
+        background: "var(--color-lane-bg)",
+        borderColor: "var(--color-border)",
+      }}
+    >
+      {data.title}
+    </div>
+  );
+}
+
+
+/** ---------- Custom Node: StepNode（显示标题+说明） ---------- */
+function StepNode({
+  data,
+}: NodeProps<{ label: string; summary?: string; href?: string; accent: string }>) {
+  return (
+    <div className="relative w-[280px] rounded-2xl border bg-white/90 dark:bg-zinc-900/90 dark:border-zinc-700 shadow-sm p-3 md:p-4">
+      {/* 左侧彩色竖条（使用固定类名而不是动态模板） */}
+      <div className={`absolute -left-1 top-2 h-6 w-1 rounded ${data.accent}`} />
+      <div className="text-[15px] md:text-base font-semibold leading-tight break-words">
+        {data.label}
+      </div>
       {data.summary && (
-        <div className="mt-1 text-xs md:text-sm opacity-70 leading-snug">{data.summary}</div>
+        <div className="mt-1 text-xs md:text-sm opacity-70 leading-snug break-words">
+          {data.summary}
+        </div>
       )}
-      {/* 连接柄 */}
       <Handle type="target" position={Position.Left} />
       <Handle type="source" position={Position.Right} />
     </div>
   );
 }
 
-const nodeTypes = { step: StepNode } as const;
+
+const nodeTypes = { step: StepNode, lane: LaneLabelNode } as const;
+
 
 /** ---------- Build nodes & edges ---------- */
 function toNodesAndEdges(allTracks: Track[]): { nodes: Node[]; edges: Edge[] } {
@@ -118,36 +170,37 @@ function toNodesAndEdges(allTracks: Track[]): { nodes: Node[]; edges: Edge[] } {
   const edges: Edge[] = [];
 
   allTracks.forEach((track, laneIdx) => {
-    const y = START_Y + laneIdx * LANE_HEIGHT;
-
-    // lane label
+    const yBase = START_Y + laneIdx * LANE_HEIGHT; // ← 原来是 y
+  
+    // lane label...
     nodes.push({
       id: `${track.key}-lane-label`,
-      position: { x: START_X - 60, y: y - 40 },
-      data: { label: track.title },
-      style: {
-        width: 120, height: 28,
-        border: "1px solid var(--color-border)",
-        borderRadius: 14, padding: 6, fontWeight: 600,
-        background: "var(--color-lane-bg)",
-      },
-      draggable: false, selectable: false,
+      type: "lane",                          // ⬅️ 使用自定义的 lane 节点
+      position: { x: START_X - 60, y: yBase - 40 },
+      data: { title: track.title },          // ⬅️ 用 title 字段
+      draggable: false,
+      selectable: false,
     });
-
+    
+  
     track.steps.forEach((step, i) => {
-      const x = START_X + i * (NODE_W + GAP_X);
+      const col = step.col ?? i;                 // 列：可覆盖
+      const row = step.row ?? 0;                 // 行偏移：可覆盖
+      const x = START_X + col * (NODE_W + GAP_X);
+      const y = yBase + row * ROW_HEIGHT;        // 最终 y
+  
       nodes.push({
         id: step.id,
         type: "step",
         position: { x, y },
-        data: { label: step.label, summary: step.summary, href: step.href, color: track.color },
+        data: { label: step.label, summary: step.summary, href: step.href, accent: ACCENTS[track.key] },
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
       });
-
-      // 同一条路线内部的顺序箭头
+  
+      // 默认左右相邻的连线：任一端 chain === false 时跳过
       const next = track.steps[i + 1];
-      if (next) {
+      if (next && (step.chain !== false) && (next.chain !== false)) {
         edges.push({
           id: `${step.id}->${next.id}`,
           source: step.id,
@@ -160,6 +213,7 @@ function toNodesAndEdges(allTracks: Track[]): { nodes: Node[]; edges: Edge[] } {
       }
     });
   });
+  
 
   // 跨泳道连线
   extraEdges.forEach((e, i) => {
