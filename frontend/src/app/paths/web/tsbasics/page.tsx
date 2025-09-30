@@ -674,6 +674,174 @@ const staff: Employee = {
         level: "intermediate",
         estMin: 10,
       },
+      {
+        id: "utility-types",
+        title: "ユーティリティ型（Utility Types）",
+        summary: "TypeScript が提供するビルトインの型変換ヘルパー群。既存の型から部分型・派生型を安全に構築できます。",
+        content: [
+          {
+            type: "p",
+            text: "ユーティリティ型は、既存の型から新しい型を作るための再利用可能なヘルパーです。プロパティの必須/任意化、読み取り専用化、ピックアップ/除外、関数シグネチャの抽出、文字列リテラルの変換などを安全に行えます。"
+          },
+          {
+            type: "code",
+            filename: "utility-basics.ts",
+            lang: "ts",
+            code: `interface User {
+        id: number;
+        name: string;
+        email?: string;
+      }`},
+          {
+            type: "code",
+            filename: "utility-partial-required-readonly.ts",
+            lang: "ts",
+            code: `// 1) Partial<T> : すべてのプロパティを任意に
+type UserPatch = Partial<User>;
+//    { id?: number; name?: string; email?: string | undefined }
+      
+// 2) Required<T> : すべてのプロパティを必須に
+type UserRequired = Required<User>;
+//    { id: number; name: string; email: string }
+      
+// 3) Readonly<T> : すべてを読み取り専用に
+type FrozenUser = Readonly<User>;
+const fu: FrozenUser = { id: 1, name: "A", email: "x@y" };
+// fu.name = "B"; // ❌ 読み取り専用`
+          },
+          {
+            type: "code",
+            filename: "utility-record-pick-omit.ts",
+            lang: "ts",
+            code: `// 4) Record<K, T> : キー集合 K で値型 T を持つマップ
+type UserRoles = Record<"owner" | "editor" | "viewer", User>;
+      
+// 5) Pick<T, K> : T から K のプロパティだけを抜き出す
+type UserPublic = Pick<User, "id" | "name">;
+//    { id: number; name: string }
+      
+// 6) Omit<T, K> : T から K のプロパティを取り除く
+type UserPrivate = Omit<User, "email">;
+//    { id: number; name: string }`
+          },
+          {
+            type: "code",
+            filename: "utility-exclude-extract-nonnullable.ts",
+            lang: "ts",
+            code: `type Status = "draft" | "published" | "archived" | undefined | null;
+      
+// 7) Exclude<T, U> : T から U を除外
+type VisibleStatus = Exclude<Status, "archived" | undefined | null>;
+//    "draft" | "published"
+      
+// 8) Extract<T, U> : T と U の共通部分だけ抽出
+type PublishedLike = Extract<Status, "published" | "archived">;
+//    "published" | "archived"
+      
+// 9) NonNullable<T> : null と undefined を除去
+type CleanStatus = NonNullable<Status>;
+//    "draft" | "published" | "archived"`
+          },
+          {
+            type: "code",
+            filename: "utility-parameters-returntype.ts",
+            lang: "ts",
+            code: `function createUser(name: string, email?: string) {
+  return { id: Date.now(), name, email };
+}
+      
+// 10) Parameters<T> : 関数引数のタプル型
+type CreateUserArgs = Parameters<typeof createUser>;
+//    [name: string, email?: string | undefined]
+      
+// 11) ReturnType<T> : 関数の戻り値型
+type CreatedUser = ReturnType<typeof createUser>;
+//    { id: number; name: string; email?: string | undefined }`
+          },
+          {
+            type: "code",
+            filename: "utility-ctor-instance.ts",
+            lang: "ts",
+            code: `class Point {
+  constructor(public x: number, public y: number) {}
+}
+      
+// 12) ConstructorParameters<T> : コンストラクタ引数のタプル型
+type PointArgs = ConstructorParameters<typeof Point>;
+//    [x: number, y: number]
+      
+// 13) InstanceType<T> : クラスのインスタンス型
+type PointInstance = InstanceType<typeof Point>;
+//    Point`
+          },
+          {
+            type: "code",
+            filename: "utility-this-helpers.ts",
+            lang: "ts",
+            code: `function printer(this: { prefix: string }, msg: string) {
+  console.log(this.prefix, msg);
+}
+      
+// 14) ThisParameterType<T> : 関数に宣言された this パラメータ型
+type PrinterThis = ThisParameterType<typeof printer>;
+//    { prefix: string }
+      
+// 15) OmitThisParameter<T> : 関数型から this パラメータを除去
+type PrinterFn = OmitThisParameter<typeof printer>;
+//    (msg: string) => void
+      
+// 16) ThisType<T> : オブジェクトリテラル内で this の型を指定
+type Box = {
+  value: number;
+} & ThisType<{ inc(): void }>; // ヘルパーとして使う（型付け支援）`
+          },
+          {
+            type: "code",
+            filename: "utility-awaited.ts",
+            lang: "ts",
+            code: `// 17) Awaited<T> : Promise の解決値（入れ子も解く）
+type ResolvedNumber = Awaited<Promise<number>>; // number
+type Deep = Awaited<Promise<Promise<string>>>;  // string
+      
+async function getData() {
+  return "ok" as const;
+}
+type Data = Awaited<ReturnType<typeof getData>>; // "ok"`
+          },
+          {
+            type: "code",
+            filename: "utility-string-literals.ts",
+            lang: "ts",
+            code: `// 18) 文字列操作ユーティリティ
+type Brand = "sony";
+type Upper = Uppercase<Brand>;      // "SONY"
+type Lower = Lowercase<"ABC">;      // "abc"
+type Cap   = Capitalize<"hello">;   // "Hello"
+type Uncap = Uncapitalize<"World">; // "world"
+      
+// 応用：キーを大文字化した型を作る
+type Keys = "id" | "name";
+type UpperKeys = Uppercase<Keys>; // "ID" | "NAME"`
+          },
+          {
+            type: "ul",
+            items: [
+              "プロパティ構造に効く: Partial / Required / Readonly / Pick / Omit / Record",
+              "集合演算に効く: Exclude / Extract / NonNullable",
+              "関数・クラスに効く: Parameters / ReturnType / ConstructorParameters / InstanceType",
+              "this 文脈に効く: ThisParameterType / OmitThisParameter / ThisType",
+              "非同期・文字列に効く: Awaited / Uppercase / Lowercase / Capitalize / Uncapitalize"
+            ]
+          },
+          {
+            type: "p",
+            text: "実務では、API レスポンス型の部分編集（Partial + Pick）、フォームの読み取り専用ビュー（Readonly + Omit）、関数の再利用（Parameters/ReturnType）、文字列キーの正規化（Uppercase/Lowercase）などで頻用します。ユーティリティ型を組み合わせると、型安全性を保ちながら柔軟な設計が可能です。"
+          }
+        ],
+        level: "intermediate",
+        estMin: 18
+      },
+      
       
       {
         id: "arrays",
@@ -1093,6 +1261,505 @@ const b = toArray(1);   // number[]`,
         level: "basic",
         estMin: 12,
       },
+      {
+        id: "void-return",
+        title: "戻り値がない関数と void 型",
+        summary: "戻り値を返さない関数は戻り値型を `void` として表します。`undefined` との違いにも注意します。",
+        content: [
+          {
+            type: "p",
+            text: "`void` は「何も返さない」ことを表す戻り値型です。関数が明示的に `return` しない、または `return;`（値なし）で終了する場合に用います。`undefined` は「未定義の値」という実際の値であり、`void` とは区別されます。"
+          },
+          {
+            type: "code",
+            filename: "void.ts",
+            lang: "ts",
+            code: `function logMessage(msg: string): void {
+  console.log(msg); // 戻り値なし
+}
+      
+function doNothing(): void {
+  return; // 値を返さない return は OK
+}
+      
+// 注意: 「戻り値型 void の関数型」に代入される実装は値を return しても呼び出し側は無視する
+type VoidFn = () => void;
+const f: VoidFn = () => 123; // 代入は可能（返した値は使われない）
+const r = f();               // r は void 扱い`
+          },
+          {
+            type: "ul",
+            items: [
+              "`void` は「値を返さない」ことの型表現、`undefined` は実際の値",
+              "戻り値 `void` の関数は `return;` で終了できる（値は返せない）",
+              "`() => void` 型に代入される実装が値を返しても、呼び出し側では無視される"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 10
+      },
+      {
+        id: "value-vs-reference",
+        title: "値渡しと参照渡し",
+        summary: "JavaScript/TypeScript の引数はすべて値渡し。ただしオブジェクトは「参照という値」を渡すため、内部変更が呼び出し元に影響します。",
+        content: [
+          {
+            type: "p",
+            text: "JS/TS の引数は常に値渡しです。プリミティブ値（number, string など）はその値のコピーが渡され、関数内で再代入しても呼び出し元に影響しません。一方でオブジェクトは「参照（ポインタのようなもの）」という値が渡されるため、プロパティの変更は呼び出し元の同じオブジェクトに反映されます。"
+          },
+          {
+            type: "code",
+            filename: "pass.ts",
+            lang: "ts",
+            code: `function inc(n: number) {
+  n += 1; // ローカルコピーを書き換えているだけ
+}
+let a = 1;
+inc(a);
+console.log(a); // 1（元は変わらない）
+      
+function bumpAge(user: { name: string; age: number }) {
+  user.age += 1; // 同じ参照先のオブジェクトを書き換える
+}
+const u = { name: "Alice", age: 20 };
+bumpAge(u);
+console.log(u.age); // 21（呼び出し元にも反映）
+      
+function reassign(obj: { v: number }) {
+  obj = { v: 999 }; // 参照変数の再代入はローカルだけに影響
+}
+const o = { v: 1 };
+reassign(o);
+console.log(o.v); // 1（プロパティ変更していないので影響なし）
+
+function mutate(obj: { v: number }) {
+  obj.v = 999; // オブジェクト内部を書き換える
+}
+const p = { v: 1 };
+mutate(p);
+console.log(p.v); // 999（内部を書き換えたので反映される）`
+          },
+          {
+            type: "ul",
+            items: [
+              "プリミティブは値のコピー、オブジェクトは参照（へのコピー）",
+              "プロパティ変更は元オブジェクトに作用、参照変数の再代入はローカルのみ",
+              "不変データを保つなら、スプレッドで新オブジェクトを生成する"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 12
+      },
+      {
+        id: "optional-parameter",
+        title: "オプション引数（optional parameter）",
+        summary: "`?` を付けて省略可能な引数を表現します。必須引数の後ろに置くのが原則です。",
+        content: [
+          {
+            type: "p",
+            text: "引数名の後ろに `?` を付けると省略可能な引数になります。呼び出し時に渡されなければ `undefined` です。通常は必須引数の後方に配置します。"
+          },
+          {
+            type: "code",
+            filename: "optional.ts",
+            lang: "ts",
+            code: `function format(name: string, title?: string): string {
+  // title が与えられなければ undefined
+  return title ? \`\${title} \${name}\` : name;
+}
+      
+format("Alice");            // "Alice"
+format("Alice", "Dr.");     // "Dr. Alice"
+      
+// オプション引数は通常、必須引数の後に置く
+// function bad(a?: number, b: number) {} // ❌ 推奨されない順序`
+          },
+          {
+            type: "ul",
+            items: [
+              "`?` が付いた引数は省略可能で、値は `undefined` になり得る",
+              "必須引数 → オプション引数 の順に並べる",
+              "オプションとデフォルトは併用可能（`title = \"Mr.\"` など）"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 8
+      },
+      {
+        id: "default-parameter",
+        title: "デフォルト引数（default parameter）",
+        summary: "引数が `undefined` のときに既定値を用います。`null` は既定値を発動しない点に注意。",
+        content: [
+          {
+            type: "p",
+            text: "引数に `=` で既定値を指定すると、呼び出しで `undefined` が渡された場合にその値が使われます。`null` は別物で、既定値は発動しません。"
+          },
+          {
+            type: "code",
+            filename: "default.ts",
+            lang: "ts",
+            code: `function greet(name: string, prefix = "Hello") {
+  return \`\${prefix}, \${name}\`;
+}
+      
+greet("Alice");            // "Hello, Alice" （省略 → undefined → 既定値）
+greet("Alice", "Hi");      // "Hi, Alice"
+greet("Alice", undefined); // "Hello, Alice"（undefined で既定値発動）
+greet("Alice", null as any); // "null, Alice"（null は別物・既定値は使われない）`
+          },
+          {
+            type: "ul",
+            items: [
+              "既定値は引数が `undefined` のときにだけ使われる",
+              "`null` は明示的な値であり、既定値は発動しない",
+              "既定値には式も使える（関数呼び出し等は呼ぶ度に評価）"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 8
+      },
+      {
+        id: "rest-parameter",
+        title: "残余引数 / 可変長引数（rest parameter）",
+        summary: "引数の残りを配列として受け取ります。型は `T[]` またはタプル+スプレッドで表現できます。",
+        content: [
+          {
+            type: "p",
+            text: "関数の最後の位置に `...` を置くと、残りの引数を配列として受け取れます。型は `number[]` のように記述します。制約が必要ならタプル型+スプレッドも有効です。"
+          },
+          {
+            type: "code",
+            filename: "rest.ts",
+            lang: "ts",
+            code: `function sum(...nums: number[]): number {
+  return nums.reduce((acc, n) => acc + n, 0);
+}
+sum(1, 2, 3); // 6
+      
+// 制約付きの可変長（先頭はレベル、以降はメッセージ）
+function log(level: "info" | "warn" | "error", ...messages: string[]) {
+  console.log(level.toUpperCase(), ...messages);
+}
+log("info", "start", "ok");
+      
+// タプル + スプレッドで位置・型を厳密化
+type Cmd = ["open" | "close", string, ...string[]];
+function run(...cmd: Cmd) {
+  // cmd[0] は "open" | "close", cmd[1] は string, それ以降は string[]
+}
+run("open", "/tmp/file", "-r", "-f");`
+          },
+          {
+            type: "ul",
+            items: [
+              "残余引数は最後のパラメータにのみ使用できる",
+              "基本は `T[]`、厳密化したい場合はタプル+スプレッド",
+              "呼び出し側は配列をスプレッドして渡せる（`fn(...arr)`）"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 10
+      },
+      {
+        id: "keyword-parameter",
+        title: "キーワード引数（オブジェクト引数 + 分割代入）",
+        summary: "TS にはネイティブのキーワード引数はないため、オブジェクト引数を使って名前付き引数を擬似的に実現します。",
+        content: [
+          {
+            type: "p",
+            text: "TypeScript には Python のようなキーワード引数はありません。代わりに「オブジェクトを 1 つ受け取り、分割代入でプロパティを取り出す」パターンが広く使われます。これにより、引数の順序に依存しない可読性の高い呼び出しができます。"
+          },
+          {
+            type: "code",
+            filename: "keyword.ts",
+            lang: "ts",
+            code: `interface FetchOptions {
+  method?: "GET" | "POST";
+  timeout?: number;
+  headers?: Record<string, string>;
+}
+      
+function fetchWithOptions(
+  url: string,
+  { method = "GET", timeout = 3000, headers = {} }: FetchOptions = {}
+): void {
+  console.log(method, timeout, headers, url);
+}
+      
+// 名前で指定できる（順序に依存しない）
+fetchWithOptions("/users", { timeout: 5000, method: "POST" });
+// 省略も柔軟
+fetchWithOptions("/health");             // 既定値が使われる
+fetchWithOptions("/me", { headers: { Authorization: "token" } });`
+          },
+          {
+            type: "ul",
+            items: [
+              "オブジェクト 1 つを引数にし、型（interface/type）で契約を定義",
+              "分割代入 + デフォルト値で可読性と安全性を両立",
+              "引数が増える API に向く（オプションの追加も容易）"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 12
+      },
+      {
+        id: "type-guard-function",
+        title: "型ガード関数（User-Defined Type Guards）",
+        summary: "`value is Type` という述語型を戻り値に持つ関数で、ユニオン型を安全に絞り込みます。",
+        content: [
+          {
+            type: "p",
+            text: "型ガードは実行時のチェック結果に基づいて、コンパイラに「この分岐の中では値の型がこれに絞り込まれる」と教える仕組みです。`typeof`/`instanceof`/`in` といった組み込みガードのほか、`value is Type` を返すユーザー定義型ガードが使えます。"
+          },
+          {
+            type: "code",
+            filename: "type-guard.ts",
+            lang: "ts",
+            code: `type User = { kind: "user"; name: string };
+type Admin = { kind: "admin"; name: string; role: "owner" | "editor" };
+type Person = User | Admin;
+      
+// ユーザー定義の型ガード
+function isAdmin(p: Person): p is Admin {
+  return p.kind === "admin";
+}
+      
+function greet(p: Person) {
+  if (isAdmin(p)) {
+    // ここでは p は Admin に絞り込まれる
+    console.log(\`[ADMIN:\${p.role}] Welcome, \${p.name}\`);
+  } else {
+    // ここでは p は User
+    console.log(\`Hello, \${p.name}\`);
+  }
+}
+      
+// 組み込みガードの例
+function printLen(x: unknown) {
+  if (typeof x === "string") {
+    console.log(x.length); // string に絞り込み
+  } else if (Array.isArray(x)) {
+    console.log(x.length); // any[] に絞り込み
+  } else if (x && typeof x === "object" && "toString" in x) {
+    console.log(String(x)); // in ガード
+  }
+}`
+          },
+          {
+            type: "ul",
+            items: [
+              "述語型（`arg is Type`）を戻す関数でユニオン型を安全に絞り込める",
+              "`typeof`/`instanceof`/`in` などの組み込みガードも併用",
+              "API レスポンスや外部入力の検証でエラーを早期に防止"
+            ]
+          }
+        ],
+        level: "intermediate",
+        estMin: 14
+      },
+      {
+        id: "assertion-function",
+        title: "アサーション関数（Assertion Functions）",
+        summary: "条件を満たさなければ実行時にエラーを投げ、満たす場合は型を絞り込む関数です。",
+        content: [
+          {
+            type: "p",
+            text: "アサーション関数（assertion function）は、引数が特定の条件を満たすことを**実行時に確認**し、満たさない場合はエラーをスローします。満たす場合はコンパイラに対して「この条件は真」と伝えるため、以降のコードで型が絞り込まれます。"
+          },
+          {
+            type: "code",
+            filename: "assertion.ts",
+            lang: "ts",
+            code: `function assertIsString(value: unknown): asserts value is string {
+  if (typeof value !== "string") {
+    throw new Error("value is not a string");
+  }
+}
+      
+function printUpper(value: unknown) {
+  assertIsString(value); // 通過後、value は string 型に絞り込まれる
+  console.log(value.toUpperCase());
+}
+      
+printUpper("hello"); // "HELLO"
+printUpper(123);      // ❌ 実行時エラー: value is not a string`
+          },
+          {
+            type: "p",
+            text: "このようなアサーション関数は、外部入力（APIレスポンスなど）や `unknown` 型を受け取ったときの安全性を確保するために非常に有用です。"
+          },
+          {
+            type: "ul",
+            items: [
+              "戻り値型 `asserts value is Type` で型を絞り込む",
+              "条件を満たさない場合は `throw` などで停止させる必要がある",
+              "実務ではバリデーション関数と組み合わせてよく使われる"
+            ]
+          }
+        ],
+        level: "intermediate",
+        estMin: 12
+      },
+      
+      {
+        id: "iife",
+        title: "即時実行関数式（IIFE）",
+        summary: "定義と同時に実行される関数式で、スコープの分離や初期化時の一度きりの処理に使われます。",
+        content: [
+          {
+            type: "p",
+            text: "IIFE（Immediately Invoked Function Expression）は、**宣言と同時に実行される関数式**です。グローバル汚染を防ぎ、スコープを閉じた一時的な処理や初期化処理に使われます。"
+          },
+          {
+            type: "code",
+            filename: "iife.ts",
+            lang: "ts",
+            code: `// 基本形
+(function() {
+  console.log("IIFE 実行！");
+})();
+      
+// アロー関数版
+(() => {
+  const message = "初期化処理";
+  console.log(message);
+})();
+      
+// 戻り値を即時利用
+const result = (() => {
+  const x = 10;
+  const y = 20;
+  return x + y;
+})();
+console.log(result); // 30`
+          },
+          {
+            type: "p",
+            text: "IIFE は一度きりの初期化処理や、モジュールスコープを疑似的に作る場面で役立ちます。現在では ES Modules の登場で使われる頻度は減りましたが、依然としてパターンとして重要です。"
+          },
+          {
+            type: "ul",
+            items: [
+              "関数式を `()` で囲み、直後に `()` をつけて即時実行",
+              "グローバルスコープを汚染せずに局所スコープを作れる",
+              "初期化処理や一時的な値計算に便利"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 10
+      },
+      
+      {
+        id: "callback-function",
+        title: "コールバック関数（Callback Functions）",
+        summary: "関数を引数として他の関数に渡し、処理の途中で呼び戻す関数です。",
+        content: [
+          {
+            type: "p",
+            text: "コールバック関数とは、**他の関数の引数として渡され、処理の途中や終了時に呼び出される関数**です。非同期処理、イベント処理、配列操作など、さまざまな場面で広く使われます。"
+          },
+          {
+            type: "code",
+            filename: "callback.ts",
+            lang: "ts",
+            code: `// 基本的なコールバック関数
+function greet(name: string, callback: (msg: string) => void) {
+  const message = \`Hello, \${name}\`;
+  callback(message);
+}
+      
+greet("Alice", (m) => {
+  console.log(m); // "Hello, Alice"
+});
+      
+// 配列操作のコールバック
+const numbers = [1, 2, 3];
+const doubled = numbers.map((n) => n * 2);
+console.log(doubled); // [2, 4, 6]
+      
+// 非同期処理でのコールバック
+function fetchData(callback: (data: string) => void) {
+  setTimeout(() => {
+    callback("取得完了");
+  }, 1000);
+}
+fetchData((data) => console.log(data)); // 約1秒後 "取得完了"`
+          },
+          {
+            type: "p",
+            text: "TypeScript ではコールバック関数の型を明示することで、呼び出し時の引数や戻り値のミスを防ぐことができます。"
+          },
+          {
+            type: "ul",
+            items: [
+              "コールバック関数は「関数を引数として渡す」仕組み",
+              "非同期処理、イベント処理、配列操作などでよく使われる",
+              "型注釈をつけることで引数・戻り値の安全性が高まる"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 12
+      },
+      
+      {
+        id: "function-overload",
+        title: "オーバーロード関数（Function Overload）",
+        summary: "同じ関数名で複数のシグネチャを定義し、引数や戻り値の型によって使い分けます。",
+        content: [
+          {
+            type: "p",
+            text: "TypeScript では、**関数オーバーロード（overload）**を使って、同じ関数名で異なる引数パターンや戻り値型を表現できます。コンパイラは呼び出し時の引数から適切なシグネチャを選びます。"
+          },
+          {
+            type: "code",
+            filename: "overload.ts",
+            lang: "ts",
+            code: `// オーバーロード宣言（シグネチャのみ）
+function reverse(value: string): string;
+function reverse(value: number[]): number[];
+      
+// 実装（本体は1つだけ）
+function reverse(value: string | number[]): string | number[] {
+  if (typeof value === "string") {
+    return value.split("").reverse().join("");
+  } else {
+    return value.slice().reverse();
+  }
+}
+      
+const s = reverse("hello");   // string として推論
+const arr = reverse([1, 2, 3]); // number[] として推論
+      
+// ❌ 以下は型エラー（どのオーバーロードにも一致しない）
+// reverse(123);`
+          },
+          {
+            type: "p",
+            text: "オーバーロードのポイントは、**複数のシグネチャを宣言**し、**実装は1つだけ**書くことです。コンパイラは宣言されたシグネチャの中から一致するものを選んで型推論を行います。"
+          },
+          {
+            type: "ul",
+            items: [
+              "複数の関数シグネチャを宣言して、引数パターンごとに型を変えられる",
+              "本体は 1 つだけ書く（共通ロジックの中で分岐処理する）",
+              "呼び出し時の型安全性と補完精度が向上する"
+            ]
+          }
+        ],
+        level: "intermediate",
+        estMin: 14
+      },
+      
+      
     ],
   }
   
