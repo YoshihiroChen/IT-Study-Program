@@ -34,52 +34,35 @@ const CURRICULUM: Chapter[] = [
       {
         id: "ts-intro",
         title: "TypeScriptとは",
-        summary: "TS は JS の上位互換であり、静的型付けと強力なツール機能を導入します。",
+        summary: "TypeScript は JavaScript を拡張したプログラミング言語で、静的型付けや高度な開発支援機能を提供します。",
         content: [
           {
             type: "p",
-            text: "TypeScript は JavaScript に型システムと開発時のチェック機能を追加し、大規模プロジェクトの保守性を大幅に向上させます。",
+            text: "TypeScript（略して TS）は、Microsoft によって開発されたオープンソースのプログラミング言語で、JavaScript（JS）の上位互換です。つまり、既存の JavaScript コードはそのまま TypeScript として動作しつつ、さらに型システムや開発支援機能を追加して、より安全で大規模な開発を可能にします。",
           },
           {
-            type: "code",
-            filename: "hello.ts",
-            lang: "ts",
-            code: `let message: string = "Hello TypeScript";
-console.log(message);`,
+            type: "p",
+            text: "JavaScript は動的型付け言語であり、柔軟性が高い一方で、型の不一致によるバグが実行時まで発見できないという欠点があります。TypeScript はこの問題を解決し、コンパイル時に型エラーを検出することで、コードの信頼性と保守性を大きく向上させます。",
+          },
+          {
+            type: "p",
+            text: "さらに、TypeScript は豊富な型注釈や型推論、インターフェース、ジェネリクスなどの強力な機能を備えており、大規模なチーム開発や複雑なアプリケーション開発において強力な武器となります。また、tsconfig.json による柔軟なコンパイル設定や、エディタとの連携による自動補完・リファクタリング支援など、開発体験も大きく向上します。",
           },
           {
             type: "ul",
             items: [
-              "tsconfig.json からコンパイル動作を設定",
-              "ESLint / Prettier と組み合わせて一貫性と可読性を向上",
-              "エディタ内での型補完やジャンプ機能が最大のメリットの一つ",
+              "JavaScript の上位互換として既存コードをそのまま活用可能",
+              "静的型チェックにより実行前にバグを検出しやすくなる",
+              "型推論・インターフェース・ジェネリクスなど高度な言語機能を提供",
+              "エディタ補完・ジャンプ・リファクタリング支援などの開発体験が向上",
+              "大規模開発や長期運用において特に効果を発揮する",
             ],
           },
         ],
         level: "basic",
         estMin: 8,
-      },
-      {
-        id: "ts-primitive",
-        title: "基本型とリテラル型",
-        content: [
-          {
-            type: "p",
-            text: "string / number / boolean / null / undefined / symbol / bigint やリテラル型の使い方を理解します。",
-          },
-          {
-            type: "code",
-            filename: "primitive.ts",
-            lang: "ts",
-            code: `let id: number = 42;
-let mode: "light" | "dark" = "light";
-mode = "dark"; // OK
-// mode = "system"; // ❌ 型が一致しない`,
-          },
-        ],
-        level: "basic",
-        estMin: 10,
-      },
+      }
+      
     ],
   },
   {
@@ -389,38 +372,46 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
     lessons: [
       {
         id: "primitive-types",
-        title: "プリミティブ型",
-        summary: "TS で基本となる 7 種類のプリミティブ型を理解します。",
+        title: "プリミティブ型（Primitive Types）",
+        summary: "JavaScript／TypeScript における最も基本的なデータ型で、値そのものを直接表現します。",
         content: [
           {
             type: "p",
-            text: "プリミティブ型（基本型）は、TypeScript の最も基本的なデータ型です。これらは値そのものを直接保持し、オブジェクトとは異なります。",
+            text: "プリミティブ型（primitive types）は、JavaScript および TypeScript における最も基本的なデータ型です。変数が値そのものを保持し、オブジェクトのように複雑な構造を持たないのが特徴です。JavaScript のデータ型は大きく分けて「プリミティブ型」と「オブジェクト型」の2つに分類されます。",
           },
           {
-            type: "code",
-            filename: "primitive.ts",
-            lang: "ts",
-            code: `let name: string = "Alice";
-  let age: number = 25;
-  let isAdmin: boolean = true;
-  let big: bigint = 9007199254740991n;
-  let sym: symbol = Symbol("id");
-  let nothing: null = null;
-  let notDefined: undefined = undefined;`,
+            type: "p",
+            text: "プリミティブ型の重要な特徴の1つは「イミュータブル（immutable）」であることです。つまり、一度作成した値自体は変更できません。例えば、文字列 \"hello\" の一部だけを書き換えることはできず、新しい文字列を作成する必要があります。これに対して、オブジェクトは「ミュータブル（mutable）」であり、内部の値を後から変更できます。",
+          },
+          {
+            type: "p",
+            text: "もう一つの特徴は、プリミティブ型そのものは基本的にプロパティやメソッドを持たない点です。特に `null` や `undefined` はプロパティを持たず、メソッド呼び出しを行うとエラーになります。しかし、`string` や `number` は内部的に「オートボクシング（autoboxing）」という仕組みによって、一時的にオブジェクト化されることで、メソッドやプロパティを利用できます。",
+          },
+          {
+            type: "p",
+            text: "このオートボクシングのおかげで、たとえば文字列リテラルであっても `.length` プロパティを参照したり、数値であってもメソッドを呼び出すことが可能になります。これは JavaScript の特徴的な振る舞いであり、TypeScript においても同様に活用されます。",
           },
           {
             type: "ul",
             items: [
-              "string / number / boolean は最も基本的な型",
-              "bigint は大きな整数を扱うための型",
-              "symbol は一意な識別子を表す",
-              "null と undefined は「値がない」ことを明示する",
+              "boolean型（真偽値）: `true` または `false` を表す",
+              "number型（数値）: 整数や浮動小数点数などの数値を表す",
+              "string型（文字列）: テキストデータを表す",
+              "undefined型: 変数が宣言されたが値が未定義であることを表す",
+              "null型: 明示的に「値が存在しない」ことを表す",
+              "symbol型（シンボル）: 一意で不変な値を表す",
+              "bigint型（長整数）: 通常の number では扱えない大きな整数を表す",
             ],
+          },
+          {
+            type: "p",
+            text: "これら 7 種類のプリミティブ型以外は、すべてオブジェクト型に分類されます。配列、関数、正規表現などもすべてオブジェクトです。TypeScript ではこれらの基本型に型注釈を付与することで、より安全で予測可能なコードを書くことができます。",
           },
         ],
         level: "basic",
-        estMin: 10,
+        estMin: 12,
       },
+      
       {
         id: "literal-types",
         title: "リテラル型",
@@ -480,6 +471,210 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
         level: "basic",
         estMin: 8,
       },
+      {
+        id: "unknown-type",
+        title: "unknown型",
+        summary: "any より安全な「未知の値」を表す型で、型チェックを強制できます。",
+        content: [
+          {
+            type: "p",
+            text: "`unknown` は「まだ型がわからない値」を表すための型です。`any` と同様にどんな値も代入できますが、使用する際には型チェックが必要となるため、安全性が高まります。",
+          },
+          {
+            type: "code",
+            filename: "unknown.ts",
+            lang: "ts",
+            code: `let value: unknown;
+  value = 42;
+  value = "hello";
+  
+  // console.log(value.toUpperCase()); // ❌ エラー: 'unknown' 型にはこのプロパティがない
+  
+  // ✅ 使用する前に型チェックが必要
+  if (typeof value === "string") {
+    console.log(value.toUpperCase()); // OK
+  }`,
+          },
+          {
+            type: "ul",
+            items: [
+              "どんな値でも代入可能だが、使用時には型チェックが必須",
+              "`any` より安全で、型安全性を損なわない",
+              "外部データやユーザー入力など、型が不明な値に適している",
+            ],
+          },
+        ],
+        level: "intermediate",
+        estMin: 10,
+      },
+      {
+        id: "never-type",
+        title: "never型",
+        summary: "決して値を返さないことを示す特殊な型で、到達不能なコードを表現します。",
+        content: [
+          {
+            type: "p",
+            text: "`never` は「決して発生しない」ことを意味する型です。通常、例外を投げる関数や無限ループなど、値が返らない場面で使用されます。また、型が網羅されていない箇所を検出するためにも役立ちます。",
+          },
+          {
+            type: "code",
+            filename: "never.ts",
+            lang: "ts",
+            code: `function fail(message: string): never {
+    throw new Error(message);
+  }
+  
+  function loopForever(): never {
+    while (true) {}
+  }
+  
+  // 型の網羅性チェックにも利用可能
+  type Shape = "circle" | "square";
+  
+  function area(shape: Shape) {
+    switch (shape) {
+      case "circle":
+        return 3.14;
+      case "square":
+        return 4;
+      default:
+        const _exhaustiveCheck: never = shape; // ❌ 新しい値が追加されたらエラー
+        return _exhaustiveCheck;
+    }
+  }`,
+          },
+          {
+            type: "ul",
+            items: [
+              "値を「絶対に返さない」関数の戻り値型として使われる",
+              "例外や無限ループなど特殊な制御フローに対応",
+              "型の網羅性チェックにより安全性を高めることができる",
+            ],
+          },
+        ],
+        level: "intermediate",
+        estMin: 12,
+      },
+      {
+        id: "enum-type",
+        title: "列挙型（enum）",
+        summary: "列挙型を使うと、意味のある定数の集合を型として表現できます。",
+        content: [
+          {
+            type: "p",
+            text: "列挙型（enum）は、関連する定数値の集合に名前を付けて管理するための構文です。数値や文字列のリテラルを直接使うよりも、コードの可読性と保守性を高められます。",
+          },
+          {
+            type: "code",
+            filename: "enum.ts",
+            lang: "ts",
+            code: `enum Direction {
+        Up,
+        Down,
+        Left,
+        Right
+      }
+      
+      let move: Direction = Direction.Up; // ✅ OK
+      
+      // 文字列列挙型も可能
+      enum Color {
+        Red = "RED",
+        Green = "GREEN",
+        Blue = "BLUE",
+      }
+      
+      let c: Color = Color.Green;`,
+          },
+          {
+            type: "ul",
+            items: [
+              "関連する定数を論理的にまとめられる",
+              "数値・文字列いずれの列挙型も定義可能",
+              "コードの可読性・意図の明確化に役立つ",
+              "switch文などと組み合わせて安全な分岐が可能",
+            ],
+          },
+        ],
+        level: "intermediate",
+        estMin: 10,
+      },
+      {
+        id: "union-type",
+        title: "ユニオン型（Union Types）",
+        summary: "複数の型のいずれかを受け取れる柔軟な型表現です。",
+        content: [
+          {
+            type: "p",
+            text: "ユニオン型（|）は、「A または B のどちらか」というように、複数の型のいずれかを受け入れる柔軟な型を表現できます。複数の可能性を持つ引数や値を安全に扱いたい場合に有効です。",
+          },
+          {
+            type: "code",
+            filename: "union.ts",
+            lang: "ts",
+            code: `function printId(id: string | number) {
+        console.log("ID:", id);
+      }
+      
+      printId(101);      // ✅ OK
+      printId("abc123"); // ✅ OK
+      // printId(true);  // ❌ エラー: 'boolean' は許可されていない`,
+          },
+          {
+            type: "ul",
+            items: [
+              "複数の型のいずれかを表現できる柔軟な型",
+              "ユーザー入力や API レスポンスなど多様な型に対応可能",
+              "型ガード（typeof / in / instanceof）と組み合わせて安全に扱える",
+              "リテラル型との組み合わせで状態の種類を限定できる",
+            ],
+          },
+        ],
+        level: "basic",
+        estMin: 10,
+      },
+      {
+        id: "intersection-type",
+        title: "インターセクション型（Intersection Types）",
+        summary: "複数の型の性質をすべて持つ複合的な型を表現します。",
+        content: [
+          {
+            type: "p",
+            text: "インターセクション型（&）は、「A かつ B」というように、複数の型を結合してすべてのプロパティを持つ新しい型を定義できます。複数の性質をまとめて扱いたいときに便利です。",
+          },
+          {
+            type: "code",
+            filename: "intersection.ts",
+            lang: "ts",
+            code: `interface Person {
+        name: string;
+      }
+      
+      interface Contact {
+        email: string;
+      }
+      
+      type Employee = Person & Contact;
+      
+      const staff: Employee = {
+        name: "Alice",
+        email: "alice@example.com"
+      };`,
+          },
+          {
+            type: "ul",
+            items: [
+              "複数の型を組み合わせて新しい型を作成できる",
+              "すべてのプロパティを持つことが保証される",
+              "オブジェクトの役割が増える場面でよく使われる",
+              "ジェネリクスやユニオン型と組み合わせるとさらに強力",
+            ],
+          },
+        ],
+        level: "intermediate",
+        estMin: 10,
+      },
+      
       {
         id: "arrays",
         title: "配列（Array）",
@@ -578,7 +773,7 @@ function useScrollSpy(ids: string[], offset = 120) {
 /** ---------- 页面组件 ---------- */
 export default function TsBasicsPage() {
   const [query, setQuery] = useState("");
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   // 切换主题
   const toggleTheme = () => {
