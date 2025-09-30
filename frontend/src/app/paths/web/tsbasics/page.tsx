@@ -199,14 +199,14 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "superset.ts",
             lang: "ts",
             code: `// 既存の JavaScript コードもそのまま動作
-  function add(a, b) {
-    return a + b;
-  }
+function add(a, b) {
+  return a + b;
+}
   
-  // 型を追加することで安全性と補完性が向上
-  function addTyped(a: number, b: number): number {
-    return a + b;
-  }`,
+// 型を追加することで安全性と補完性が向上
+function addTyped(a: number, b: number): number {
+  return a + b;
+}`,
           },
           {
             type: "ul",
@@ -234,11 +234,11 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "generics.ts",
             lang: "ts",
             code: `function identity<T>(value: T): T {
-    return value;
-  }
+  return value;
+}
   
-  let num = identity<number>(42);  // 推論されても OK
-  let str = identity("hello");     // 型が "string" として保持される`,
+let num = identity<number>(42);  // 推論されても OK
+let str = identity("hello");     // 型が "string" として保持される`,
           },
           {
             type: "ul",
@@ -266,22 +266,22 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "class-interface.ts",
             lang: "ts",
             code: `interface Animal {
-    name: string;
-    speak(): void;
-  }
+  name: string;
+  speak(): void;
+}
   
-  class Dog implements Animal {
-    name: string;
-    constructor(name: string) {
-      this.name = name;
-    }
-    speak() {
-      console.log(this.name + " says woof!");
-    }
+class Dog implements Animal {
+  name: string;
+  constructor(name: string) {
+    this.name = name;
   }
+  speak() {
+    console.log(this.name + " says woof!");
+  }
+}
   
-  const dog = new Dog("Pochi");
-  dog.speak(); // "Pochi says woof!"`,
+const dog = new Dog("Pochi");
+dog.speak(); // "Pochi says woof!"`,
           },
           {
             type: "ul",
@@ -309,13 +309,13 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "async.ts",
             lang: "ts",
             code: `async function fetchData(url: string): Promise<string> {
-    const res = await fetch(url);
-    return await res.text();
-  }
+  const res = await fetch(url);
+  return await res.text();
+}
   
-  fetchData("https://example.com")
-    .then(data => console.log(data))
-    .catch(err => console.error(err));`,
+fetchData("https://example.com")
+  .then(data => console.log(data))
+  .catch(err => console.error(err));`,
           },
           {
             type: "ul",
@@ -344,13 +344,13 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             lang: "ts",
             code: `console.log("A");
   
-  setTimeout(() => {
-    console.log("B");
-  }, 0);
+setTimeout(() => {
+  console.log("B");
+}, 0);
   
-  console.log("C");
+console.log("C");
   
-  // 出力順: A → C → B`,
+// 出力順: A → C → B`,
           },
           {
             type: "ul",
@@ -426,8 +426,8 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "literal.ts",
             lang: "ts",
             code: `let theme: "light" | "dark" = "light";
-  theme = "dark";    // ✅ OK
-  // theme = "system"; // ❌ エラー: 型 '"system"' は '\"light\" | \"dark\"' に代入できない`,
+theme = "dark";    // ✅ OK
+// theme = "system"; // ❌ エラー: 型 '"system"' は '\"light\" | \"dark\"' に代入できない`,
           },
           {
             type: "ul",
@@ -455,9 +455,9 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "any.ts",
             lang: "ts",
             code: `let value: any = 42;
-  value = "hello";     // ✅ OK
-  value = true;        // ✅ OK
-  value.toUpperCase(); // ✅ 実行時エラーになる可能性あり`,
+value = "hello";     // ✅ OK
+value = true;        // ✅ OK
+value.toUpperCase(); // ✅ 実行時エラーになる可能性あり`,
           },
           {
             type: "ul",
@@ -485,15 +485,15 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "unknown.ts",
             lang: "ts",
             code: `let value: unknown;
-  value = 42;
-  value = "hello";
+value = 42;
+value = "hello";
   
-  // console.log(value.toUpperCase()); // ❌ エラー: 'unknown' 型にはこのプロパティがない
+// console.log(value.toUpperCase()); // ❌ エラー: 'unknown' 型にはこのプロパティがない
   
-  // ✅ 使用する前に型チェックが必要
-  if (typeof value === "string") {
-    console.log(value.toUpperCase()); // OK
-  }`,
+// ✅ 使用する前に型チェックが必要
+if (typeof value === "string") {
+  console.log(value.toUpperCase()); // OK
+}`,
           },
           {
             type: "ul",
@@ -521,27 +521,27 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "never.ts",
             lang: "ts",
             code: `function fail(message: string): never {
-    throw new Error(message);
+  throw new Error(message);
+}
+  
+function loopForever(): never {
+  while (true) {}
+}
+  
+// 型の網羅性チェックにも利用可能
+type Shape = "circle" | "square";
+  
+function area(shape: Shape) {
+  switch (shape) {
+    case "circle":
+      return 3.14;
+    case "square":
+      return 4;
+    default:
+      const _exhaustiveCheck: never = shape; // ❌ 新しい値が追加されたらエラー
+      return _exhaustiveCheck;
   }
-  
-  function loopForever(): never {
-    while (true) {}
-  }
-  
-  // 型の網羅性チェックにも利用可能
-  type Shape = "circle" | "square";
-  
-  function area(shape: Shape) {
-    switch (shape) {
-      case "circle":
-        return 3.14;
-      case "square":
-        return 4;
-      default:
-        const _exhaustiveCheck: never = shape; // ❌ 新しい値が追加されたらエラー
-        return _exhaustiveCheck;
-    }
-  }`,
+}`,
           },
           {
             type: "ul",
@@ -569,22 +569,22 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "enum.ts",
             lang: "ts",
             code: `enum Direction {
-        Up,
-        Down,
-        Left,
-        Right
-      }
+  Up,
+  Down,
+  Left,
+  Right
+}
       
-      let move: Direction = Direction.Up; // ✅ OK
+let move: Direction = Direction.Up; // ✅ OK
       
-      // 文字列列挙型も可能
-      enum Color {
-        Red = "RED",
-        Green = "GREEN",
-        Blue = "BLUE",
-      }
+// 文字列列挙型も可能
+enum Color {
+  Red = "RED",
+  Green = "GREEN",
+  Blue = "BLUE",
+}
       
-      let c: Color = Color.Green;`,
+let c: Color = Color.Green;`,
           },
           {
             type: "ul",
@@ -613,12 +613,12 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "union.ts",
             lang: "ts",
             code: `function printId(id: string | number) {
-        console.log("ID:", id);
-      }
+  console.log("ID:", id);
+}
       
-      printId(101);      // ✅ OK
-      printId("abc123"); // ✅ OK
-      // printId(true);  // ❌ エラー: 'boolean' は許可されていない`,
+printId(101);      // ✅ OK
+printId("abc123"); // ✅ OK
+// printId(true);  // ❌ エラー: 'boolean' は許可されていない`,
           },
           {
             type: "ul",
@@ -647,19 +647,19 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "intersection.ts",
             lang: "ts",
             code: `interface Person {
-        name: string;
-      }
+  name: string;
+}
       
-      interface Contact {
-        email: string;
-      }
+interface Contact {
+  email: string;
+}
       
-      type Employee = Person & Contact;
+type Employee = Person & Contact;
       
-      const staff: Employee = {
-        name: "Alice",
-        email: "alice@example.com"
-      };`,
+const staff: Employee = {
+  name: "Alice",
+  email: "alice@example.com"
+};`,
           },
           {
             type: "ul",
@@ -689,10 +689,10 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "array.ts",
             lang: "ts",
             code: `let numbers: number[] = [1, 2, 3];
-  numbers.push(4);      // ✅ OK
-  // numbers.push("5"); // ❌ エラー: 'string' は 'number' に代入できない
+numbers.push(4);      // ✅ OK
+// numbers.push("5"); // ❌ エラー: 'string' は 'number' に代入できない
   
-  let strings: Array<string> = ["a", "b", "c"];`,
+let strings: Array<string> = ["a", "b", "c"];`,
           },
           {
             type: "ul",
@@ -720,8 +720,8 @@ let p: Person = user;  // ✅ OK。構造に name: string があれば互換と�
             filename: "tuple.ts",
             lang: "ts",
             code: `let user: [string, number] = ["Alice", 25];
-  user[0] = "Bob";   // ✅ OK
-  // user[1] = "25"; // ❌ エラー: 'string' は 'number' に代入できない`,
+user[0] = "Bob";   // ✅ OK
+// user[1] = "25"; // ❌ エラー: 'string' は 'number' に代入できない`,
           },
           {
             type: "ul",
