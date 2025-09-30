@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Search, BookOpen, ChevronRight, Sun, Moon } from "lucide-react";
 import CodeBlock from "@/components/CodeBlock";
+import Link from "next/link"; // ← 在文件最上方加上这个
 
 /** ---------- 内容数据类型 ---------- */
 type PNode = { type: "p"; text: string };
@@ -1761,7 +1762,204 @@ const arr = reverse([1, 2, 3]); // number[] として推論
       
       
     ],
+  },
+  {
+    key: "oop",
+    title: "TypeScriptのオブジェクト指向",
+    lessons: [
+      {
+        id: "class",
+        title: "クラス（Class）",
+        summary: "TypeScript はクラスベースのオブジェクト指向構文をサポートし、データと処理をひとまとまりに表現できます。",
+        content: [
+          {
+            type: "p",
+            text: "クラス（class）は、オブジェクト指向プログラミング（OOP）の基本的な構成要素であり、**状態（プロパティ）と振る舞い（メソッド）** をひとまとまりにして表現します。TypeScript は ES6 のクラス構文を拡張し、アクセス修飾子や抽象クラスなどの強力な機能を提供します。"
+          },
+          {
+            type: "code",
+            filename: "class-basic.ts",
+            lang: "ts",
+            code: `class Person {
+  // プロパティ宣言（型注釈を付けられる）
+  name: string;
+  age: number;
+  
+  // コンストラクタ（インスタンス生成時に呼ばれる）
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
   }
+  
+  // メソッド（振る舞い）
+  greet(): void {
+    console.log(\`こんにちは、私は\${this.name}、\${this.age}歳です。\`);
+  }
+}
+  
+const alice = new Person("Alice", 25);
+alice.greet(); // "こんにちは、私はAlice、25歳です。"`
+          },
+          {
+            type: "p",
+            text: "TypeScript ではアクセス修飾子によってクラスメンバーの可視性を制御できます。"
+          },
+          {
+            type: "code",
+            filename: "class-access.ts",
+            lang: "ts",
+            code: `class BankAccount {
+  public owner: string;     // どこからでもアクセス可能（省略可）
+  private balance: number;  // クラス内部からのみアクセス可能
+  protected id: number;     // サブクラスからもアクセス可能
+  
+  constructor(owner: string, balance: number, id: number) {
+    this.owner = owner;
+    this.balance = balance;
+    this.id = id;
+  }
+  
+  deposit(amount: number) {
+    this.balance += amount;
+  }
+  
+  getBalance() {
+    return this.balance;
+  }
+}
+  
+const acc = new BankAccount("Alice", 1000, 1);
+acc.deposit(500);
+console.log(acc.getBalance()); // 1500
+// acc.balance; // ❌ private のため外部からアクセス不可`
+          },
+          {
+            type: "p",
+            text: "継承（extends）を使うと、既存のクラスを拡張して新しいクラスを作成できます。共通ロジックの再利用やポリモーフィズムの実現に役立ちます。"
+          },
+          {
+            type: "code",
+            filename: "class-extends.ts",
+            lang: "ts",
+            code: `class Animal {
+  constructor(public name: string) {}
+  speak() {
+    console.log(\`\${this.name} が鳴きます。\`);
+  }
+}
+  
+class Dog extends Animal {
+  bark() {
+    console.log("ワンワン！");
+  }
+}
+  
+const dog = new Dog("ポチ");
+dog.speak(); // "ポチ が鳴きます。"
+dog.bark();  // "ワンワン！"`
+          },
+          {
+            type: "ul",
+            items: [
+              "クラスはプロパティとメソッドを持つ設計図",
+              "アクセス修飾子（public / private / protected）で可視性を制御",
+              "extends による継承で共通ロジックを再利用可能",
+              "constructor でインスタンス化時の初期化を行う"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 15
+      },
+      {
+        id: "interface",
+        title: "インターフェース（Interface）",
+        summary: "オブジェクトの形や契約を表現する仕組みで、実装と分離した設計を可能にします。",
+        content: [
+          {
+            type: "p",
+            text: "インターフェース（interface）は、**オブジェクトの構造（プロパティやメソッドの形）を定義するための型**です。実装を持たず、オブジェクトやクラスが「どのような形を持つべきか」という“契約”を表します。"
+          },
+          {
+            type: "code",
+            filename: "interface-basic.ts",
+            lang: "ts",
+            code: `interface User {
+  id: number;
+  name: string;
+  email?: string; // オプショナルプロパティ
+}
+  
+function printUser(user: User) {
+  console.log(\`\${user.id}: \${user.name}\`);
+}
+  
+const alice: User = { id: 1, name: "Alice" };
+printUser(alice);`
+          },
+          {
+            type: "p",
+            text: "クラスは `implements` を使ってインターフェースの契約を実装することができます。これにより、型チェックによる安全性と、複数インターフェースの組み合わせによる柔軟な設計が可能になります。"
+          },
+          {
+            type: "code",
+            filename: "interface-implements.ts",
+            lang: "ts",
+            code: `interface Speakable {
+  speak(): void;
+}
+  
+interface Named {
+  name: string;
+}
+  
+class Person implements Speakable, Named {
+  constructor(public name: string) {}
+  speak() {
+    console.log(\`\${this.name} が話します。\`);
+  }
+}
+  
+const p = new Person("田中");
+p.speak(); // "田中 が話します。"`
+          },
+          {
+            type: "p",
+            text: "インターフェースは**拡張（extends）**して複数の契約をまとめることもできます。"
+          },
+          {
+            type: "code",
+            filename: "interface-extends.ts",
+            lang: "ts",
+            code: `interface HasId {
+  id: number;
+}
+interface HasTimestamp {
+  createdAt: Date;
+}
+interface Entity extends HasId, HasTimestamp {}
+  
+const post: Entity = {
+  id: 1,
+  createdAt: new Date(),
+};`
+          },
+          {
+            type: "ul",
+            items: [
+              "インターフェースはオブジェクトやクラスの「形」を定義する",
+              "`implements` でクラスが契約を実装可能",
+              "`extends` で複数インターフェースをまとめられる",
+              "オプショナルプロパティ・読み取り専用プロパティなどの修飾も可能"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 15
+      }
+    ]
+  }
+  
   
   
 ];
@@ -1842,8 +2040,23 @@ export default function TsBasicsPage() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-          <BookOpen className="w-5 h-5 opacity-80" />
-          <h1 className="text-lg font-semibold tracking-wide">プログラミング言語学習：TypeScript</h1>
+          {/* ✅ 新增：返回首页按钮 */}
+          <Link
+            href="/"
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-sm transition ${
+              theme === "dark"
+                ? "border-white/20 hover:bg-white/10 text-white"
+                : "border-neutral-300 hover:bg-neutral-100 text-neutral-800"
+            }`}
+          >
+            <ChevronRight className="w-4 h-4 -rotate-180" />
+            <span>首页</span>
+          </Link>
+
+          <BookOpen className="w-5 h-5 opacity-80 ml-2" />
+          <h1 className="text-lg font-semibold tracking-wide">
+            プログラミング言語学習：TypeScript
+          </h1>
 
           <button
             onClick={toggleTheme}
