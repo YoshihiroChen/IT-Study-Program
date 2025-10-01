@@ -4,6 +4,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Search, BookOpen, ChevronRight, Sun, Moon } from "lucide-react";
 import CodeBlock from "@/components/CodeBlock";
 import Link from "next/link"; // ← 在文件最上方加上这个
+import Image from "next/image";
+
 
 /** ---------- 内容数据类型 ---------- */
 type PNode = { type: "p"; text: string };
@@ -241,6 +243,14 @@ const CURRICULUM: Chapter[] = [
           },
         ],
       },
+      
+      
+    ],
+  },
+  {
+    key: "system-diagram",
+    title: "Webシステム構成と職種の関係図",
+    lessons: [
       {
         id: "system-diagram",
         title: "Webシステム構成と職種の関係図",
@@ -263,12 +273,165 @@ const CURRICULUM: Chapter[] = [
             text: "この図からわかるように、フロントエンドエンジニアは主にUI層を担当し、バックエンドエンジニアはAPIやビジネスロジックを設計・実装します。AIエンジニア、データサイエンティスト、アルゴリズムエンジニアはアプリ層だけでなく、データ基盤やMLOpsといったインフラ層にも深く関与します。インフラエンジニアは全体の基盤を支え、セキュリティエンジニアは全レイヤーにわたってシステムの安全性を確保します。フルスタックエンジニアは全ての領域を横断的に理解し、連携を促進する役割を担います。"
           }
         ],
-        estMin: 15
+      },
+    ],
+  },
+  {
+    key: "about-guidance",
+    title: "本ガイダンスについて",
+    lessons: [
+      {
+        id: "about-this-guidance",
+        title: "対象と範囲",
+        summary: "本ガイダンスはWebアプリケーション開発に特化した学習ルートを示し、以降の内容はフロントエンド／バックエンドエンジニアを主な対象とします。",
+        content: [
+          {
+            type: "p",
+            text: "このガイダンスは、日本のWeb系IT業界を背景に、Webアプリケーション開発に進むための学習ルートを整理したものです。対象は主にフロントエンドエンジニアとバックエンドエンジニアを志向する学習者であり、以降の各章・各レッスンもこの前提で構成されています。"
+          },
+          {
+            type: "ul",
+            items: [
+              "対象領域: ブラウザ／UI・API／ビジネスロジック・データベース・クラウド基盤に関わるWebアプリ開発",
+              "想定職種: Webフロントエンドエンジニア、Webバックエンドエンジニア、ソフトエンジニア（Web）",
+              "学習のねらい: Web開発の基礎技術、Webエンジニアとしての自走力（勉強内容と勉強手法の掌握）",
+              "注意点: モバイルネイティブ開発、組込み、データ分析専業、インフラ専業などは本ガイダンスの中心対象ではありません（関連章があっても、Web開発者の観点からの解説が主になります）"
+            ]
+          },
+          {
+            type: "p",
+            text: "用語や技術は継続的に更新されますが、本ガイダンスでは“Web アプリ開発者として現場で迷わない”ことを最優先し、学習順序と到達目標を明確に提示します。以降の章でも Web 開発者向けの観点で内容を統一しますので、他領域の学習と混同しないように進めてください。"
+          }
+        ],
+      },
+    ],
+  },
+  {
+    key: "selection-flow",
+    title: "Webエンジニア選考フロー",
+    lessons: [
+      {
+        id: "web-engineer-selection-flow",
+        title: "Webエンジニア選考フロー",
+        summary: "エントリーシート→ウェブテスト（コーディングテスト）→個人面接（複数回）→内々定の順で進む典型的な選考プロセスを図で示します。",
+        content: [
+          {
+            type: "img",
+            src: "/images/web-engineer-selection-flow.png",
+            alt: "Webエンジニア選考フロー（横長・モノクロ・同一行）",
+            caption: "エントリーシート → ウェブテスト（コーディングテスト） → 個人面接（複数回） → 内々定",
+            width: 1920,
+            height: 640
+          }
+        ],
+      },
+      {
+        id: "entry-sheet",
+        title: "エントリーシート",
+        summary: "応募時に提出するエントリーシート（ES）に記載すべき主な項目と、Webエンジニア職向けの書き方ポイントを整理します。",
+        content: [
+          {
+            type: "p",
+            text: "エントリーシートは、選考初期で応募者の基礎情報と適性を素早く把握するための書類です。Webエンジニア職では、一般的な学歴・基本情報に加え、開発経験や技術スタック、ポートフォリオの提示が重視されます。"
+          },
+          {
+            type: "ul",
+            items: [
+              "基本情報：氏名（フリガナ）／生年月日／国籍・在留資格（必要な場合）／連絡先（メール・電話）／住所",
+              "学歴：学部・学科（本科院校）／研究科・専攻（修士院校）／在籍期間／卒業（予定）年月",
+              "専攻・出身分野：研究テーマ・扱った技術領域・関連する開発経験",
+              "学チカ（学生時代に力を入れたこと）：課題／取り組み／成果／学び（後述のSTAR法で整理）",
+              "資格・認定：基本情報技術者・応用情報・LPIC／AWS・GCP・Azure 認定 等（あれば）",
+              "語学力：TOEIC／TOEFL／IELTS／英検／JLPT 等（スコア・級・取得年月）",
+              "志望動機・自己PR：なぜWeb開発か／自分の強み・価値観／将来像",
+              "希望職種と開発経験（重要）：フロントエンド／バックエンド／フルスタックなどの志向、使用言語・FW・ツール（例：TypeScript／React／Next.js／Node.js／Python 等）、担当範囲、役割、チーム規模、開発プロセス、テスト・レビュー経験",
+              "作品・実績：GitHub／ポートフォリオURL／技術記事・登壇資料（公開可能なもの）",
+              "その他：インターン・アルバイトの実務経験／勤務開始可能時期／就労可否（ビザ）／勤務地・働き方の希望",
+              "企業独自の設問例：開発年数／得意領域（例：API設計・DB・フロント性能最適化）／使用可能クラウド／チーム開発経験／障害対応経験／セキュリティの配慮 等"
+            ]
+          },
+          {
+            type: "img",
+            src: "/images/web-engineer-entry-sheet.png",
+            alt: "Webエンジニア選考フロー（エントリーシート→ウェブテスト→個人面接（複数回）→内々定）",
+            caption: "Webエンジニア採用のエントリーシートの一例",
+            width: 1600,
+            height: 600
+          },
+          
+        ],
+      },
+      {
+        id: "web-coding-test",
+        title: "ウェブテスト（コーディングテスト）",
+        summary: "多くのWeb系IT企業ではコーディング中心のウェブテストを実施します。典型的にはアルゴリズム問題／機能実装型の課題が多く、ごく一部は数学寄りの問題を出題します。",
+        content: [
+          {
+            type: "p",
+            text: "Web系の選考では、一次～二次の早い段階でオンラインのコーディングテストが行われることが一般的です。出題形式は大きく3つ：①アルゴリズム・データ構造、②与えられたシナリオに基づく機能追加・実装、③少数ながら数学系（確率・組合せ・数列など）です。"
+          },
+          {
+            type: "ul",
+            items: [
+              "想定言語：JavaScript/TypeScript、Python が主流（企業指定がある場合あり）",
+              "制限：時間制限・メモリ制限・入出力仕様に厳密に従う（サンプル通過だけでなく隅ケースに注意）",
+              "評価観点：正確性・計算量（時間/空間）・可読性・テスト容易性・境界条件の扱い"
+            ]
+          },
+          {
+            type: "img",
+            src: "/images/web-engineer-coding-test.png",
+            alt: "ウェブテスト（コーディングテスト）の受験画面イメージ",
+            caption: "オンラインで実施されるコーディングテストの例（問題文・エディタ・入出力パネルなど）",
+            width: 1600,
+            height: 900
+          },
+        ],
+    
+      },
+      {
+        id: "multiple-interviews",
+        title: "個人面接複数回",
+        summary: "個人面接ではESに基づく質問と行動評価が行われ、志望動機・自己PRに加えて、開発/インターン等のプロジェクト経験が鍵。技術面を含む多方面から現時点のIT知識・経験が確認される。",
+        content: [
+          {
+            type: "p",
+            text: "個人面接では、面接官はエントリーシート（entry）の内容を起点に質問し、あなたの行動を評価します。最も一般的な志望動機や自己PRに加えて、この期間はプロジェクト経験（開発経験またはインターン経験）が重要な役割を果たします。面接官は技術などの観点からも質問し、これまでのIT知識およびIT経験を全方位で確認します。"
+          },
+          {
+            type: "ul",
+            items: [
+              "なぜこの職種を志望しますか？",
+              "なぜこの会社を志望しますか？",
+              "どのような開発経験がありますか？",
+              "なぜそのプロジェクトに取り組みましたか？",
+              "なぜその技術スタックを採用しましたか？",
+              "（プログラミング基礎知識に関する質問）",
+              "（開発フレームワークの基礎知識に関する質問）",
+              "ご自身のキャリアパスについてどう考えていますか？"
+            ]
+          }
+        ],
+        estMin: 5
+      },
+      {
+        id: "naitei",
+        title: "内々定",
+        summary: "ES・ウェブテスト・複数回の個人面接を経て、最終的に内々定に到達します。",
+        content: [
+        ],
       }
+      
+
+      
+      
+      
       
       
     ]
   }
+  
+  
   
   
   
@@ -486,8 +649,11 @@ export default function TsBasicsPage() {
 
                     <div className="prose max-w-none space-y-4">
                       {l.content.map((node, idx) => {
-                        if (node.type === "p") return <p key={idx}>{node.text}</p>;
-                        if (node.type === "ul")
+                        if (node.type === "p") {
+                          return <p key={idx}>{node.text}</p>;
+                        }
+
+                        if (node.type === "ul") {
                           return (
                             <ul key={idx} className="list-disc pl-5 space-y-1">
                               {node.items.map((it, i) => (
@@ -495,7 +661,9 @@ export default function TsBasicsPage() {
                               ))}
                             </ul>
                           );
-                        if (node.type === "code")
+                        }
+
+                        if (node.type === "code") {
                           return (
                             <CodeBlock
                               key={idx}
@@ -505,9 +673,35 @@ export default function TsBasicsPage() {
                               appearance={theme}  // 跟随主题
                             />
                           );
+                        }
+
+                        // ✅ 新增：图片节点渲染（用 next/image）
+                        if (node.type === "img") {
+                          const width = node.width ?? 1200;
+                          const height = node.height ?? 800;
+                          return (
+                            <figure key={idx} className="my-6">
+                              <Image
+                                src={node.src}
+                                alt={node.alt}
+                                width={width}
+                                height={height}
+                                className="rounded-md border border-neutral-200"
+                                priority={false}
+                              />
+                              {node.caption && (
+                                <figcaption className="mt-2 text-sm text-neutral-600">
+                                  {node.caption}
+                                </figcaption>
+                              )}
+                            </figure>
+                          );
+                        }
+
                         return null;
                       })}
                     </div>
+
                   </section>
                 ))}
               </div>
