@@ -224,35 +224,142 @@ function addTyped(a: number, b: number): number {
       {
         id: "generics",
         title: "ジェネリクス（Generics）",
-        summary: "ジェネリクスを使うと、型安全性を保ちながら再利用性の高いコードを書けます。",
+        summary: "ジェネリクスを使うと、型安全性と汎用性を両立したコードを書けるようになります。",
         content: [
           {
             type: "p",
-            text: "ジェネリクス（Generics）は、関数・クラス・インターフェースを型に依存しない形で設計しつつ、使用時には具体的な型情報を保持できる強力な仕組みです。型安全性と柔軟性の両立が可能です。",
+            text: "ジェネリクス（Generics）は、関数・クラス・インターフェースなどを特定の型に縛られずに設計しつつ、実際に使うときには具体的な型情報を保持できる仕組みです。これにより、型安全性と再利用性という一見相反する要素を同時に満たせるようになります。",
+          },
+      
+          {
+            type: "p",
+            text: "なぜジェネリクスが必要なのか？",
+          },
+          {
+            type: "p",
+            text: "例えば、2つの文字列のどちらかをランダムに返す関数を考えてみましょう。次のように書けます。",
+          },
+          {
+            type: "code",
+            filename: "randomString.ts",
+            lang: "ts",
+            code: `function chooseRandomlyString(v1: string, v2: string): string {
+  return Math.random() < 0.5 ? v1 : v2;
+}
+      
+const result = chooseRandomlyString("勝ち", "負け");`,
+          },
+          {
+            type: "p",
+            text: "この関数は文字列には便利ですが、「数値」や「URLオブジェクト」にも同じロジックを使いたくなったらどうでしょうか？ そのたびに関数を作り直す必要が出てきます。",
+          },
+          {
+            type: "code",
+            filename: "duplicated.ts",
+            lang: "ts",
+            code: `function chooseRandomlyNumber(v1: number, v2: number): number {
+  return Math.random() < 0.5 ? v1 : v2;
+}
+      
+function chooseRandomlyURL(v1: URL, v2: URL): URL {
+  return Math.random() < 0.5 ? v1 : v2;
+}`,
+          },
+          {
+            type: "p",
+            text: "ロジックは同じなのに、型が違うだけで関数が増えてしまいました。これでは保守性も再利用性も低下してしまいます。",
+          },
+      
+          {
+            type: "p",
+            text: "any では解決できない理由",
+          },
+          {
+            type: "p",
+            text: "では、共通化のために型を any にしてしまえばどうでしょうか？ これなら1つの関数でどんな型にも対応できますが、代わりに型チェックが効かなくなり、実行時エラーを招きやすくなります。",
+          },
+          {
+            type: "code",
+            filename: "any.ts",
+            lang: "ts",
+            code: `function chooseRandomly(v1: any, v2: any): any {
+  return Math.random() < 0.5 ? v1 : v2;
+}
+      
+let str = chooseRandomly(0, 1);
+str.toLowerCase(); // 実行時に TypeError`,
+          },
+          {
+            type: "p",
+            text: "コンパイラは any に対して何もチェックしないため、「数値を文字列として扱っている」というバグを見逃してしまいます。",
+          },
+      
+          {
+            type: "p",
+            text: "型も「引数」にできるという発想",
+          },
+          {
+            type: "p",
+            text: "ここで登場するのがジェネリクスの考え方です。ロジックは同じで「型だけが違う」のであれば、その“型”を引数のように外から渡せるようにすればよいのです。つまり、「値」だけでなく「型」もパラメータ化するという発想です。",
           },
           {
             type: "code",
             filename: "generics.ts",
             lang: "ts",
-            code: `function identity<T>(value: T): T {
-  return value;
+            code: `function chooseRandomly<T>(v1: T, v2: T): T {
+  return Math.random() < 0.5 ? v1 : v2;
 }
-  
-let num = identity<number>(42);  // 推論されても OK
-let str = identity("hello");     // 型が "string" として保持される`,
+      
+chooseRandomly<string>("勝ち", "負け");
+chooseRandomly<number>(1, 2);
+chooseRandomly<URL>(urlA, urlB);`,
+          },
+          {
+            type: "p",
+            text: "ここで <T> は「型パラメータ」を表しています。関数の引数や戻り値に書かれた T は呼び出し時に指定した型（string、number、URLなど）に置き換えられます。慣習として T（Type の略）を使いますが、U や TypeName など自由な名前を付けられます。",
+          },
+      
+          {
+            type: "p",
+            text: "型安全性が復活する",
+          },
+          {
+            type: "p",
+            text: "ジェネリクスを導入すると、コンパイル時に型チェックが行われるようになります。先ほど any を使って見逃されたバグも、事前に検出可能になります。",
+          },
+          {
+            type: "code",
+            filename: "safe.ts",
+            lang: "ts",
+            code: `function chooseRandomly<T>(v1: T, v2: T): T {
+  return Math.random() < 0.5 ? v1 : v2;
+}
+      
+// ❌ コンパイルエラー: number は string と互換性がない
+let str = chooseRandomly<string>(0, 1);`,
+          },
+          {
+            type: "p",
+            text: "このように、型パラメータを導入することで、コードを共通化しつつ、型の安全性まで確保できるようになります。",
+          },
+      
+          {
+            type: "p",
+            text: "まとめ",
           },
           {
             type: "ul",
             items: [
-              "型の再利用と抽象化を両立できる",
-              "ライブラリやユーティリティ関数で広く活用される",
-              "型推論と組み合わせることで柔軟な設計が可能",
+              "ジェネリクスは「型も引数として受け取る」という仕組み",
+              "ロジックを共通化しながら型の安全性も保てる",
+              "ライブラリやユーティリティ関数の設計に欠かせない概念",
             ],
           },
         ],
         level: "intermediate",
-        estMin: 12,
+        estMin: 20
       },
+      
       {
         id: "class-interface",
         title: "クラスとインターフェース",
@@ -2249,7 +2356,7 @@ export default function TsBasicsPage() {
             }`}
           >
             <ChevronRight className="w-4 h-4 -rotate-180" />
-            <span>首页</span>
+            <span>トップページ</span>
           </Link>
 
           <BookOpen className="w-5 h-5 opacity-80 ml-2" />
