@@ -1958,7 +1958,206 @@ const post: Entity = {
         estMin: 15
       }
     ]
+  },
+  {
+    key: "async",
+    title: "TypeScriptの非同期処理",
+    lessons: [
+      {
+        id: "promise",
+        title: "Promise<T>",
+        summary: "非同期処理の結果を表すオブジェクトで、将来解決される値を扱います。",
+        content: [
+          {
+            type: "p",
+            text: "`Promise<T>` は、**非同期処理の最終的な成功（resolve）または失敗（reject）** を表すオブジェクトです。`T` は将来返ってくる値の型であり、TypeScript によって安全に扱うことができます。"
+          },
+          {
+            type: "code",
+            filename: "promise-basic.ts",
+            lang: "ts",
+            code: `// 基本的な Promise の生成
+function fetchData(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const success = true;
+      if (success) {
+        resolve("データ取得成功");
+      } else {
+        reject("エラーが発生しました");
+      }
+    }, 1000);
+  });
+}
+  
+// Promise の利用
+fetchData()
+  .then((data) => {
+    console.log(data); // "データ取得成功"
+  })
+  .catch((err) => {
+    console.error(err); // "エラーが発生しました"
+  })
+  .finally(() => {
+    console.log("通信終了");
+  });`
+          },
+          {
+            type: "p",
+            text: "Promise は「非同期処理の状態」を持ちます：`pending`（待機中）、`fulfilled`（成功）、`rejected`（失敗）の3段階です。`then` / `catch` / `finally` はそれぞれ成功・失敗・完了後に呼ばれるコールバックを登録します。"
+          },
+          {
+            type: "ul",
+            items: [
+              "`Promise<T>` は「将来返ってくる T 型の値」を表す",
+              "3 つの状態：pending → fulfilled または rejected",
+              "`then` で成功時、`catch` で失敗時、`finally` で完了時処理を書く"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 12
+      },
+      {
+        id: "async",
+        title: "async 関数",
+        summary: "`async` を付けた関数は常に Promise を返し、中で `await` を使えるようになります。",
+        content: [
+          {
+            type: "p",
+            text: "`async` は関数を「非同期関数」にするキーワードで、戻り値が自動的に `Promise` になります。関数内では `await` を使って非同期処理の完了を待つことができ、同期的な記述で読みやすいコードが書けます。"
+          },
+          {
+            type: "code",
+            filename: "async-basic.ts",
+            lang: "ts",
+            code: `// async 関数の基本
+async function fetchUser(): Promise<string> {
+  return "ユーザー情報";
+}
+  
+fetchUser().then((data) => console.log(data)); // "ユーザー情報"
+  
+// async 関数は常に Promise を返す
+async function getNumber(): Promise<number> {
+  return 42;
+}
+  
+const result = await getNumber(); // Promise<number> → number`
+          },
+          {
+            type: "p",
+            text: "`async` 関数は内部で例外が発生した場合、自動的に `reject` 状態の Promise を返します。したがって、呼び出し側では `.catch()` または `try...catch` で安全にハンドリングできます。"
+          },
+          {
+            type: "code",
+            filename: "async-error.ts",
+            lang: "ts",
+            code: `async function mightFail() {
+  throw new Error("失敗しました");
+}
+  
+mightFail()
+  .then(() => console.log("成功"))
+  .catch((e) => console.error(e.message)); // "失敗しました"`
+  
+          },
+          {
+            type: "ul",
+            items: [
+              "`async` を付けると関数の戻り値が自動的に Promise になる",
+              "戻り値は `Promise<T>` として型推論される",
+              "throw は reject と等価で、`.catch()` や `try...catch` で捕捉できる"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 10
+      },
+      {
+        id: "await",
+        title: "await 式",
+        summary: "`await` は Promise の完了を待ち、その結果を同期的なコードのように扱える構文です。",
+        content: [
+          {
+            type: "p",
+            text: "`await` は `async` 関数の中でのみ使える構文で、**Promise の解決（fulfilled）を待ってから次の行へ進む** という動作をします。これにより、コールバック地獄（callback hell）を避け、読みやすい非同期コードが書けます。"
+          },
+          {
+            type: "code",
+            filename: "await-basic.ts",
+            lang: "ts",
+            code: `function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+  
+async function run() {
+  console.log("開始");
+  await delay(1000); // 1秒待つ（Promise が解決されるまで待機）
+  console.log("1秒経過");
+}
+  
+run();`
+          },
+          {
+            type: "p",
+            text: "`await` は Promise の結果をそのまま返すため、変数に代入して使うことができます。また、`try...catch` と組み合わせることで非同期処理中の例外も安全に処理できます。"
+          },
+          {
+            type: "code",
+            filename: "await-trycatch.ts",
+            lang: "ts",
+            code: `async function fetchData(): Promise<string> {
+  throw new Error("ネットワークエラー");
+}
+  
+async function main() {
+  try {
+    const data = await fetchData(); // ❌ reject されたらここで例外
+    console.log(data);
+  } catch (e) {
+    console.error("エラー:", (e as Error).message);
+  } finally {
+    console.log("完了");
   }
+}
+  
+main();`
+          },
+          {
+            type: "p",
+            text: "複数の Promise を同時に実行したい場合は `Promise.all` や `Promise.allSettled` などと組み合わせて使います。`await` は逐次実行になるため、並列性が必要な場合は注意しましょう。"
+          },
+          {
+            type: "code",
+            filename: "await-promise-all.ts",
+            lang: "ts",
+            code: `async function getA() { return "A"; }
+async function getB() { return "B"; }
+  
+async function runAll() {
+  const [a, b] = await Promise.all([getA(), getB()]);
+  console.log(a, b); // "A", "B"
+}
+  
+runAll();`
+          },
+          {
+            type: "ul",
+            items: [
+              "`await` は Promise の結果を待ってから処理を進める",
+              "`try...catch` と組み合わせると非同期エラーも安全に処理可能",
+              "`Promise.all` と組み合わせると複数の非同期処理を並列実行できる",
+              "`await` は `async` 関数内でのみ使用可能"
+            ]
+          }
+        ],
+        level: "basic",
+        estMin: 14
+      }
+    ]
+  }
+  
   
   
   
