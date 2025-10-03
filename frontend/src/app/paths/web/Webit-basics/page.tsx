@@ -420,7 +420,7 @@ const CURRICULUM: Chapter[] = [
         summary: "ES・ウェブテスト・複数回の個人面接を経て、最終的に内々定に到達します。",
         content: [
         ],
-      }
+      },
       
 
       
@@ -428,8 +428,51 @@ const CURRICULUM: Chapter[] = [
       
       
       
+    ],
+  },
+  {
+    key: "jp-web-tech-stack",
+    title: "日本Web系IT業界の技術スタック",
+    lessons: [
+      {
+        id: "overview-tech-stack",
+        title: "技術スタックの概観",
+        summary: "大手は分離式（フロントエンド/バックエンド分離）が主流で、TypeScript＋Python/Java の組み合わせが多い。中小は分離式とモノリシック（例：Ruby on Rails）が併存。",
+        content: [
+          {
+            type: "p",
+            text: "現在の日本のWeb系IT企業では、フロントエンドとバックエンドを分離する「分離式アーキテクチャ」が主流です。大手企業ではフロントエンドにTypeScript（例：React/Next.js）、バックエンドにPython（Django/FastAPI）やJava（Spring）を採用する構成が一般的です。"
+          },
+          {
+            type: "p",
+            text: "一方で、中小企業やスタートアップでは選択がより多様で、分離式を採るケースもあれば、従来の一体型（モノリシック）フレームワーク、たとえば Ruby on Rails を中心に素早く開発を回すケースも見られます。"
+          },
+          {
+            type: "ul",
+            items: [
+              "大手：TypeScript（React/Next.js 等）＋ Python（Django/FastAPI）または Java（Spring）でAPIを提供する分離式が中心",
+              "中小・スタートアップ：分離式とモノリシックが併存（例：Ruby on Rails／場合によっては Laravel なども）",
+              "分離式の利点：スケール・チーム分業・技術選択の柔軟性／モノリシックの利点：初期開発速度・一体的な運用のしやすさ"
+            ]
+          }
+        ],
+      },
+      {
+        id: "learning-route",
+        title: "本ガイダンスの学習ルートについて",
+        summary: "本ガイダンスは前節で述べた日本のWeb系技術スタック（分離式：TypeScript＋Python/Java）を前提に設計され、言語と関連フレームワーク学習から最終のプロジェクト実践まで一貫して扱います。",
+        content: [
+          {
+            type: "p",
+            text: "本学習サイトのWeb系IT業界向けルートは、上記の技術スタックの現状を前提にプランニングしています。具体的には、TypeScript・Python・Javaといった主要言語および関連する開発フレームワーク（例：React/Next.js、Django/FastAPI、Spring など）を段階的に学び、後期のプロジェクト実践もこのスタックを軸に進めます。"
+          }
+        ],
+        estMin: 4
+      }
+      
     ]
   }
+  
   
   
   
