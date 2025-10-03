@@ -93,6 +93,24 @@ const tracks: Track[] = [
         row: 0.9,
         chain: false,
       },
+      {
+        id: "web-3c",
+        label: "Pythonコーディング環境：Jupyternotebook",
+        href: "/paths/web/py-jupyternotebook",
+        summary: "オフラインの資格試験",
+        col: 2,
+        row: -2,
+        chain: false,
+      },
+      {
+        id: "web-3d",
+        label: "Pythonコーディング問題演習",
+        href: "/paths/web/py-coding-problems",
+        summary: "jupyternotebookによりパイソン問題を解く",
+        col: 1,
+        row: -2,
+        chain: false,
+      },
     ],
   },
   {
@@ -125,7 +143,9 @@ const tracks: Track[] = [
 /** 额外连线（跨泳道 / 竖直分支等） */
 type Side =
   | "left" | "right" | "top" | "bottom"
-  | "top-in" | "top-out" | "bottom-in" | "bottom-out";
+  | "top-in" | "top-out" | "bottom-in" | "bottom-out"
+  | "left-out" | "right-in";
+
 
 type ExtraEdge = {
   source: string;
@@ -142,6 +162,16 @@ const extraEdges: ExtraEdge[] = [
   // { source: "web-2a", target: "web-3", sourceHandle: "right", targetHandle: "left", type: "smoothstep" },
   { source: "web-3", target: "web-3a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-3", target: "web-3b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "web-3b", target: "web-3c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  {
+    source: "web-3c",
+    target: "web-3d",
+    sourceHandle: "left-out",
+    targetHandle: "right-in",
+    type: "straight",
+    animated: true,
+  }
+  
 
 ];
 
@@ -186,6 +216,9 @@ function StepNode({ data }: RFNodeProps<{ label: string; summary?: string; href?
       <Handle type="target" position={Position.Top} id="top-in" />
       <Handle type="source" position={Position.Bottom} id="bottom-out" />
       <Handle type="target" position={Position.Bottom} id="bottom-in" />
+      {/* 左右双向（新增） */}
+      <Handle type="source" position={Position.Left}  id="left-out"  />
+      <Handle type="target" position={Position.Right} id="right-in"  />
 
     </div>
   );
