@@ -62,17 +62,35 @@ const tracks: Track[] = [
         href: "/paths/web/tsbasics",
         summary: "特徴、文、値、変数、関数、非同期処理、モジュール",
       },
-      { id: "web-3", label: "プログラミング言語学習（Python）", href: "/paths/web/api-auth", summary: "文、データ構造、クラス" },
+      { id: "web-3", label: "プログラミング言語学習（Python）", href: "/paths/web/py-basics", summary: "文、データ構造、クラス" },
       { id: "web-4", label: "開発ツールと流れの紹介", href: "/paths/web/deploy", summary: "アジャイル開発、Vs Code" },
       { id: "web-5", label: "開発フレームワークの紹介", href: "/paths/web/deploy", summary: "Next.js、React、FastApi" },
       // 分支补讲：与 web-2 同列，位于上一行，不参与默认横向连线
       {
         id: "web-2a",
-        label: "面接準備：Typescriptの問題集",
+        label: "模擬面接：Typescript",
         href: "/paths/web/ts-problems",
-        summary: "特徴、文、値、変数、関数、非同期処理、モジュール",
+        summary: "専門的な技術面接でTSの学習結果を確認",
         col: 1,
         row: -1,
+        chain: false,
+      },
+      {
+        id: "web-3a",
+        label: "模擬面接：Python",
+        href: "/paths/web/py-problems",
+        summary: "専門的な技術面接でPyの学習結果を確認",
+        col: 2,
+        row: -1,
+        chain: false,
+      },
+      {
+        id: "web-3b",
+        label: "資格取得：python3 エンジニア認定基礎試験",
+        href: "/paths/web/py-certificates",
+        summary: "オフラインの資格試験",
+        col: 2,
+        row: 0.9,
         chain: false,
       },
     ],
@@ -105,7 +123,10 @@ const tracks: Track[] = [
 ];
 
 /** 额外连线（跨泳道 / 竖直分支等） */
-type Side = "left" | "right" | "top" | "bottom";
+type Side =
+  | "left" | "right" | "top" | "bottom"
+  | "top-in" | "top-out" | "bottom-in" | "bottom-out";
+
 type ExtraEdge = {
   source: string;
   target: string;
@@ -119,6 +140,9 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-2", target: "web-2a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   // （可选）补讲后再接回主线：
   // { source: "web-2a", target: "web-3", sourceHandle: "right", targetHandle: "left", type: "smoothstep" },
+  { source: "web-3", target: "web-3a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  { source: "web-3", target: "web-3b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+
 ];
 
 /** ---------- Layout constants ---------- */
@@ -157,6 +181,12 @@ function StepNode({ data }: RFNodeProps<{ label: string; summary?: string; href?
       {/* 竖直分支上下 */}
       <Handle type="source" position={Position.Top} id="top" />
       <Handle type="target" position={Position.Bottom} id="bottom" />
+      {/* 竖直分支（双向） */}
+      <Handle type="source" position={Position.Top} id="top-out" />
+      <Handle type="target" position={Position.Top} id="top-in" />
+      <Handle type="source" position={Position.Bottom} id="bottom-out" />
+      <Handle type="target" position={Position.Bottom} id="bottom-in" />
+
     </div>
   );
 }

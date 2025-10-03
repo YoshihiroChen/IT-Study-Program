@@ -412,7 +412,6 @@ const CURRICULUM: Chapter[] = [
             ]
           }
         ],
-        estMin: 5
       },
       {
         id: "naitei",
@@ -467,7 +466,6 @@ const CURRICULUM: Chapter[] = [
             text: "本学習サイトのWeb系IT業界向けルートは、上記の技術スタックの現状を前提にプランニングしています。具体的には、TypeScript・Python・Javaといった主要言語および関連する開発フレームワーク（例：React/Next.js、Django/FastAPI、Spring など）を段階的に学び、後期のプロジェクト実践もこのスタックを軸に進めます。"
           }
         ],
-        estMin: 4
       }
       
     ]
