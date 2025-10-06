@@ -1030,7 +1030,375 @@ print(add(3, 5))`
         "estMin": 4
       }
     ]
+  },
+  {
+    "key": "python-modules",
+    "title": "Pythonのモジュール",
+    "lessons": [
+      {
+        "id": "module",
+        "title": "モジュール",
+        "summary": "モジュールとは、Python コードをまとめたファイルで、再利用や整理を目的としています。",
+        "content": [
+          {
+            "type": "p",
+            "text": "モジュール（module）とは、**Python のコードを機能ごとに分割して再利用可能にしたファイル** のことです。1 つの `.py` ファイルが 1 つのモジュールになります。モジュールを使うと、コードの見通しがよくなり、他のプロジェクトでも簡単に再利用できます。"
+          },
+          {
+            "type": "code",
+            "filename": "my_module.py",
+            "lang": "python",
+            "code": `# my_module.py
+def greet(name):
+    return f"Hello, {name}!"
+  
+PI = 3.14159`
+          },
+          {
+            "type": "p",
+            "text": "上記のようなファイルを作成すると、それがモジュールになります。別のファイルから `import` 文で読み込んで使用できます。"
+          },
+          {
+            "type": "code",
+            "filename": "use_module.py",
+            "lang": "python",
+            "code": `import my_module
+  
+print(my_module.greet("Alice"))  # Hello, Alice!
+print(my_module.PI)              # 3.14159
+  
+# 特定の要素だけをインポートすることも可能
+from my_module import greet
+print(greet("Bob"))`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "モジュール = `.py` ファイル 1 つ",
+              "`import` で読み込むことで関数や定数を再利用可能",
+              "`from ... import ...` を使うと一部だけを取り込める",
+              "`as` で別名をつけてインポートできる（例：`import numpy as np`）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 8
+      },
+      {
+        "id": "package",
+        "title": "パッケージ",
+        "summary": "パッケージは複数のモジュールをまとめて構造化したものです。",
+        "content": [
+          {
+            "type": "p",
+            "text": "パッケージ（package）は、**複数のモジュールをまとめて階層構造で管理する仕組み** です。ディレクトリの中に `__init__.py` ファイルがあると、そのディレクトリはパッケージとして認識されます。"
+          },
+          {
+            "type": "code",
+            "filename": "package-structure.txt",
+            "lang": "text",
+            "code": `my_package/
+├── __init__.py
+├── math_utils.py
+└── string_utils.py`
+          },
+          {
+            "type": "code",
+            "filename": "math_utils.py",
+            "lang": "python",
+            "code": `# my_package/math_utils.py
+def add(a, b):
+    return a + b`
+          },
+          {
+            "type": "p",
+            "text": "パッケージを使うときは、モジュール名の前にパッケージ名を付けてインポートします。"
+          },
+          {
+            "type": "code",
+            "filename": "use_package.py",
+            "lang": "python",
+            "code": `import my_package.math_utils
+  
+print(my_package.math_utils.add(2, 3))  # 5
+  
+# 部分的にインポートすることも可能
+from my_package import math_utils
+print(math_utils.add(5, 7))`
+          },
+          {
+            "type": "p",
+            "text": "`__init__.py` は空でもかまいませんが、パッケージの初期化処理や外部に公開するシンボルを定義する場所としても使えます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "パッケージ = 複数モジュールの集合（フォルダ単位）",
+              "`__init__.py` があるディレクトリがパッケージとして認識される",
+              "ネームスペースを階層的に整理できる",
+              "大規模プロジェクトや外部ライブラリでは必須の仕組み"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 10
+      }
+    ]
+  },
+  {
+    "key": "python-io",
+    "title": "Pythonの入力と出力",
+    "lessons": [
+      {
+        "id": "input-output",
+        "title": "入力と出力",
+        "summary": "Python では `print()` 関数で出力し、`input()` 関数でユーザーから入力を受け取れます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python の基本的な出力は `print()` 関数で行い、入力は `input()` 関数を使って標準入力から受け取ります。"
+          },
+          {
+            "type": "code",
+            "filename": "basic-io.py",
+            "lang": "python",
+            "code": `# 出力
+print("Hello, World!")
+  
+# 入力
+name = input("あなたの名前は？: ")
+print("こんにちは,", name)`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`print()` は複数の値をカンマで区切って出力可能",
+              "`input()` は常に文字列として入力を受け取る（必要に応じて型変換する）",
+              "例えば `int(input(\"数値を入力: \"))` のようにして数値入力も可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "formatting-output",
+        "title": "出力を見やすくフォーマットする",
+        "summary": "Python では文字列を柔軟に整形して出力できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "複雑な出力を行う場合、文字列のフォーマット機能を使うと見やすく整理された出力ができます。"
+          }
+        ],
+        "level": "basic",
+        "estMin": 3
+      },
+      {
+        "id": "f-string",
+        "title": "フォーマット済み文字列リテラル",
+        "summary": "Python 3.6 以降で導入された f-string は、最も簡潔な文字列フォーマット方法です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "f-string（フォーマット済み文字列リテラル）は、文字列の前に `f` を付けて `{}` 内に式を書くだけで埋め込みができる構文です。"
+          },
+          {
+            "type": "code",
+            "filename": "f-string.py",
+            "lang": "python",
+            "code": `name = "Alice"
+age = 25
+print(f"{name} は {age} 歳です")  # Alice は 25 歳です`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Python 3.6 以降で使用可能",
+              "式を直接埋め込める（計算式などもOK）",
+              "`{変数:指定}` で桁数や小数点のフォーマットも可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "format-method",
+        "title": "文字列の format() メソッド",
+        "summary": "Python 2 系からある柔軟なフォーマット方法です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`format()` メソッドを使うと、文字列内に `{}` をプレースホルダとして値を埋め込めます。"
+          },
+          {
+            "type": "code",
+            "filename": "format-method.py",
+            "lang": "python",
+            "code": `name = "Bob"
+age = 30
+print("名前: {}, 年齢: {}".format(name, age))
+print("名前: {n}, 年齢: {a}".format(n=name, a=age))`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "位置引数とキーワード引数の両方が使用可能",
+              "桁数指定や整列も可能：`{:<10}`, `{:>10}`, `{:.2f}` など"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "manual-format",
+        "title": "文字列の手作業でのフォーマット",
+        "summary": "文字列結合や `+` 演算子でシンプルなフォーマットも可能です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "もっとも単純な方法として、`+` や `,` を使って文字列と変数を結合する方法もあります。"
+          },
+          {
+            "type": "code",
+            "filename": "manual-format.py",
+            "lang": "python",
+            "code": `name = "Charlie"
+age = 28
+print("名前: " + name + ", 年齢: " + str(age))`
+          },
+          {
+            "type": "p",
+            "text": "ただし、この方法は可読性が低く、型変換も必要になるため、f-string や `format()` の方が推奨されます。"
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "old-formatting",
+        "title": "古い文字列書式設定方法",
+        "summary": "`%` 演算子を使った C 言語風のフォーマットです。",
+        "content": [
+          {
+            "type": "p",
+            "text": "古い形式のフォーマット方法として `%` 演算子を使う方法もありますが、現在では f-string や `format()` が推奨されています。"
+          },
+          {
+            "type": "code",
+            "filename": "old-format.py",
+            "lang": "python",
+            "code": `name = "Diana"
+age = 22
+print("名前: %s, 年齢: %d" % (name, age))`
+          }
+        ],
+        "level": "basic",
+        "estMin": 3
+      },
+      {
+        "id": "file-io",
+        "title": "ファイルを読み書きする",
+        "summary": "Python では `open()` を使って簡単にファイル操作ができます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`open()` 関数を使ってファイルを開き、`read()` や `write()` メソッドで読み書きします。ファイルは使い終わったら必ず閉じるようにしましょう（`with` を使うと自動で閉じられます）。"
+          },
+          {
+            "type": "code",
+            "filename": "file-io.py",
+            "lang": "python",
+            "code": `# 書き込み
+with open("example.txt", "w", encoding="utf-8") as f:
+    f.write("Hello, File!")
+  
+# 読み込み
+with open("example.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+    print(content)`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`open(path, mode)` でファイルを開く（`w`: 書き込み, `r`: 読み込み, `a`: 追記）",
+              "`with` を使うと自動的にファイルが閉じられる",
+              "`read()`, `readline()`, `readlines()` などで読み込み可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "file-methods",
+        "title": "ファイルオブジェクトのメソッド",
+        "summary": "ファイルオブジェクトには多くの便利なメソッドがあります。",
+        "content": [
+          {
+            "type": "p",
+            "text": "主なファイルメソッドは以下の通りです："
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`f.read(size)`：指定サイズ分読み込む（未指定なら全体）",
+              "`f.readline()`：1 行だけ読み込む",
+              "`f.readlines()`：全行をリストとして読み込む",
+              "`f.write(text)`：文字列を書き込む",
+              "`f.writelines(list)`：複数行をまとめて書き込む",
+              "`f.close()`：ファイルを閉じる（`with` 使用時は不要）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "json-io",
+        "title": "json による構造化されたデータの保存",
+        "summary": "Python の辞書やリストを JSON ファイルとして保存・読み込みできます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "JSON（JavaScript Object Notation）は、軽量なデータ交換形式です。Python の `json` モジュールを使うと、辞書やリストなどの構造化データを簡単に保存・読み込みできます。"
+          },
+          {
+            "type": "code",
+            "filename": "json-io.py",
+            "lang": "python",
+            "code": `import json
+  
+data = {"name": "Alice", "age": 25}
+  
+# 保存
+with open("data.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+  
+# 読み込み
+with open("data.json", "r", encoding="utf-8") as f:
+    loaded = json.load(f)
+  
+print(loaded["name"])  # Alice`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`json.dump(obj, file)`：オブジェクトを JSON 形式でファイルに書き込む",
+              "`json.load(file)`：JSON ファイルから Python オブジェクトを読み込む",
+              "`indent` を指定すると整形された JSON を出力可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      }
+    ]
   }
+  
+  
   
   
   
