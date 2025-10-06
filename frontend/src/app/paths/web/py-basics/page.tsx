@@ -1396,7 +1396,397 @@ print(loaded["name"])  # Alice`
         "estMin": 7
       }
     ]
+  },
+  {
+    "key": "python-errors-exceptions",
+    "title": "Pythonのエラーと例外",
+    "lessons": [
+      {
+        "id": "exceptions-overview",
+        "title": "例外とは",
+        "summary": "例外は、プログラム実行中に発生する“異常事態”を表すオブジェクトです。",
+        "content": [
+          {
+            "type": "p",
+            "text": "例外（Exception）は、**通常の処理フローを中断してエラーハンドリングへ制御を移す仕組み** です。Python では例外もオブジェクトであり、型（クラス）を持ちます。発生時にはスタックを遡って（伝播して）対応する `except` が見つかるまで探索します。"
+          },
+          {
+            "type": "code",
+            "filename": "exception-overview.py",
+            "lang": "python",
+            "code": `def div(a, b):
+    return a / b  # b=0 のとき ZeroDivisionError
+  
+print(div(10, 2))
+print(div(10, 0))  # ここで例外が発生してプログラムは中断する`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "例外はクラス階層を持つ（基底は Exception）",
+              "未処理の例外はプログラムをクラッシュさせる",
+              "try/except で捕捉し、適切に処理・ログ化・再送出できる"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "try-except",
+        "title": "try/except の基本",
+        "summary": "エラーが起こりうる処理を `try` に入れ、`except` で捕捉します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "最小構成は `try:` と `except 例外型:` の組み合わせです。例外オブジェクトは `as e` で受け取れます。"
+          },
+          {
+            "type": "code",
+            "filename": "try-except-basic.py",
+            "lang": "python",
+            "code": `try:
+    n = int(input("数字を入力: "))
+    print(100 // n)
+except ValueError as e:
+    print("数字に変換できません:", e)
+except ZeroDivisionError:
+    print("0 で割ることはできません")`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "複数の例外を並べて個別に処理できる",
+              "タプルでまとめて捕捉も可能：`except (TypeError, ValueError): ...`",
+              "例外の型はできるだけ具体的に（広すぎる捕捉は避ける）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      },
+      {
+        "id": "else-finally",
+        "title": "else / finally 節",
+        "summary": "`else` は例外が起きなかったときに、`finally` は結果に関わらず必ず実行されます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`else` は try ブロックが成功した場合だけ実行され、`finally` はクリーンアップ処理のために常に実行されます。"
+          },
+          {
+            "type": "code",
+            "filename": "else-finally.py",
+            "lang": "python",
+            "code": `try:
+    f = open("data.txt", "r", encoding="utf-8")
+    content = f.read()
+except FileNotFoundError:
+    print("ファイルがありません")
+else:
+    print("読み込み成功:", len(content))
+finally:
+    # f が存在する場合のみ閉じる
+    try:
+        f.close()
+    except NameError:
+        pass`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`else` は “成功時の後処理” を書く場所",
+              "`finally` はリソース解放・接続終了などに最適",
+              "try ブロックは最小限の範囲にする（読みやすさ向上）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      },
+      {
+        "id": "raise-reraise",
+        "title": "例外を送出・再送出する (`raise`)",
+        "summary": "`raise` で意図的に例外を送出できます。`raise` 単独で再送出も可能です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "バリデーションや不正状態の通知に `raise` を使います。`except` 内で `raise` 単独を使うと “同じ例外” を再送出できます。"
+          },
+          {
+            "type": "code",
+            "filename": "raise-reraise.py",
+            "lang": "python",
+            "code": `def positive(n: int) -> int:
+    if n <= 0:
+        raise ValueError("n must be positive")
+    return n
+  
+try:
+    positive(-3)
+except ValueError as e:
+    print("ログだけ残して再送出")
+    raise  # スタック情報を保ったまま再送出`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "入力チェック・契約違反の検知に `raise` を使う",
+              "再送出は上位レイヤに判断を委ねるときに有効",
+              "ユーザー向けメッセージとログ向け技術情報は分離するのが理想"
+            ]
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 7
+      },
+      {
+        "id": "exception-chaining",
+        "title": "例外の連鎖（`raise ... from ...`）",
+        "summary": "元の原因となった例外を保持したまま新しい例外へ変換できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`raise NewError(...) from original` を使うと、**原因となった例外（cause）** を保ったまま文脈に適した例外へ変換できます。"
+          },
+          {
+            "type": "code",
+            "filename": "exception-chaining.py",
+            "lang": "python",
+            "code": `def parse_age(raw: str) -> int:
+      try:
+          return int(raw)
+      except ValueError as e:
+          raise ValueError("年齢の形式が不正です") from e`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "低レベル例外を高レベルのドメイン例外へマッピング可能",
+              "デバッグ時に “本当の原因” がたどれるので有用"
+            ]
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 6
+      },
+      {
+        "id": "custom-exceptions",
+        "title": "ユーザー定義例外",
+        "summary": "独自のドメインエラーを作るには Exception を継承します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "プロジェクト固有の失敗を区別したい場合は、**独自の例外クラス** を定義します。用途別に階層を切ると保守しやすくなります。"
+          },
+          {
+            "type": "code",
+            "filename": "custom-exceptions.py",
+            "lang": "python",
+            "code": `class AppError(Exception):
+    """アプリ共通の基底例外"""
+  
+class ConfigError(AppError):
+    pass
+  
+class NetworkError(AppError):
+    pass
+  
+def load_config(path: str) -> dict:
+    if path.endswith(".json") is False:
+        raise ConfigError("設定ファイルは .json のみ対応")
+    return {"ok": True}`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "基底クラスを 1 つ用意しておくと “アプリ全例外” を一括捕捉できる",
+              "例外メッセージはユーザー／開発者の双方に伝わる表現を心掛ける"
+            ]
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 7
+      },
+      {
+        "id": "cleanup-with",
+        "title": "クリーンアップと with 文（コンテキスト管理）",
+        "summary": "`with` を使うと例外の有無に関係なく安全にリソースを解放できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`try/finally` のパターンは `with` で簡潔に書けます。ファイル、ロック、DB 接続など“開いたら閉じる”資源で必須です。"
+          },
+          {
+            "type": "code",
+            "filename": "with-cleanup.py",
+            "lang": "python",
+            "code": `# ファイルは with で自動クローズ
+  with open("log.txt", "a", encoding="utf-8") as f:
+      f.write("entry\\n")  # 例外が起きても必ず閉じられる`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "コンテキストマネージャは `__enter__` / `__exit__` で実装される",
+              "自作も可能（contextlib やクラス実装）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "assertions",
+        "title": "アサーション（`assert`）",
+        "summary": "開発時の不変条件チェックに使います（本番では無効化されうる）。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`assert 条件, メッセージ` は条件が偽のとき `AssertionError` を送出します。**最適化モード（`python -O`）では無効化** される点に注意。"
+          },
+          {
+            "type": "code",
+            "filename": "assertion.py",
+            "lang": "python",
+            "code": `def normalized(p: float) -> float:
+      assert 0.0 <= p <= 1.0, "p は 0..1 の範囲"
+      return p`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "ユーザー入力の検証には `assert` ではなく通常のバリデーション＋例外を使う",
+              "アサーションは“バグ検出用”"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "logging",
+        "title": "エラーロギングとデバッグ",
+        "summary": "`logging` を使うとスタックトレース付きの診断ログを残せます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`print()` ではなく `logging` を使うと、レベル管理・出力先切替・フォーマット統一が可能です。例外時は `logger.exception()` が便利です。"
+          },
+          {
+            "type": "code",
+            "filename": "logging-errors.py",
+            "lang": "python",
+            "code": `import logging
+  
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s %(levelname)s %(message)s")
+  
+logger = logging.getLogger(__name__)
+  
+try:
+    1 / 0
+except Exception:
+    logger.exception("計算に失敗しました")  # スタックトレース付きで出力`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`logger.exception()` は except 節で使うと自動で traceback を付与",
+              "ユーザー向け表示とログの詳細は分ける（情報漏洩対策）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "suppress-and-pitfalls",
+        "title": "例外の抑制と落とし穴",
+        "summary": "必要最小限の捕捉・`contextlib.suppress`・“素手の except” の回避。",
+        "content": [
+          {
+            "type": "p",
+            "text": "“何でも捕る” はバグ隠しになります。**広すぎる捕捉や空の except は避ける** のが原則です。どうしても無視したい一時的な例外は `contextlib.suppress` を使います。"
+          },
+          {
+            "type": "code",
+            "filename": "suppress-pitfalls.py",
+            "lang": "python",
+            "code": `from contextlib import suppress
+  
+# NG: 何でも捕ると KeyboardInterrupt 等も飲み込む恐れ
+# try:
+#     risky()
+# except Exception:
+#     pass  # 事故の元
+  
+# OK: 特定の例外だけを明示して抑制
+with suppress(FileNotFoundError):
+    open("maybe_missing.txt").read()`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`except Exception:` でも広すぎることが多い（必要ならログして再送出）",
+              "`except:` は BaseException まで捕るため原則禁止（SystemExit/KeyboardInterrupt を飲む）",
+              "“捕って何もしない” は最終手段。最低限ログを残す"
+            ]
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 7
+      },
+      {
+        "id": "builtin-exceptions",
+        "title": "よく使う組み込み例外",
+        "summary": "代表的な例外と発生場面を把握しておくと、迅速に原因を特定できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "頻出の組み込み例外と典型的な発生条件："
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`TypeError`：引数の型が不正（例: `len(10)`）",
+              "`ValueError`：型は合っているが値が不正（例: `int('abc')`）",
+              "`KeyError`：辞書にキーが存在しない",
+              "`IndexError`：シーケンスの範囲外アクセス",
+              "`FileNotFoundError`：指定ファイルが存在しない",
+              "`ZeroDivisionError`：0 除算",
+              "`TimeoutError`：タイムアウト関連の失敗",
+              "`AssertionError`：`assert` が失敗"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "best-practices",
+        "title": "要約とベストプラクティス",
+        "summary": "例外設計・捕捉・ログ・再送出の基本指針を整理します。",
+        "content": [
+          {
+            "type": "ul",
+            "items": [
+              "try の範囲は最小限にし、成功フローは `else` に逃がす",
+              "具体的な例外型だけを捕捉し、意味のある回復・再試行・メッセージを提供",
+              "ユーザー向けメッセージと内部ログを分ける（`logging` を活用）",
+              "低レベル→高レベルへは `raise ... from ...` で文脈を保つ",
+              "独自例外の基底クラスを作り、階層化して保守性を上げる",
+              "リソース解放は `with` または `finally` を徹底",
+              "`assert` はバグ検出用、入力検証には使わない"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      }
+    ]
   }
+  
   
   
   
