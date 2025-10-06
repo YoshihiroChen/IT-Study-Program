@@ -1071,8 +1071,8 @@ console.log(typeof greet); // "function"（関数もオブジェクトの一種�
   },
 
   {
-    key: "syntax",
-    title: "TypeScriptの文法",
+    key: "variables-and-functions",
+    title: "TypeScriptの変数と関数",
     lessons: [
       {
         id: "variable-declaration",
@@ -1870,6 +1870,206 @@ const arr = reverse([1, 2, 3]); // number[] として推論
       
     ],
   },
+  {
+    "key": "syntax",
+    "title": "TypeScriptの文",
+    "lessons": [
+      {
+        "id": "scope",
+        "title": "変数のスコープ",
+        "summary": "スコープとは、変数や関数が「どこで参照できるか」を定める有効範囲のことです。TypeScript では主に 5 種類のスコープがあります。",
+        "content": [
+          {
+            "type": "p",
+            "text": "スコープ（scope）とは、**変数・関数・定数がアクセス可能な範囲** のことです。TypeScript では以下の 5 種類のスコープが存在し、それぞれの特徴を理解することが安全なコード設計に役立ちます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "グローバルスコープ (Global Scope) – プログラム全体から参照可能",
+              "ローカルスコープ (Local Scope) – 特定の関数やブロック内のみで有効",
+              "関数スコープ (Function Scope) – 関数内でのみ有効（`var` に特有）",
+              "レキシカルスコープ (Lexical Scope) – 定義された位置に基づいて外側スコープへアクセス可能",
+              "ブロックスコープ (Block Scope) – `{}` ブロック内のみで有効（`let` / `const`）"
+            ]
+          },
+          {
+            "type": "code",
+            "filename": "scope-types.ts",
+            "lang": "ts",
+            "code": `// グローバルスコープ：どこからでもアクセス可能
+let globalVar = "グローバル";
+  
+function showScopes() {
+  // ローカルスコープ（関数内）
+  const localVar = "ローカル";
+  
+  // 関数スコープ（var に特有）
+  if (true) {
+    var functionScoped = "関数スコープ";
+    let blockScoped = "ブロックスコープ"; // ブロック内だけ
+    console.log(blockScoped); // OK
+  }
+  
+  // console.log(blockScoped); // ❌ エラー: ブロック外では参照不可
+  console.log(functionScoped); // OK: var は関数全体で有効
+  
+  // レキシカルスコープ：ネストされた関数でも外側の変数を参照可能
+  function inner() {
+    console.log(localVar);   // 外側スコープの変数にアクセス可能
+    console.log(globalVar);  // グローバルにもアクセス可能
+  }
+  
+  inner();
+}
+  
+showScopes();
+  
+console.log(globalVar); // グローバルスコープなので関数外からもアクセス可能
+// console.log(localVar); // ❌ エラー: 関数外からは参照不可`
+          },
+          {
+            "type": "p",
+            "text": "このように、TypeScript では変数のスコープがどのレベルに属しているかでアクセス可能な範囲が決まります。特に `var` は「関数スコープ」を持ち、`let` や `const` は「ブロックスコープ」を持つという違いは重要です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Global Scope – どこからでもアクセスできるが、衝突リスクが高いため最小限にする",
+              "Local Scope – 関数やブロックの内部だけで有効な安全なスコープ",
+              "Function Scope – `var` にのみ適用され、関数全体で有効になる",
+              "Lexical Scope – 定義時点のスコープ構造に基づき、外側の変数へアクセス可能",
+              "Block Scope – `{}` 内でのみ有効、`let` / `const` 使用時の基本的なスコープ"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 10
+      },
+      {
+        "id": "else-if",
+        "title": "else-if 文",
+        "summary": "複数の条件を順番に評価し、最初に真になったブロックを実行します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`if` に続けて `else if` を使うと、複数条件の分岐が可能になります。最初に真 (`true`) になったブロックだけが実行されます。"
+          },
+          {
+            "type": "code",
+            "filename": "else-if.ts",
+            "lang": "ts",
+            "code": `const score = 75;
+  
+if (score >= 90) {
+  console.log("Aランク");
+} else if (score >= 70) {
+  console.log("Bランク"); // このブロックが実行される
+} else if (score >= 50) {
+  console.log("Cランク");
+} else {
+  console.log("不合格");
+}`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`if` は最初の条件を判定",
+              "`else if` はそれ以外の条件を順番に評価",
+              "`else` はすべての条件が偽のときに実行される"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "switch",
+        "title": "switch 文",
+        "summary": "複数の条件分岐を簡潔に書くための構文です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`switch` は一つの値に対して複数のケースを比較し、該当するブロックを実行します。`break` を入れないと後続のケースにも処理が進むため注意が必要です。"
+          },
+          {
+            "type": "code",
+            "filename": "switch-basic.ts",
+            "lang": "ts",
+            "code": `const color = "blue";
+  
+switch (color) {
+  case "red":
+    console.log("赤です");
+    break;
+  case "blue":
+    console.log("青です"); // ここが実行される
+    break;
+  case "green":
+    console.log("緑です");
+    break;
+  default:
+    console.log("未知の色です");
+}`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`switch` は一つの値に対して複数のパターンを比較する際に有効",
+              "`break` を書かないと後続の case も実行される（フォールスルー）",
+              "`default` はどの case にも当てはまらない場合に実行される"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "ternary",
+        "title": "三項演算子",
+        "summary": "簡単な条件分岐を 1 行で書くための演算子です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "三項演算子（条件演算子）は、`条件 ? 真のときの式 : 偽のときの式` という構文で、簡潔な分岐を書けます。"
+          },
+          {
+            "type": "code",
+            "filename": "ternary-basic.ts",
+            "lang": "ts",
+            "code": `const age = 20;
+  const result = age >= 18 ? "大人" : "未成年";
+  
+  console.log(result); // "大人"`
+          },
+          {
+            "type": "p",
+            "text": "ネストして複数の条件を判定することも可能ですが、可読性が低下しやすいため注意が必要です。"
+          },
+          {
+            "type": "code",
+            "filename": "ternary-nested.ts",
+            "lang": "ts",
+            "code": `const score = 85;
+const grade = score >= 90 ? "A" : score >= 70 ? "B" : "C";
+  
+console.log(grade); // "B"`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "三項演算子は簡潔な条件分岐に便利",
+              "複雑な条件では if 文の方が読みやすい場合が多い",
+              "ネストを多用しすぎると可読性が下がるため注意"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      }
+    ]
+  },
+  
   {
     key: "oop",
     title: "TypeScriptのオブジェクト指向",

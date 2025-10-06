@@ -41,6 +41,79 @@ type Chapter = {
 
 /** ---------- 示例课程大纲 ---------- */
 const CURRICULUM: Chapter[] = [
+  {
+    "key": "intro-python",
+    "title": "Pythonの紹介",
+    "lessons": [
+      {
+        "id": "what-is-python",
+        "title": "Pythonとは",
+        "summary": "Python は、読みやすく書きやすい構文を持つ高水準の汎用プログラミング言語です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python（パイソン）は 1991 年に Guido van Rossum によって開発された **高水準・汎用・インタプリタ型のプログラミング言語** です。シンプルで直感的な文法が特徴で、初心者からプロフェッショナルまで幅広く使われています。"
+          },
+          {
+            "type": "p",
+            "text": "Python は「人間が読みやすく書きやすいコード」を重視して設計されており、少ない行数で多くの処理を表現できます。そのため、教育用途だけでなく、AI・データ分析・Web開発・自動化など、さまざまな分野で活用されています。"
+          },
+          {
+            "type": "code",
+            "filename": "hello-python.py",
+            "lang": "python",
+            "code": `# 最初の Python プログラム
+  print("Hello, Python!")`
+          },
+          {
+            "type": "p",
+            "text": "Python のコードは非常に読みやすく、上の例のように 1 行で文字列を出力できます。C 言語や Java に比べて記述量が少なく、自然言語に近い書き方ができるのが特徴です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "**高水準言語**：人間が理解しやすい文法で書ける",
+              "**インタプリタ言語**：コンパイル不要で、すぐに実行できる",
+              "**汎用言語**：Web、AI、データ分析、自動化など幅広い分野に対応",
+              "**豊富なライブラリ**：NumPy、Pandas、Django、FastAPI など強力なエコシステム",
+              "**マルチプラットフォーム**：Windows / macOS / Linux などあらゆる環境で動作"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "Python は「初心者でも学びやすく、上級者でも強力に使える」言語です。特に近年は AI・機械学習・データサイエンス分野での需要が高く、エンジニアだけでなく研究者やビジネス職の人材にも広く使われています。"
+          },
+          {
+            "type": "p",
+            "text": "■ TypeScriptとの比較"
+          },
+          {
+            "type": "p",
+            "text": "Python と TypeScript はどちらも人気の高いプログラミング言語ですが、**用途・特徴・設計思想** に明確な違いがあります。TypeScript は JavaScript を拡張した静的型付き言語であり、主に Web フロントエンドやバックエンド開発に使われる一方、Python は幅広い分野に対応する汎用スクリプト言語です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "**型システム**：Python は動的型付け（実行時に型が決まる）、TypeScript は静的型付け（コンパイル時に型をチェック）",
+              "**記述量**：Python は簡潔で短く書ける、TypeScript は厳密な型指定によりやや長くなる",
+              "**主な用途**：Python は AI・機械学習・データ分析・自動化・Web バックエンド、TypeScript は Web フロントエンドや SPA 開発",
+              "**実行方式**：Python はインタプリタ（逐次実行）、TypeScript はコンパイル（JavaScript に変換して実行）",
+              "**学習コスト**：Python は低く初心者向け、TypeScript はやや高く JavaScript の知識が前提",
+              "**代表的なフレームワーク**：Python は Django / FastAPI / Flask、TypeScript は Next.js / Angular / NestJS"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "つまり、**Python は「何でもできる万能スクリプト言語」**、**TypeScript は「大規模 Web アプリ向けの型安全な言語」** という位置づけです。両者は競合関係ではなく、たとえば「バックエンドは Python、フロントエンドは TypeScript」といった形で共存させるケースが多くなっています。"
+          }
+        ],
+        "level": "basic",
+        "estMin": 15
+      }
+    ]
+  }
+  
+  
   
   
   
