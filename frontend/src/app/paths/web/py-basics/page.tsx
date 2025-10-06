@@ -111,7 +111,929 @@ const CURRICULUM: Chapter[] = [
         "estMin": 15
       }
     ]
+  },
+  {
+    "key": "python-data-structures",
+    "title": "Pythonのデータ構造",
+    "lessons": [
+      {
+        "id": "primitive-types",
+        "title": "プリミティブ型",
+        "summary": "Python の基本的なデータ型には、数値型・文字列型・ブール型などがあります。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python のプリミティブ型（基本型）は、プログラムの基礎を構成する最も単純なデータ型です。代表的なものには数値型（int, float）、文字列型（str）、ブール型（bool）などがあります。"
+          },
+          {
+            "type": "code",
+            "filename": "primitive-types.py",
+            "lang": "python",
+            "code": `# 数値型
+x = 42        # int（整数）
+y = 3.14      # float（浮動小数点数）
+  
+# 文字列型
+name = "Python"
+  
+# ブール型
+is_active = True
+  
+print(type(x))       # <class 'int'>
+print(type(y))       # <class 'float'>
+print(type(name))    # <class 'str'>
+print(type(is_active))  # <class 'bool'>`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`int`：整数を表す",
+              "`float`：小数を表す",
+              "`str`：文字列を表す",
+              "`bool`：True / False の論理値を表す"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "Python ではすべてがオブジェクトとして扱われますが、これらのプリミティブ型は最も基本的なデータ構造として、複雑な型の基盤になります。"
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      },
+      {
+        "id": "list",
+        "title": "リスト",
+        "summary": "複数の要素を順序付きで格納できる可変長のデータ構造です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "リスト（list）は、複数の値を順序付きで格納できるデータ構造です。**ミュータブル（可変）** なため、要素の追加・削除・変更が可能です。"
+          },
+          {
+            "type": "code",
+            "filename": "list-basic.py",
+            "lang": "python",
+            "code": `fruits = ["apple", "banana", "orange"]
+print(fruits[0])  # "apple"
+  
+# 要素の追加
+fruits.append("grape")
+  
+# 要素の変更
+fruits[1] = "mango"
+  
+# 要素の削除
+del fruits[2]
+  
+print(fruits)  # ['apple', 'mango', 'grape']`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "インデックスでアクセス可能（0 始まり）",
+              "append(), insert(), remove() などで操作可能",
+              "ミュータブル（可変）なので後から変更できる"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      },
+      {
+        "id": "tuple",
+        "title": "タプル",
+        "summary": "リストに似ていますが、**イミュータブル（不変）** なデータ構造です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "タプル（tuple）は、複数の値を順序付きで格納できる点でリストと似ていますが、**イミュータブル（作成後に変更できない）** という大きな違いがあります。"
+          },
+          {
+            "type": "code",
+            "filename": "tuple-basic.py",
+            "lang": "python",
+            "code": `point = (10, 20)
+print(point[0])  # 10
+  
+# point[0] = 30  # ❌ エラー: タプルは変更不可
+  
+# アンパックも可能
+x, y = point
+print(x, y)  # 10 20`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "要素は順序付き・重複可",
+              "イミュータブルで安全性が高い",
+              "辞書のキーなど変更不可能な構造が必要な場合に便利"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "sequence",
+        "title": "シーケンス",
+        "summary": "リスト・タプル・文字列など、順序を持つデータ型の総称です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "シーケンス（sequence）とは、**順序を持つデータ型の共通的な性質** をまとめた概念です。リスト、タプル、文字列などが含まれ、インデックスアクセスやスライスなどが共通して使えます。"
+          },
+          {
+            "type": "code",
+            "filename": "sequence.py",
+            "lang": "python",
+            "code": `seq = [10, 20, 30, 40]
+  
+# インデックスアクセス
+print(seq[1])   # 20
+  
+# スライス
+print(seq[1:3]) # [20, 30]
+  
+# in 演算子
+print(30 in seq)  # True
+  
+# 長さ
+print(len(seq))  # 4`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "インデックスアクセスが可能",
+              "スライス構文 `[start:end]` が使える",
+              "in / len() など共通の操作が可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "set",
+        "title": "集合型",
+        "summary": "重複のない要素を持つデータ構造で、集合演算が可能です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "集合型（set）は、**重複しない要素の集まり** を表すデータ構造です。順序は保持しませんが、和・積・差といった集合演算を高速に行えます。"
+          },
+          {
+            "type": "code",
+            "filename": "set-basic.py",
+            "lang": "python",
+            "code": `a = {1, 2, 3}
+b = {3, 4, 5}
+  
+print(a | b)  # 和集合: {1, 2, 3, 4, 5}
+print(a & b)  # 積集合: {3}
+print(a - b)  # 差集合: {1, 2}
+  
+# 要素の追加・削除
+a.add(4)
+a.remove(2)`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "重複のないデータ集合を扱える",
+              "和・積・差などの集合演算が可能",
+              "順序は保証されない（インデックスアクセス不可）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      },
+      {
+        "id": "dict",
+        "title": "辞書型",
+        "summary": "キーと値のペアでデータを管理する柔軟なデータ構造です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "辞書型（dict）は、**キーと値のペア** でデータを格納するデータ構造です。キーはユニークでなければならず、値はどんな型でも格納できます。"
+          },
+          {
+            "type": "code",
+            "filename": "dict-basic.py",
+            "lang": "python",
+            "code": `person = {
+  "name": "Alice",
+  "age": 25,
+  "city": "Tokyo"
+}
+  
+print(person["name"])  # Alice
+  
+# 要素の追加・更新
+person["age"] = 26
+  
+# 要素の削除
+del person["city"]
+  
+# キーと値の取得
+for key, value in person.items():
+    print(key, value)`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "キーで値にアクセスする（順序付き・ユニーク）",
+              "ミュータブルなので追加・削除・更新が可能",
+              "JSON などデータ交換形式とも相性がよい"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 8
+      },
+      {
+        "id": "stack",
+        "title": "スタック",
+        "summary": "後入れ先出し（LIFO）の原則でデータを管理する構造です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "スタック（stack）は、**後入れ先出し（LIFO: Last In, First Out）** の原則に従ってデータを扱うデータ構造です。最後に追加した要素が最初に取り出されます。関数呼び出しの履歴や戻り処理など、順序が重要な場面でよく使われます。Pythonではリストでスタックを実現できます。"
+          },
+          {
+            "type": "code",
+            "filename": "stack-basic.py",
+            "lang": "python",
+            "code": `stack = []
+      
+      # 要素の追加（push）
+      stack.append(1)
+      stack.append(2)
+      stack.append(3)
+      print(stack)  # [1, 2, 3]
+      
+      # 要素の取り出し（pop） - 最後に入れたものから
+      top = stack.pop()
+      print(top)    # 3
+      print(stack)  # [1, 2]`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "後入れ先出し（LIFO）の構造を持つ",
+              "append() で追加、pop() で取り出す",
+              "関数コールスタックや取り消し操作などに利用される"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "queue",
+        "title": "キュー",
+        "summary": "先入れ先出し（FIFO）の原則でデータを管理する構造です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "キュー（queue）は、**先入れ先出し（FIFO: First In, First Out）** の原則に従ってデータを扱うデータ構造です。最初に追加した要素が最初に取り出されます。タスク処理やデータの順次処理などに適しています。Pythonではcollections.dequeを使うとキューを実現できます。"
+          },
+          {
+            "type": "code",
+            "filename": "queue-basic.py",
+            "lang": "python",
+            "code": `from collections import deque
+      
+queue = deque()
+      
+# 要素の追加（enqueue）
+queue.append("A")
+queue.append("B")
+queue.append("C")
+print(queue)  # deque(['A', 'B', 'C'])
+      
+# 要素の取り出し（dequeue） - 最初に入れたものから
+first = queue.popleft()
+print(first)  # A
+print(queue)  # deque(['B', 'C'])`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "先入れ先出し（FIFO）の構造を持つ",
+              "append() で追加、popleft() で取り出す",
+              "タスクスケジューラやイベント処理キューなどに利用される"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      }
+      
+    ]
+  },
+  {
+    "key": "python-control-flow",
+    "title": "Pythonの制御構文",
+    "lessons": [
+      {
+        "id": "variable-declaration",
+        "title": "変数宣言",
+        "summary": "Python では型を明示せずに変数を宣言でき、代入と同時に型が決まります。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python の変数宣言は非常にシンプルで、**型を明示する必要がなく代入によって自動的に型が決まる** のが特徴です。キーワード `let` や `const` を使う TypeScript とは異なり、変数名に値を代入するだけで宣言が完了します。"
+          },
+          {
+            "type": "code",
+            "filename": "variable-basic.py",
+            "lang": "python",
+            "code": `# 変数の宣言と代入
+x = 10          # 整数
+name = "Alice"  # 文字列
+is_valid = True # ブール値
+  
+print(x, name, is_valid)  # 10 Alice True`
+          },
+          {
+            "type": "p",
+            "text": "Python 3.6 以降では、型ヒント（型アノテーション）を付けて宣言することも可能です。型チェックには影響しませんが、静的解析ツールや補完機能を強化できます。"
+          },
+          {
+            "type": "code",
+            "filename": "variable-annotation.py",
+            "lang": "python",
+            "code": `# 型ヒント付きの宣言
+age: int = 25
+height: float = 172.5
+message: str = "Hello"
+  
+print(age, height, message)`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Python では代入と同時に変数が作成される（型宣言は不要）",
+              "同じ変数に異なる型の値を代入することも可能（動的型付け）",
+              "型ヒントを使うとコードの可読性と保守性が向上する"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "if-statement",
+        "title": "if 文",
+        "summary": "条件に応じて処理を分岐するための基本構文です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`if` 文は、条件式が `True` のときにだけ特定の処理を実行します。`elif` や `else` を使って複数条件を扱うことも可能です。"
+          },
+          {
+            "type": "code",
+            "filename": "if-basic.py",
+            "lang": "python",
+            "code": `score = 85
+  
+if score >= 90:
+    print("Aランク")
+elif score >= 70:
+    print("Bランク")
+else:
+    print("Cランク")`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`if`：条件が True の場合に実行",
+              "`elif`：他の条件を追加する場合に使用",
+              "`else`：どの条件にも当てはまらない場合に実行"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "for-loop",
+        "title": "for 文",
+        "summary": "繰り返し処理を行うための構文です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`for` 文は、シーケンス（リスト、文字列など）の要素を順に取り出して処理を繰り返すために使われます。"
+          },
+          {
+            "type": "code",
+            "filename": "for-basic.py",
+            "lang": "python",
+            "code": `fruits = ["apple", "banana", "orange"]
+  
+  for fruit in fruits:
+      print(fruit)`
+          },
+          {
+            "type": "p",
+            "text": "インデックスが必要な場合は、`enumerate()` を使うと便利です。"
+          },
+          {
+            "type": "code",
+            "filename": "for-enumerate.py",
+            "lang": "python",
+            "code": `for i, fruit in enumerate(fruits):
+      print(i, fruit)`
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "range-function",
+        "title": "range() 関数",
+        "summary": "数値の連続した範囲を生成するイテラブルを返す関数です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`range()` は数値の範囲を生成する関数で、`for` 文と組み合わせて指定回数のループ処理を行う際によく使われます。"
+          },
+          {
+            "type": "code",
+            "filename": "range-basic.py",
+            "lang": "python",
+            "code": `# 0 から 4 まで出力
+for i in range(5):
+    print(i)
+  
+# 開始値とステップを指定
+for i in range(2, 10, 2):
+    print(i)  # 2, 4, 6, 8`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`range(stop)`：0 から stop-1 まで",
+              "`range(start, stop)`：start から stop-1 まで",
+              "`range(start, stop, step)`：step ごとに増加"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "break-continue",
+        "title": "break 文と continue 文",
+        "summary": "ループの途中で処理を終了したりスキップしたりします。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`break` はループを途中で終了し、`continue` はその反復をスキップして次の周回へ進みます。"
+          },
+          {
+            "type": "code",
+            "filename": "break-continue.py",
+            "lang": "python",
+            "code": `for i in range(10):
+    if i == 5:
+        break  # ループを終了
+    if i % 2 == 0:
+        continue  # 偶数のときはスキップ
+    print(i)`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`break`：ループ全体を即座に終了する",
+              "`continue`：その周の残り処理をスキップして次へ進む"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "loop-else",
+        "title": "ループの else 節",
+        "summary": "ループが最後まで正常に終了したときに実行されるブロックです。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`for` や `while` ループには `else` を付けることができ、**`break` で中断されなかった場合のみ** 実行されます。"
+          },
+          {
+            "type": "code",
+            "filename": "loop-else.py",
+            "lang": "python",
+            "code": `for i in range(5):
+    if i == 3:
+        break
+else:
+    print("break されなければ実行される")
+  
+# この例では break があるため else は実行されない`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`break` が実行されなかった場合にのみ `else` が実行される",
+              "検索などで「見つからなかった場合の処理」に便利"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "pass-statement",
+        "title": "pass 文",
+        "summary": "構文上文が必要な場所で何もしないためのプレースホルダーです。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`pass` は、**「何もしない」ことを明示するための文** です。まだ実装していない関数や条件分岐などのプレースホルダーとして使われます。"
+          },
+          {
+            "type": "code",
+            "filename": "pass-basic.py",
+            "lang": "python",
+            "code": `def todo_function():
+    pass  # ここは後で実装予定
+  
+if True:
+    pass  # 条件はあるが今は何もしない`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "構文上文が必要だが処理したくないときに使う",
+              "未実装箇所の目印としてよく使われる"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "match-statement",
+        "title": "match 文",
+        "summary": "Python 3.10 以降で導入されたパターンマッチ構文です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`match` 文は Python 3.10 以降で導入された構文で、**値のパターンに基づいて分岐処理** を行います。`switch` に似ていますが、より強力なマッチングが可能です。"
+          },
+          {
+            "type": "code",
+            "filename": "match-basic.py",
+            "lang": "python",
+            "code": `status = 404
+  
+match status:
+    case 200:
+        print("OK")
+    case 404:
+        print("Not Found")
+    case 500:
+        print("Server Error")
+    case _:
+          print("Unknown Status")`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`match` は値や構造に基づく分岐を記述できる",
+              "`_` はワイルドカードとしてどんな値にもマッチ",
+              "Python 3.10 以降で利用可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      }
+    ]
+  },
+  {
+    "key": "python-functions",
+    "title": "Pythonの関数",
+    "lessons": [
+      {
+        "id": "function-definition",
+        "title": "関数の定義方法",
+        "summary": "`def` キーワードを使って関数を定義します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python の関数は `def` キーワードで定義し、処理をまとめて再利用可能にします。関数は引数（パラメータ）を受け取り、`return` で値を返すことができます。"
+          },
+          {
+            "type": "code",
+            "filename": "function-basic.py",
+            "lang": "python",
+            "code": `def greet(name):
+    return f"Hello, {name}!"
+  
+message = greet("Alice")
+print(message)  # Hello, Alice!`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`def` の後に関数名と引数リストを書く",
+              "関数内の処理はインデントで表す",
+              "`return` で値を返す（省略すると `None` が返る）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "default-args",
+        "title": "デフォルトの引数値",
+        "summary": "引数にデフォルト値を設定すると、省略時にも動作します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "引数にデフォルト値を設定すると、呼び出し時に値を渡さなくてもそのデフォルト値が使われます。"
+          },
+          {
+            "type": "code",
+            "filename": "default-args.py",
+            "lang": "python",
+            "code": `def greet(name="World"):
+    print(f"Hello, {name}!")
+  
+greet()           # Hello, World!
+greet("Python")   # Hello, Python!`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "デフォルト値は右から順に設定する必要がある",
+              "ミュータブル（例: リスト）をデフォルト値に使うときは注意が必要"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "keyword-args",
+        "title": "キーワード引数",
+        "summary": "引数名を指定して渡すと、順番に関係なく引数を渡せます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "キーワード引数を使うと、引数の順序を気にせず名前付きで渡せるため、コードの可読性が向上します。"
+          },
+          {
+            "type": "code",
+            "filename": "keyword-args.py",
+            "lang": "python",
+            "code": `def introduce(name, age):
+    print(f"{name} は {age} 歳です")
+  
+introduce(age=25, name="Alice")`
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "special-params",
+        "title": "特殊なパラメータ",
+        "summary": "Python では関数の引数にさまざまな制約を指定できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python 3.8 以降では、`/` や `*` を使って「位置専用」「キーワード専用」などのパラメータを定義できます。"
+          }
+        ],
+        "level": "basic",
+        "estMin": 3
+      },
+      {
+        "id": "positional-or-keyword",
+        "title": "位置またはキーワード引数",
+        "summary": "通常の引数は位置・キーワードのどちらでも指定可能です。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "positional-or-keyword.py",
+            "lang": "python",
+            "code": `def power(x, y):
+    return x ** y
+  
+print(power(2, 3))       # 位置引数
+print(power(x=2, y=3))   # キーワード引数`
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "positional-only",
+        "title": "位置専用引数",
+        "summary": "`/` を使うと、その前の引数は位置引数のみ許可されます。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "positional-only.py",
+            "lang": "python",
+            "code": `def add(x, y, /):
+    return x + y
+  
+print(add(1, 2))      # OK
+# print(add(x=1, y=2)) # ❌ エラー`
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "keyword-only",
+        "title": "キーワード専用引数",
+        "summary": "`*` の後の引数はキーワード引数でしか渡せません。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "keyword-only.py",
+            "lang": "python",
+            "code": `def greet(*, name):
+      print(f"Hello, {name}!")
+  
+  greet(name="Alice")  # OK
+  # greet("Alice")     # ❌ エラー`
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "function-example",
+        "title": "関数の例",
+        "summary": "位置専用・キーワード専用を組み合わせた関数の例です。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "function-example.py",
+            "lang": "python",
+            "code": `def example(a, b, /, c, *, d):
+    print(a, b, c, d)
+  
+example(1, 2, 3, d=4)   # OK`
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "special-summary",
+        "title": "要約",
+        "summary": "特殊パラメータの記号と意味を整理します。",
+        "content": [
+          {
+            "type": "ul",
+            "items": [
+              "`/` の前：位置専用引数のみ",
+              "`*` の後：キーワード専用引数のみ",
+              "通常の引数：どちらでも指定可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 3
+      },
+      {
+        "id": "varargs",
+        "title": "任意引数リスト",
+        "summary": "`*args` で任意個数の位置引数を受け取ります。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "varargs.py",
+            "lang": "python",
+            "code": `def total(*numbers):
+    return sum(numbers)
+  
+print(total(1, 2, 3))    # 6`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`*args` はタプルとして受け取る",
+              "0 個以上の位置引数に対応可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "unpack-args",
+        "title": "引数リストのアンパック",
+        "summary": "シーケンスや辞書を `*` や `**` で展開して渡せます。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "unpack-args.py",
+            "lang": "python",
+            "code": `def add(a, b, c):
+    return a + b + c
+  
+nums = [1, 2, 3]
+print(add(*nums))    # 6
+  
+params = {"a": 4, "b": 5, "c": 6}
+print(add(**params)) # 15`
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "lambda",
+        "title": "ラムダ式",
+        "summary": "小さな無名関数をその場で定義できます。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "lambda-basic.py",
+            "lang": "python",
+            "code": `square = lambda x: x * x
+print(square(5))  # 25
+  
+# 高階関数と組み合わせて
+nums = [1, 2, 3, 4]
+squares = list(map(lambda x: x ** 2, nums))
+print(squares)  # [1, 4, 9, 16]`
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "docstring",
+        "title": "ドキュメンテーション文字列",
+        "summary": "関数の説明を文字列として定義し、`help()` で参照できます。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "docstring.py",
+            "lang": "python",
+            "code": `def greet(name):
+    """名前を受け取り、挨拶文を返す関数"""
+    return f"Hello, {name}!"
+  
+print(help(greet))`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "関数の最初の行に三重クォートで記述",
+              "`help()` 関数で自動的に表示される",
+              "Sphinx などのドキュメント生成にも利用可能"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "function-annotations",
+        "title": "関数のアノテーション",
+        "summary": "引数や戻り値に型情報を付けることで、可読性と保守性が向上します。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "annotations.py",
+            "lang": "python",
+            "code": `def add(x: int, y: int) -> int:
+    return x + y
+  
+print(add(3, 5))`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "アノテーションは型チェックには影響しない（実行時は無視される）",
+              "静的解析ツールや IDE の補完で活用される",
+              "戻り値の型は `-> 型名` で指定する"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      }
+    ]
   }
+  
+  
+  
   
   
   
