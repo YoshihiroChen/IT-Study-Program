@@ -1785,7 +1785,397 @@ with suppress(FileNotFoundError):
         "estMin": 6
       }
     ]
+  },
+  {
+    "key": "python-classes",
+    "title": "Pythonのクラス",
+    "lessons": [
+      {
+        "id": "names-and-objects",
+        "title": "名前とオブジェクトについて",
+        "summary": "Python のすべての値はオブジェクトであり、名前はそれを指すラベルのようなものです。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python では、**すべてがオブジェクト** です。整数や文字列だけでなく、関数、クラス、モジュールまでもがオブジェクトです。そして変数は「オブジェクトを指すラベル」に過ぎません。"
+          },
+          {
+            "type": "code",
+            "filename": "names-objects.py",
+            "lang": "python",
+            "code": `a = [1, 2, 3]
+b = a  # b は a と同じリストを指す
+b.append(4)
+print(a)  # [1, 2, 3, 4]`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "変数はオブジェクトそのものではなく、オブジェクトへの参照（名前）",
+              "複数の名前が同じオブジェクトを指すことも可能",
+              "`id()` でオブジェクトの識別子を確認できる"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "scope-namespace",
+        "title": "Python のスコープと名前空間",
+        "summary": "スコープは名前が有効な範囲、名前空間は名前とオブジェクトの対応表です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python では名前が有効な範囲（スコープ）と、それがどのオブジェクトを指すかを管理する名前空間（namespace）が密接に関係しています。名前解決は LEGB ルール（Local → Enclosing → Global → Built-in）に従って行われます。"
+          },
+          {
+            "type": "code",
+            "filename": "scope-namespace.py",
+            "lang": "python",
+            "code": `x = "global"
+  
+def outer():
+    x = "enclosing"
+    def inner():
+        x = "local"
+        print(x)  # local
+    inner()
+    print(x)  # enclosing
+  
+outer()
+print(x)  # global`
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "scope-example",
+        "title": "スコープと名前空間の例",
+        "summary": "ローカル・グローバル・ビルトインなど、スコープの例です。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "scope-example.py",
+            "lang": "python",
+            "code": `x = 10  # グローバルスコープ
+  
+def func():
+    y = 5  # ローカルスコープ
+    print(x + y)
+  
+func()`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "ローカル: 関数内で定義された変数",
+              "グローバル: モジュール全体で有効な変数",
+              "ビルトイン: Python が提供する名前空間（例: `len`, `print`）"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "class-intro",
+        "title": "クラス初見",
+        "summary": "クラスはオブジェクト指向の中心的な構造で、データと処理をひとまとめにします。",
+        "content": [
+          {
+            "type": "p",
+            "text": "クラスは、**データ（属性）と動作（メソッド）をまとめて扱う** ための仕組みです。Python では `class` キーワードを使って定義します。"
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "class-syntax",
+        "title": "クラス定義の構文",
+        "summary": "`class` キーワードでクラスを定義します。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "class-basic.py",
+            "lang": "python",
+            "code": `class Person:
+    def __init__(self, name):
+        self.name = name
+  
+    def greet(self):
+        print(f"こんにちは、{self.name}です")
+  
+p = Person("Alice")
+p.greet()`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`__init__` はコンストラクタで、インスタンス生成時に呼ばれる",
+              "`self` はインスタンス自身を指す",
+              "属性は `self.属性名` として定義・アクセスする"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "class-object",
+        "title": "クラスオブジェクト",
+        "summary": "クラスもオブジェクトであり、動的に操作できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python ではクラスそのものもオブジェクトであり、他の関数に渡したり、属性を動的に追加することが可能です。"
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 4
+      },
+      {
+        "id": "instance-object",
+        "title": "インスタンスオブジェクト",
+        "summary": "クラスを呼び出すとインスタンスが生成されます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "クラスを関数のように呼ぶと、そのクラスのインスタンスが生成されます。インスタンスはクラスの属性やメソッドにアクセスできます。"
+          }
+        ],
+        "level": "basic",
+        "estMin": 4
+      },
+      {
+        "id": "method-object",
+        "title": "メソッドオブジェクト",
+        "summary": "インスタンスメソッドは、呼び出されると自動的に `self` を受け取ります。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "method-object.py",
+            "lang": "python",
+            "code": `class Counter:
+    def __init__(self, start=0):
+        self.value = start
+  
+    def increment(self):
+        self.value += 1
+  
+c = Counter()
+c.increment()
+print(c.value)  # 1`
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "class-instance-vars",
+        "title": "クラスとインスタンス変数",
+        "summary": "クラス変数は全インスタンスで共有され、インスタンス変数はそれぞれに固有です。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "class-vs-instance-vars.py",
+            "lang": "python",
+            "code": `class Dog:
+    species = "犬"  # クラス変数（共有）
+  
+    def __init__(self, name):
+        self.name = name  # インスタンス変数（個別）
+  
+a = Dog("ポチ")
+b = Dog("ハチ")
+  
+print(a.species, b.species)  # 犬 犬
+a.species = "オオカミ"
+print(a.species, b.species)  # オオカミ 犬`
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "class-cautions",
+        "title": "いろいろな注意点",
+        "summary": "ミュータブルなクラス変数や動的属性追加に注意。",
+        "content": [
+          {
+            "type": "p",
+            "text": "クラス変数にリストや辞書などミュータブルなオブジェクトを使うと、すべてのインスタンスで共有されるため意図しない挙動になることがあります。"
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 4
+      },
+      {
+        "id": "inheritance",
+        "title": "継承",
+        "summary": "既存のクラスを拡張して新しいクラスを作成できます。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "inheritance.py",
+            "lang": "python",
+            "code": `class Animal:
+    def speak(self):
+        print("...")
+  
+class Dog(Animal):
+    def speak(self):
+        print("ワン！")
+  
+Dog().speak()  # ワン！`
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "multiple-inheritance",
+        "title": "多重継承",
+        "summary": "複数のクラスから継承することも可能です。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "multiple-inheritance.py",
+            "lang": "python",
+            "code": `class A:
+    def greet(self):
+        print("A")
+  
+class B:
+    def greet(self):
+        print("B")
+  
+class C(A, B):
+    pass
+  
+C().greet()  # A （MRO に従う）`
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 5
+      },
+      {
+        "id": "private-vars",
+        "title": "プライベート変数",
+        "summary": "名前の前に `__` を付けると外部からアクセスしづらくなります。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "private-vars.py",
+            "lang": "python",
+            "code": `class Account:
+    def __init__(self, balance):
+        self.__balance = balance
+  
+    def get_balance(self):
+        return self.__balance
+  
+a = Account(100)
+print(a.get_balance())
+# print(a.__balance)  # AttributeError`
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "others",
+        "title": "残りのはしばし",
+        "summary": "クラスは動的に定義したり、属性を追加することも可能です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python のクラスは柔軟で、定義後に属性やメソッドを追加することもできます。これは他の静的型言語との大きな違いです。"
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 4
+      },
+      {
+        "id": "iterator",
+        "title": "イテレータ (iterator)",
+        "summary": "`__iter__` と `__next__` を実装すると、オブジェクトを反復処理可能にできます。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "iterator.py",
+            "lang": "python",
+            "code": `class Counter:
+    def __init__(self, stop):
+        self.current = 0
+        self.stop = stop
+  
+    def __iter__(self):
+        return self
+  
+    def __next__(self):
+        if self.current >= self.stop:
+            raise StopIteration
+        self.current += 1
+        return self.current
+  
+for i in Counter(3):
+    print(i)  # 1, 2, 3`
+          }
+        ],
+        "level": "intermediate",
+        "estMin": 6
+      },
+      {
+        "id": "generator",
+        "title": "ジェネレータ (generator)",
+        "summary": "`yield` を使って簡単にイテレータを作成できます。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "generator.py",
+            "lang": "python",
+            "code": `def countdown(n):
+    while n > 0:
+        yield n
+        n -= 1
+  
+for i in countdown(3):
+    print(i)  # 3, 2, 1`
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      },
+      {
+        "id": "generator-expr",
+        "title": "ジェネレータ式",
+        "summary": "内包表記のような簡潔な構文でジェネレータを生成できます。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "generator-expr.py",
+            "lang": "python",
+            "code": `squares = (x * x for x in range(5))
+for n in squares:
+    print(n)`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "リスト内包表記に似ているが、即時実行されず遅延評価される",
+              "メモリ効率がよく、大量データ処理に向いている"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 5
+      }
+    ]
   }
+  
   
   
   
