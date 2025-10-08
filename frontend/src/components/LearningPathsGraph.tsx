@@ -65,6 +65,7 @@ const tracks: Track[] = [
       { id: "web-3", label: "プログラミング言語学習（Python）", href: "/paths/web/py-basics", summary: "文、データ構造、クラス" },
       { id: "web-4", label: "開発フローとツールの紹介", href: "/paths/web/deploy-flow", summary: "アジャイル開発、ウォーターフォール開発、VsCode、Github等" },
       { id: "web-5", label: "開発フレームワークの紹介", href: "/paths/web/deploy", summary: "Next.js、React、FastApi" },
+      { id: "web-6", label: "Fastapiの学習", href: "/paths/web/fastapi", summary: "Next.js、React、FastApi" },
       // 分支补讲：与 web-2 同列，位于上一行，不参与默认横向连线
       {
         id: "web-2a",
@@ -129,6 +130,15 @@ const tracks: Track[] = [
         row: -2,
         chain: false,
       },
+      {
+        id: "web-4d",
+        label: "AWSの使用ガイダンス",
+        href: "/paths/web/aws-guidance",
+        summary: "AWSを使ってクラウド開発環境を構築する",
+        col: 4,
+        row: -2,
+        chain: false,
+      },
     ],
   },
   {
@@ -160,7 +170,7 @@ const tracks: Track[] = [
 
 /** 额外连线（跨泳道 / 竖直分支等） */
 type Side =
-  | "left" | "right" | "top" | "bottom"
+  | "left" | "right" | "top" | "bottom"| "left-in" | "right-out"
   | "top-in" | "top-out" | "bottom-in" | "bottom-out"
   | "left-out" | "right-in";
 
@@ -198,6 +208,7 @@ const extraEdges: ExtraEdge[] = [
     animated: true,
   },
   { source: "web-4b", target: "web-4c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  { source: "web-4c", target: "web-4d", sourceHandle: "right-out", targetHandle: "left-in", type: "straight", animated: true },
   
 
 ];
@@ -233,8 +244,8 @@ function StepNode({ data }: RFNodeProps<{ label: string; summary?: string; href?
       <div className="text-[15px] md:text-base font-semibold leading-tight break-words">{data.label}</div>
       {data.summary && <div className="mt-1 text-xs md:text-sm opacity-70 leading-snug break-words">{data.summary}</div>}
       {/* 主链左右 */}
-      <Handle type="target" position={Position.Left} id="left" />
-      <Handle type="source" position={Position.Right} id="right" />
+      <Handle type="target" position={Position.Left} id="left-in" />
+      <Handle type="source" position={Position.Right} id="right-out" />
       {/* 竖直分支上下 */}
       <Handle type="source" position={Position.Top} id="top" />
       <Handle type="target" position={Position.Bottom} id="bottom" />
