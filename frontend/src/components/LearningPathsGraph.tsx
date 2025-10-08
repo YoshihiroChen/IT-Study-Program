@@ -64,7 +64,7 @@ const tracks: Track[] = [
       },
       { id: "web-3", label: "プログラミング言語学習（Python）", href: "/paths/web/py-basics", summary: "文、データ構造、クラス" },
       { id: "web-4", label: "開発フローとツールの紹介", href: "/paths/web/deploy-flow", summary: "アジャイル開発、ウォーターフォール開発、VsCode、Github等" },
-      { id: "web-5", label: "開発フレームワークの紹介", href: "/paths/web/deploy", summary: "Next.js、React、FastApi" },
+      { id: "web-5", label: "開発フレームワークの紹介", href: "/paths/web/deploy-framework", summary: "Next.js、React、FastApi" },
       { id: "web-6", label: "Fastapiの学習", href: "/paths/web/fastapi", summary: "Next.js、React、FastApi" },
       // 分支补讲：与 web-2 同列，位于上一行，不参与默认横向连线
       {
