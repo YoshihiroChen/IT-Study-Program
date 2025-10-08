@@ -63,7 +63,7 @@ const tracks: Track[] = [
         summary: "特徴、文、値、変数、関数、非同期処理、モジュール",
       },
       { id: "web-3", label: "プログラミング言語学習（Python）", href: "/paths/web/py-basics", summary: "文、データ構造、クラス" },
-      { id: "web-4", label: "開発ツールと流れの紹介", href: "/paths/web/deploy", summary: "アジャイル開発、Vs Code" },
+      { id: "web-4", label: "開発フローとツールの紹介", href: "/paths/web/deploy-flow", summary: "アジャイル開発、Vs Code" },
       { id: "web-5", label: "開発フレームワークの紹介", href: "/paths/web/deploy", summary: "Next.js、React、FastApi" },
       // 分支补讲：与 web-2 同列，位于上一行，不参与默认横向连线
       {
