@@ -2174,7 +2174,120 @@ for n in squares:
         "estMin": 5
       }
     ]
+  },
+  {
+    "key": "python-venv-packages",
+    "title": "仮想環境とパッケージ",
+    "lessons": [
+      {
+        "id": "what-is-venv",
+        "title": "仮想環境とは",
+        "summary": "プロジェクトごとに独立した Python 実行環境を構築できる仕組みです。",
+        "content": [
+          {
+            "type": "p",
+            "text": "仮想環境（virtual environment）とは、**プロジェクトごとに独立した Python 実行環境を作る仕組み** です。これにより、異なるプロジェクト間で使用するライブラリやバージョンが衝突しないようにできます。"
+          },
+          {
+            "type": "p",
+            "text": "たとえば、あるプロジェクトでは Django 3.2 を使い、別のプロジェクトでは Django 4.0 を使いたい場合、仮想環境を使えば両方を同じマシン上で共存させられます。"
+          },
+          {
+            "type": "code",
+            "filename": "check-python-env.py",
+            "lang": "bash",
+            "code": "# 現在の Python のパス確認\necho $(which python3)\n\n# 現在インストールされているパッケージ一覧\npip list"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "仮想環境は Python の標準機能として提供されている（`venv` モジュール）",
+              "各プロジェクトで必要なパッケージを独立して管理できる",
+              "グローバル環境を汚さず、安全に開発できる"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 6
+      },
+      {
+        "id": "create-venv",
+        "title": "仮想環境の作成",
+        "summary": "`venv` モジュールを使ってプロジェクトごとに独立した環境を作成します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`python -m venv` コマンドで簡単に仮想環境を作成できます。通常はプロジェクトディレクトリ直下に `venv` フォルダを作成します。"
+          },
+          {
+            "type": "code",
+            "filename": "create-venv.sh",
+            "lang": "bash",
+            "code": "# 仮想環境の作成\npython3 -m venv venv\n\n# 仮想環境の有効化（macOS / Linux）\nsource venv/bin/activate\n\n# 仮想環境の有効化（Windows）\nvenv\\Scripts\\activate"
+          },
+          {
+            "type": "p",
+            "text": "仮想環境が有効になると、コマンドラインの先頭に `(venv)` のような表示が出て、使用される Python や pip がその環境内のものに切り替わります。"
+          },
+          {
+            "type": "code",
+            "filename": "check-env.sh",
+            "lang": "bash",
+            "code": "# 現在の Python パスを確認\nwhich python3\n\n# 仮想環境を終了\ndeactivate"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`python -m venv venv` で環境を作成",
+              "`source venv/bin/activate`（macOS / Linux）または `venv\\Scripts\\activate`（Windows）で有効化",
+              "`deactivate` でいつでも元に戻せる"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      },
+      {
+        "id": "pip-package-management",
+        "title": "pipを使ったパッケージ管理",
+        "summary": "pip は Python 標準のパッケージ管理ツールで、ライブラリのインストール・更新・削除ができます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`pip` は Python 標準のパッケージ管理ツールで、外部ライブラリのインストールやバージョン管理を行います。仮想環境内で使用することで、プロジェクトごとに依存関係を分離できます。"
+          },
+          {
+            "type": "code",
+            "filename": "pip-commands.sh",
+            "lang": "bash",
+            "code": "# パッケージのインストール\npip install requests\n\n# バージョン指定でインストール\npip install django==4.2.0\n\n# インストール済みパッケージの一覧\npip list\n\n# パッケージのアップグレード\npip install --upgrade requests\n\n# パッケージのアンインストール\npip uninstall requests"
+          },
+          {
+            "type": "p",
+            "text": "プロジェクトの依存関係を共有したいときは、`requirements.txt` に一覧を書き出して共有するのが一般的です。"
+          },
+          {
+            "type": "code",
+            "filename": "requirements.sh",
+            "lang": "bash",
+            "code": "# 現在の環境のパッケージを保存\npip freeze > requirements.txt\n\n# 別の環境で同じ構成を再現\npip install -r requirements.txt"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`pip install パッケージ名` でインストール",
+              "`pip list` や `pip show` で状態確認",
+              "`requirements.txt` を使うと環境を簡単に再現できる",
+              "仮想環境と pip を組み合わせるのが Python 開発の基本"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 8
+      }
+    ]
   }
+  
   
   
   

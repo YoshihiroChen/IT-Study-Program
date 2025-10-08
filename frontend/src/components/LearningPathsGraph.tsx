@@ -111,6 +111,15 @@ const tracks: Track[] = [
         row: -2,
         chain: false,
       },
+      {
+        id: "web-4b",
+        label: "Vs Codeの使用ガイダンス",
+        href: "/paths/web/vs-code-guidance",
+        summary: "Vs Codeを使って開発する基本的な手法を習得する",
+        col: 3,
+        row: -1,
+        chain: false,
+      },
     ],
   },
   {
@@ -168,6 +177,14 @@ const extraEdges: ExtraEdge[] = [
     target: "web-3d",
     sourceHandle: "left-out",
     targetHandle: "right-in",
+    type: "straight",
+    animated: true,
+  },
+  {
+    source: "web-4",
+    target: "web-4b",
+    sourceHandle: "top",
+    targetHandle: "bottom",
     type: "straight",
     animated: true,
   }
