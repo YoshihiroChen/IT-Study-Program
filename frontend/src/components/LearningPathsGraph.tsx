@@ -139,6 +139,15 @@ const tracks: Track[] = [
         row: -2,
         chain: false,
       },
+      {
+        id: "web-4e",
+        label: "ターミナルの使用ガイダンス",
+        href: "/paths/web/terminal-guidance",
+        summary: "ターミナルを使ってパソコンを操作する方法を習得する",
+        col: 3,
+        row: 0.9,
+        chain: false,
+      },
     ],
   },
   {
@@ -209,6 +218,7 @@ const extraEdges: ExtraEdge[] = [
   },
   { source: "web-4b", target: "web-4c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-4c", target: "web-4d", sourceHandle: "right-out", targetHandle: "left-in", type: "straight", animated: true },
+  { source: "web-4", target: "web-4e", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   
 
 ];
