@@ -63,7 +63,7 @@ const tracks: Track[] = [
         summary: "特徴、文、値、変数、関数、非同期処理、モジュール",
       },
       { id: "web-3", label: "プログラミング言語学習（Python）", href: "/paths/web/py-basics", summary: "文、データ構造、クラス" },
-      { id: "web-4", label: "開発フローとツールの紹介", href: "/paths/web/deploy-flow", summary: "アジャイル開発、Vs Code" },
+      { id: "web-4", label: "開発フローとツールの紹介", href: "/paths/web/deploy-flow", summary: "アジャイル開発、ウォーターフォール開発、VsCode、Github等" },
       { id: "web-5", label: "開発フレームワークの紹介", href: "/paths/web/deploy", summary: "Next.js、React、FastApi" },
       // 分支补讲：与 web-2 同列，位于上一行，不参与默认横向连线
       {
@@ -113,11 +113,20 @@ const tracks: Track[] = [
       },
       {
         id: "web-4b",
-        label: "Vs Codeの使用ガイダンス",
+        label: "VsCodeの使用ガイダンス",
         href: "/paths/web/vs-code-guidance",
-        summary: "Vs Codeを使って開発する基本的な手法を習得する",
+        summary: "VsCodeを使って開発する基本的な手法を習得する",
         col: 3,
         row: -1,
+        chain: false,
+      },
+      {
+        id: "web-4c",
+        label: "Githubの使用ガイダンス",
+        href: "/paths/web/github-guidance",
+        summary: "Githubを使ってソースコードを管理する基本的な手法を習得する",
+        col: 3,
+        row: -2,
         chain: false,
       },
     ],
@@ -187,7 +196,8 @@ const extraEdges: ExtraEdge[] = [
     targetHandle: "bottom",
     type: "straight",
     animated: true,
-  }
+  },
+  { source: "web-4b", target: "web-4c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   
 
 ];
