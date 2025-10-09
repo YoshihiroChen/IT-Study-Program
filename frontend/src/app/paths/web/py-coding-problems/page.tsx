@@ -423,7 +423,7 @@ export default function PyCodingProblemsPage() {
 
   // テーマ別クラス
   const pageCls = cx(isDark ? 'bg-neutral-950 text-neutral-100' : 'bg-white text-neutral-900', 'min-h-screen transition-colors');
-  const headerCls = cx('sticky top-0 z-40 border-b backdrop-blur', isDark ? 'border-white/10 bg-neutral-950/70' : 'border-neutral-200 bg-white/80');
+  const headerCls = cx('sticky top-0 z-40 backdrop-blur', isDark ? 'border-white/10 bg-neutral-950/70' : 'border-neutral-200 bg-white/80');
   const tabActive = isDark ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-emerald-600 hover:bg-emerald-500 text-white';
   const tabIdle = isDark ? 'bg-neutral-800 hover:bg-neutral-700' : 'bg-neutral-200 hover:bg-neutral-300';
   const cardBorder = isDark ? 'border-neutral-800' : 'border-neutral-200';
@@ -438,7 +438,7 @@ export default function PyCodingProblemsPage() {
         {/* ヘッダー */}
         <header className={headerCls}>
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-            <h1 className="text-2xl font-semibold tracking-tight">Python オンライン練習（Leet 風）</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Pythonオンライン実践</h1>
             <div className="flex items-center gap-3 text-sm">
               <span className={cx('opacity-80', error ? 'text-red-400' : '')}>
                 Pyodide 状態：{loading ? '読み込み中…' : error ? '読み込み失敗' : '準備完了'}
