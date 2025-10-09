@@ -12,6 +12,10 @@ import { Sun, Moon } from 'lucide-react';
 
 // ==================== 型定義 ====================
 
+// 放在文件顶部 import 后、其它代码之前
+const NL = '\n'; // 统一使用的换行符（防止 '\n' 被误改成真实换行）
+
+
 type TestCase = {
   name: string; // テスト名（UI 表示用）
   args: any[]; // Python 関数へ渡す引数（位置引数）
@@ -164,7 +168,7 @@ function usePyodide() {
 type Theme = 'light' | 'dark';
 
 function useTheme(): [Theme, () => void] {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
 
   // 初期化：localStorage or OS 設定
   useEffect(() => {
@@ -202,6 +206,117 @@ function useProblemState() {
   const resetBuffer = (id: string) => setBuffers((m) => ({ ...m, [id]: PROBLEMS.find((p) => p.id === id)!.starter }));
   return { buffers, setBuffer, resetBuffer };
 }
+
+/**
+ * スターターコードからインデント幅（スペース数）を推定
+ * 例: 最初に見つかったインデントの最小幅（2 か 4 が多い）。見つからなければ 4。
+ */
+// ===== 修正版：从 starter 推测缩进宽度 =====
+function detectIndentFromStarter(text: string): string {
+  const lines = text.split(NL);
+  let min: number | null = null;
+  for (const ln of lines) {
+    if (!ln.trim()) continue; // 空行は無視
+    const m = ln.match(/^ +/); // 先頭スペース
+    if (m) {
+      const n = m[0].length;
+      if (n > 0 && (min === null || n < min)) min = n;
+    }
+  }
+  // 先に null を排除して TS の警告をなくす
+  if (min === null) {
+    return ' '.repeat(4);
+  }
+  const size = min % 4 === 0 ? 4 : (min % 2 === 0 ? 2 : min);
+  return ' '.repeat(size);
+}
+
+
+/**
+ * テキストエリアで Tab / Shift+Tab によるインデントを実現
+ */
+// ===== 修正版：Tab/Shift+Tab 缩进处理（全部使用 NL）=====
+function handleEditorKeyDown(
+  e: React.KeyboardEvent<HTMLTextAreaElement>,
+  indent: string,
+  value: string,
+  setValue: (v: string) => void
+) {
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  const el = e.currentTarget;
+  const start = el.selectionStart ?? 0;
+  const end = el.selectionEnd ?? 0;
+
+  const before = value.slice(0, start);
+  const after = value.slice(end);
+
+  // 行頭〜行末のインデックス（使用するのは NL）
+  const lineStart = before.lastIndexOf(NL) + 1; // 先頭行なら 0
+  const lineEndIndex = value.indexOf(NL, end);
+  const lineEnd = lineEndIndex === -1 ? value.length : lineEndIndex;
+
+  const affected = value.slice(lineStart, lineEnd);
+  const isMultiLine = affected.includes(NL) || start !== end; // 複数行 or 範囲選択
+  const isShift = e.shiftKey;
+
+  if (isMultiLine) {
+    const lines = affected.split(NL);
+    if (isShift) {
+      // 逆インデント
+      const removed = lines.map((ln) => (ln.startsWith(indent) ? ln.slice(indent.length) : ln)).join(NL);
+      const newValue = value.slice(0, lineStart) + removed + value.slice(lineEnd);
+      const removedCount = lines.reduce(
+        (acc, ln) => acc + (ln.startsWith(indent) ? indent.length : 0),
+        0
+      );
+      const newStart = start - Math.min(indent.length, start - lineStart);
+      const newEnd = end - removedCount;
+      setValue(newValue);
+      requestAnimationFrame(() => {
+        el.selectionStart = newStart;
+        el.selectionEnd = newEnd;
+      });
+    } else {
+      // インデント追加
+      const added = lines.map((ln) => indent + ln).join(NL);
+      const newValue = value.slice(0, lineStart) + added + value.slice(lineEnd);
+      const addedCount = indent.length * lines.length;
+      const newStart = start + indent.length;
+      const newEnd = end + addedCount;
+      setValue(newValue);
+      requestAnimationFrame(() => {
+        el.selectionStart = newStart;
+        el.selectionEnd = newEnd;
+      });
+    }
+  } else {
+    if (isShift) {
+      // 単一行で Shift+Tab
+      const curLineStart = before.lastIndexOf(NL) + 1;
+      const curLine = value.slice(curLineStart, end);
+      let newValue = value;
+      let cursor = start;
+      if (curLine.startsWith(indent)) {
+        newValue = value.slice(0, curLineStart) + curLine.slice(indent.length) + value.slice(end);
+        cursor = Math.max(curLineStart, start - indent.length);
+      }
+      setValue(newValue);
+      requestAnimationFrame(() => {
+        el.selectionStart = el.selectionEnd = cursor;
+      });
+    } else {
+      // 単一位置に indent を挿入
+      const newValue = before + indent + after;
+      const cursor = start + indent.length;
+      setValue(newValue);
+      requestAnimationFrame(() => {
+        el.selectionStart = el.selectionEnd = cursor;
+      });
+    }
+  }
+}
+
 
 function toPlain(v: any): any {
   if (v == null) return v;
@@ -287,6 +402,8 @@ export default function PyCodingProblemsPage() {
   const isDark = theme === 'dark';
 
   const current = useMemo(() => PROBLEMS.find((p) => p.id === active)!, [active]);
+  // 現在の問題スターターからインデント幅（スペース）を推定
+  const indentStr = useMemo(() => detectIndentFromStarter(current.starter), [current.id]);
 
   async function onRun() {
     if (!pyodide) return;
@@ -392,6 +509,7 @@ export default function PyCodingProblemsPage() {
             <textarea
               value={buffers[current.id]}
               onChange={(e) => setBuffer(current.id, e.target.value)}
+              onKeyDown={(e) => handleEditorKeyDown(e, indentStr, buffers[current.id], (v) => setBuffer(current.id, v))}
               spellCheck={false}
               className={editorTextArea}
             />
@@ -457,4 +575,3 @@ export default function PyCodingProblemsPage() {
     </div>
   );
 }
-
