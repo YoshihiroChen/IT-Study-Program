@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+
 
 /**
  * 🐍 Python 練習ページ（LeetCode風）+ 昼夜テーマ切替
@@ -168,7 +170,7 @@ function usePyodide() {
 type Theme = 'light' | 'dark';
 
 function useTheme(): [Theme, () => void] {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setTheme] = useState<Theme>('light');
 
   // 初期化：localStorage or OS 設定
   useEffect(() => {
@@ -438,14 +440,34 @@ export default function PyCodingProblemsPage() {
         {/* ヘッダー */}
         <header className={headerCls}>
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-            <h1 className="text-2xl font-semibold tracking-tight">Pythonオンライン実践</h1>
+            {/* 左侧：返回首页 + 标题 */}
+            <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                className={cx(
+                  'flex items-center gap-1 px-2 py-1 rounded-lg border text-sm transition',
+                  isDark ? 'border-white/20 hover:bg-white/10 text-white'
+                        : 'border-neutral-300 hover:bg-neutral-100 text-neutral-800'
+                )}
+              >
+                <ChevronRight className="w-4 h-4 -rotate-180" />
+                <span>トップページ</span>
+              </Link>
+
+              <h1 className="text-2xl font-semibold tracking-tight">Pythonオンライン実践</h1>
+            </div>
+
+            {/* 右侧：状态 + 主题切换 */}
             <div className="flex items-center gap-3 text-sm">
               <span className={cx('opacity-80', error ? 'text-red-400' : '')}>
                 Pyodide 状態：{loading ? '読み込み中…' : error ? '読み込み失敗' : '準備完了'}
               </span>
               <button
                 onClick={toggleTheme}
-                className={cx('ml-2 flex items-center gap-2 rounded-lg border px-3 py-1.5 transition', isDark ? 'border-white/20 hover:bg-white/10' : 'border-neutral-300 hover:bg-neutral-100')}
+                className={cx(
+                  'ml-2 flex items-center gap-2 rounded-lg border px-3 py-1.5 transition',
+                  isDark ? 'border-white/20 hover:bg-white/10' : 'border-neutral-300 hover:bg-neutral-100'
+                )}
                 aria-label={isDark ? '昼モードに切替' : '夜モードに切替'}
               >
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -454,6 +476,7 @@ export default function PyCodingProblemsPage() {
             </div>
           </div>
         </header>
+
 
         {/* 問題タブ */}
         <div className="mb-4 flex flex-wrap gap-2">
