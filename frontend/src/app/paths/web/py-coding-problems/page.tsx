@@ -1,43 +1,31 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { Sun, Moon } from 'lucide-react';
 
 /**
- * 🐍 Python 練習ページ（LeetCode風）
+ * 🐍 Python 練習ページ（LeetCode風）+ 昼夜テーマ切替
  * - Pyodide を読み込み、ブラウザで Python を実行
- * - 各問題ごとにエディタにコードを書き、テストケースで採点（合格率でスコア）
- * - 完全クライアントサイド実装（Next.js のクライアントコンポーネント）
+ * - 各問題に対してコードを記述し、公開テストで採点（合格率でスコア表示）
+ * - 右上のボタンで ライト/ダーク を切替（localStorage に保存）
  */
 
 // ==================== 型定義 ====================
 
 type TestCase = {
-  /** テスト名（UI 表示用） */
-  name: string;
-  /** Python 関数へ渡す引数（位置引数のみ対応） */
-  args: any[];
-  /** 期待される戻り値（JS 側で比較） */
-  expected: any;
+  name: string; // テスト名（UI 表示用）
+  args: any[]; // Python 関数へ渡す引数（位置引数）
+  expected: any; // 期待される戻り値（JS で比較）
 };
 
 type Problem = {
-  /** 一意 ID */
-  id: string;
-  /** タブに表示するタイトル */
-  title: string;
-  /** 問題文 */
-  prompt: string;
-  /** 受験者が実装すべき関数名（Python 側のシンボル名） */
-  funcName: string;
-  /** エディタに最初から表示するスターターコード */
-  starter: string;
-  /** 公開テストケース */
-  tests: TestCase[];
-  /**
-   * 比較関数（省略時は deepEqual）。
-   * PyProxy（Pyodide の Python オブジェクト参照）を受けるので、必要に応じて整形。
-   */
-  validator?: (output: any, expected: any) => boolean;
+  id: string; // 一意 ID（タブ切替用）
+  title: string; // タブに表示するタイトル
+  prompt: string; // 問題文
+  funcName: string; // 受験者が実装すべき関数名（Python 名）
+  starter: string; // スターターコード
+  tests: TestCase[]; // 公開テスト
+  validator?: (output: any, expected: any) => boolean; // カスタム比較
 };
 
 // ==================== 問題セット ====================
@@ -72,7 +60,6 @@ const PROBLEMS: Problem[] = [
       { name: '空リスト', args: [[]], expected: [0, 0] },
     ],
     validator: (out, exp) => {
-      // Py 側の tuple などを配列風に受ける場合があるため、素直に 0/1 番目を比較
       const a0 = Array.isArray(out) ? out[0] : (out as any)[0];
       const a1 = Array.isArray(out) ? out[1] : (out as any)[1];
       return a0 === exp[0] && a1 === exp[1];
@@ -86,7 +73,7 @@ const PROBLEMS: Problem[] = [
     funcName: 'kaprekar_steps',
     starter: `# 4桁で同一数字のみ（例: 1111）の入力は除外される前提。\n# テストは有効ケースのみ与えられる。\n\ndef kaprekar_steps(n: int) -> int:\n    # TODO: 実装\n    return 0\n`,
     tests: [
-      { name: '3524', args: [3524], expected: 3 },  // 3524 -> 3087 -> 8352 -> 6174
+      { name: '3524', args: [3524], expected: 3 }, // 3524 -> 3087 -> 8352 -> 6174
       { name: '2111', args: [2111], expected: 5 },
       { name: '9831', args: [9831], expected: 7 },
       { name: '既に6174', args: [6174], expected: 0 },
@@ -100,30 +87,15 @@ const PROBLEMS: Problem[] = [
     funcName: 'top_k_words',
     starter: `# 規則: 小文字化し、英字以外を区切りとみなす（正規表現）。\n# (-count, word) でソートし、先頭 k 個の (word, count) を返す。\nimport re\nfrom collections import Counter\nfrom typing import List, Tuple\n\ndef top_k_words(text: str, k: int) -> List[Tuple[str, int]]:\n    # TODO: 実装\n    return []\n`,
     tests: [
-      {
-        name: '単純ケース',
-        args: ['Apple banana apple BANANA banana orange!', 2],
-        expected: [ ['banana', 3], ['apple', 2] ],
-      },
-      {
-        name: '同率ケース',
-        args: ['a a b b c', 2],
-        expected: [ ['a', 2], ['b', 2] ],
-      },
-      {
-        name: '句読点処理',
-        args: ['Hello, world! Hello... world?? hello;', 1],
-        expected: [['hello', 3]],
-      },
+      { name: '単純ケース', args: ['Apple banana apple BANANA banana orange!', 2], expected: [['banana', 3], ['apple', 2]] },
+      { name: '同率ケース', args: ['a a b b c', 2], expected: [['a', 2], ['b', 2]] },
+      { name: '句読点処理', args: ['Hello, world! Hello... world?? hello;', 1], expected: [['hello', 3]] },
     ],
     validator: (out, exp) => {
-      // Py の list[tuple[str,int]] -> JS 反映を素直にペア配列に変換して比較
       const toPairs = (v: any): [string, number][] => Array.from(v as any).map((x: any) => [String(x[0]), Number(x[1])]);
       const a = toPairs(out);
       if (a.length !== exp.length) return false;
-      for (let i = 0; i < a.length; i++) {
-        if (a[i][0] !== exp[i][0] || a[i][1] !== exp[i][1]) return false;
-      }
+      for (let i = 0; i < a.length; i++) if (a[i][0] !== exp[i][0] || a[i][1] !== exp[i][1]) return false;
       return true;
     },
   },
@@ -153,9 +125,6 @@ declare global {
   }
 }
 
-/**
- * Pyodide を動的に読み込み、準備完了までの状態を管理するフック。
- */
 function usePyodide() {
   const [pyodide, setPyodide] = useState<Pyodide | null>(null);
   const [loading, setLoading] = useState(true);
@@ -166,7 +135,6 @@ function usePyodide() {
     async function init() {
       try {
         setLoading(true);
-        // スクリプト未読込なら CDN から取得
         if (!window.loadPyodide) {
           await new Promise<void>((resolve, reject) => {
             const script = document.createElement('script');
@@ -185,12 +153,37 @@ function usePyodide() {
       }
     }
     init();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   return { pyodide, loading, error };
+}
+
+// ==================== テーマ（昼/夜）管理 ====================
+
+type Theme = 'light' | 'dark';
+
+function useTheme(): [Theme, () => void] {
+  const [theme, setTheme] = useState<Theme>('light');
+
+  // 初期化：localStorage or OS 設定
+  useEffect(() => {
+    const saved = typeof window !== 'undefined' ? (localStorage.getItem('pyproblems-theme') as Theme | null) : null;
+    if (saved === 'light' || saved === 'dark') {
+      setTheme(saved);
+      return;
+    }
+    const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(prefersDark ? 'dark' : 'light');
+  }, []);
+
+  // 変更時に保存
+  useEffect(() => {
+    if (typeof window !== 'undefined') localStorage.setItem('pyproblems-theme', theme);
+  }, [theme]);
+
+  const toggle = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
+  return [theme, toggle];
 }
 
 // ==================== ユーティリティ ====================
@@ -200,7 +193,6 @@ function cx(...xs: (string | false | null | undefined)[]) {
 }
 
 function useProblemState() {
-  // 各問題ごとのコードバッファ
   const [buffers, setBuffers] = useState<Record<string, string>>(() => {
     const init: Record<string, string> = {};
     for (const p of PROBLEMS) init[p.id] = p.starter;
@@ -211,27 +203,18 @@ function useProblemState() {
   return { buffers, setBuffer, resetBuffer };
 }
 
-/** Python の戻り値を JS 側で比較しやすい素の値に変換 */
 function toPlain(v: any): any {
   if (v == null) return v;
   if (typeof v === 'object') {
     if (Array.isArray(v)) return v.map(toPlain);
     if ((v as any).toJs) {
-      try {
-        return (v as any).toJs({ dict_converter: Object.fromEntries });
-      } catch {
-        try {
-          return (v as any).toJs();
-        } catch {
-          return String(v);
-        }
-      }
+      try { return (v as any).toJs({ dict_converter: Object.fromEntries }); }
+      catch { try { return (v as any).toJs(); } catch { return String(v); } }
     }
   }
   return v;
 }
 
-/** 構造的な等価比較（配列・オブジェクト対応） */
 function deepEqual(a: any, b: any): boolean {
   if (a === b) return true;
   if (typeof a !== typeof b) return false;
@@ -241,8 +224,7 @@ function deepEqual(a: any, b: any): boolean {
       for (let i = 0; i < a.length; i++) if (!deepEqual(a[i], b[i])) return false;
       return true;
     }
-    const ka = Object.keys(a);
-    const kb = Object.keys(b);
+    const ka = Object.keys(a), kb = Object.keys(b);
     if (ka.length !== kb.length) return false;
     for (const k of ka) if (!deepEqual(a[k], (b as any)[k])) return false;
     return true;
@@ -250,57 +232,36 @@ function deepEqual(a: any, b: any): boolean {
   return false;
 }
 
-// ==================== テスト実行器 ====================
-
 async function runTests(
   pyodide: Pyodide,
   problem: Problem,
   code: string
-): Promise<{
-  passed: number;
-  total: number;
-  details: { name: string; ok: boolean; got: any; expected: any; error?: string }[];
-}> {
-  // Python 側のグローバルをクリアしてクリーンな環境に
+): Promise<{ passed: number; total: number; details: { name: string; ok: boolean; got: any; expected: any; error?: string }[] }>
+{
+  // Python グローバルをクリア
   pyodide.runPython('globals().clear()');
 
-  // 1) 受験者コードを実行（関数定義）
+  // 受験者のコードを実行（関数定義）
   try {
     pyodide.runPython(code);
   } catch (e: any) {
     return {
       passed: 0,
       total: problem.tests.length,
-      details: problem.tests.map((t) => ({
-        name: t.name,
-        ok: false,
-        got: null,
-        expected: t.expected,
-        error: 'コードの実行時にエラーが発生しました: ' + (e?.message || String(e)),
-      })),
+      details: problem.tests.map((t) => ({ name: t.name, ok: false, got: null, expected: t.expected, error: 'コードの実行時エラー: ' + (e?.message || String(e)) })),
     };
   }
 
-  // 2) Python グローバルから目標関数を取得
   const func = pyodide.globals.get(problem.funcName);
   if (!func) {
     return {
       passed: 0,
       total: problem.tests.length,
-      details: problem.tests.map((t) => ({
-        name: t.name,
-        ok: false,
-        got: null,
-        expected: t.expected,
-        error: `関数 ${problem.funcName} が見つかりません。関数名が正しいか確認してください。`,
-      })),
+      details: problem.tests.map((t) => ({ name: t.name, ok: false, got: null, expected: t.expected, error: `関数 ${problem.funcName} が見つかりません` })),
     };
   }
 
-  // 3) 各テストを実行
-  let passed = 0;
-  const details: { name: string; ok: boolean; got: any; expected: any; error?: string }[] = [];
-
+  let passed = 0; const details: { name: string; ok: boolean; got: any; expected: any; error?: string }[] = [];
   for (const tc of problem.tests) {
     try {
       const out = func(...tc.args);
@@ -311,7 +272,6 @@ async function runTests(
       details.push({ name: tc.name, ok: false, got: null, expected: tc.expected, error: err?.message || String(err) });
     }
   }
-
   return { passed, total: problem.tests.length, details };
 }
 
@@ -323,6 +283,8 @@ export default function PyCodingProblemsPage() {
   const [active, setActive] = useState<string>(PROBLEMS[0].id);
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<Record<string, { passed: number; total: number; details: any[] }>>({});
+  const [theme, toggleTheme] = useTheme();
+  const isDark = theme === 'dark';
 
   const current = useMemo(() => PROBLEMS.find((p) => p.id === active)!, [active]);
 
@@ -342,14 +304,37 @@ export default function PyCodingProblemsPage() {
     setResults((m) => ({ ...m, [current.id]: undefined as any }));
   }
 
+  // テーマ別クラス
+  const pageCls = cx(isDark ? 'bg-neutral-950 text-neutral-100' : 'bg-white text-neutral-900', 'min-h-screen transition-colors');
+  const headerCls = cx('sticky top-0 z-40 border-b backdrop-blur', isDark ? 'border-white/10 bg-neutral-950/70' : 'border-neutral-200 bg-white/80');
+  const tabActive = isDark ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-emerald-600 hover:bg-emerald-500 text-white';
+  const tabIdle = isDark ? 'bg-neutral-800 hover:bg-neutral-700' : 'bg-neutral-200 hover:bg-neutral-300';
+  const cardBorder = isDark ? 'border-neutral-800' : 'border-neutral-200';
+  const cardBg = isDark ? 'bg-neutral-900/60' : 'bg-neutral-50';
+  const subPanelBg = isDark ? 'bg-black/30 text-neutral-300' : 'bg-white text-neutral-600';
+  const textMuted = isDark ? 'text-neutral-300' : 'text-neutral-600';
+  const editorTextArea = cx('h-[380px] w-full resize-none bg-transparent p-3 font-mono text-sm leading-6 focus:outline-none', isDark ? '' : 'text-neutral-800');
+
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+    <div className={pageCls}>
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* ヘッダー */}
-        <header className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight">Python オンライン練習（Leet 風）</h1>
-          <div className="text-sm opacity-80">
-            Pyodide 状態：{loading ? '読み込み中…' : error ? '読み込み失敗' : '準備完了'}
+        <header className={headerCls}>
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+            <h1 className="text-2xl font-semibold tracking-tight">Python オンライン練習（Leet 風）</h1>
+            <div className="flex items-center gap-3 text-sm">
+              <span className={cx('opacity-80', error ? 'text-red-400' : '')}>
+                Pyodide 状態：{loading ? '読み込み中…' : error ? '読み込み失敗' : '準備完了'}
+              </span>
+              <button
+                onClick={toggleTheme}
+                className={cx('ml-2 flex items-center gap-2 rounded-lg border px-3 py-1.5 transition', isDark ? 'border-white/20 hover:bg-white/10' : 'border-neutral-300 hover:bg-neutral-100')}
+                aria-label={isDark ? '昼モードに切替' : '夜モードに切替'}
+              >
+                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                <span>{isDark ? '昼' : '夜'}</span>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -358,19 +343,17 @@ export default function PyCodingProblemsPage() {
           {PROBLEMS.map((p) => {
             const r = results[p.id];
             const score = r ? Math.round((r.passed / r.total) * 100) : null;
+            const isActive = active === p.id;
             return (
               <button
                 key={p.id}
                 onClick={() => setActive(p.id)}
-                className={
-                  'rounded-full px-4 py-2 text-sm transition ' +
-                  (active === p.id ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-neutral-800 hover:bg-neutral-700')
-                }
+                className={cx('rounded-full px-4 py-2 text-sm transition', isActive ? tabActive : tabIdle)}
                 title={score != null ? `スコア ${score}%` : undefined}
               >
                 {p.title}
                 {score != null && (
-                  <span className="ml-2 rounded-full bg-black/30 px-2 py-0.5 text-[10px]">{score}%</span>
+                  <span className={cx('ml-2 rounded-full px-2 py-0.5 text-[10px]', isDark ? 'bg-black/30' : 'bg-black/70 text-white')}>{score}%</span>
                 )}
               </button>
             );
@@ -380,10 +363,10 @@ export default function PyCodingProblemsPage() {
         {/* 問題パネル */}
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* 説明 */}
-          <article className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
+          <article className={cx('rounded-2xl border p-4', cardBorder, cardBg)}>
             <h2 className="mb-2 text-lg font-medium">問題文</h2>
-            <p className="whitespace-pre-wrap text-neutral-300">{current.prompt}</p>
-            <div className="mt-4 rounded-xl bg-black/30 p-3 text-xs text-neutral-300">
+            <p className={cx('whitespace-pre-wrap', textMuted)}>{current.prompt}</p>
+            <div className={cx('mt-4 rounded-xl p-3 text-xs', subPanelBg, 'border', isDark ? 'border-white/10' : 'border-neutral-200')}>
               <p>
                 関数シグネチャ：<code className="select-all">{current.funcName}(…)</code>
               </p>
@@ -392,20 +375,15 @@ export default function PyCodingProblemsPage() {
           </article>
 
           {/* エディタ */}
-          <article className="overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/60 p-0">
-            <div className="flex items-center justify-between border-b border-neutral-800 px-3 py-2">
+          <article className={cx('overflow-hidden rounded-2xl border p-0', cardBorder, cardBg)}>
+            <div className={cx('flex items-center justify-between border-b px-3 py-2', isDark ? 'border-neutral-800' : 'border-neutral-200')}>
               <h3 className="text-sm font-medium">コードエディタ（Python）</h3>
               <div className="flex items-center gap-2">
-                <button onClick={onReset} className="rounded-md bg-neutral-800 px-3 py-1.5 text-xs hover:bg-neutral-700">
-                  初期コードに戻す
-                </button>
+                <button onClick={onReset} className={cx('rounded-md px-3 py-1.5 text-xs', isDark ? 'bg-neutral-800 hover:bg-neutral-700' : 'bg-neutral-200 hover:bg-neutral-300')}>初期コードに戻す</button>
                 <button
                   onClick={onRun}
                   disabled={!pyodide || running || !!error}
-                  className={cx(
-                    'rounded-md px-3 py-1.5 text-xs',
-                    running || !pyodide || !!error ? 'cursor-not-allowed bg-neutral-700' : 'bg-emerald-600 hover:bg-emerald-500'
-                  )}
+                  className={cx('rounded-md px-3 py-1.5 text-xs', running || !pyodide || !!error ? (isDark ? 'cursor-not-allowed bg-neutral-700' : 'cursor-not-allowed bg-neutral-300') : 'bg-emerald-600 hover:bg-emerald-500 text-white')}
                 >
                   {running ? '実行中…' : 'テストを実行'}
                 </button>
@@ -415,35 +393,31 @@ export default function PyCodingProblemsPage() {
               value={buffers[current.id]}
               onChange={(e) => setBuffer(current.id, e.target.value)}
               spellCheck={false}
-              className="h-[380px] w-full resize-none bg-transparent p-3 font-mono text-sm leading-6 focus:outline-none"
+              className={editorTextArea}
             />
           </article>
         </section>
 
         {/* 結果 */}
-        <section className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
+        <section className={cx('mt-4 rounded-2xl border p-4', cardBorder, cardBg)}>
           <h2 className="mb-3 text-lg font-medium">テスト結果</h2>
           {results[current.id] ? (
             <div>
-              <div className="mb-3 text-sm text-neutral-300">
-                合格 {results[current.id].passed} / {results[current.id].total}（スコア{' '}
-                {Math.round((results[current.id].passed / results[current.id].total) * 100)}%）
+              <div className={cx('mb-3 text-sm', textMuted)}>
+                合格 {results[current.id].passed} / {results[current.id].total}（スコア {Math.round((results[current.id].passed / results[current.id].total) * 100)}%）
               </div>
               <ul className="space-y-2">
                 {results[current.id].details.map((d, i) => (
                   <li
                     key={i}
-                    className={cx(
-                      'rounded-xl border px-3 py-2 text-sm',
-                      d.ok ? 'border-emerald-700 bg-emerald-900/20' : 'border-red-800 bg-red-900/20'
-                    )}
+                    className={cx('rounded-xl border px-3 py-2 text-sm', d.ok ? (isDark ? 'border-emerald-700 bg-emerald-900/20' : 'border-emerald-300 bg-emerald-50') : (isDark ? 'border-red-800 bg-red-900/20' : 'border-red-300 bg-red-50'))}
                   >
                     <div className="flex items-center justify-between">
                       <div className="font-medium">{d.name}</div>
-                      <div className={d.ok ? 'text-emerald-400' : 'text-red-400'}>{d.ok ? '合格' : '不合格'}</div>
+                      <div className={d.ok ? 'text-emerald-500' : 'text-red-500'}>{d.ok ? '合格' : '不合格'}</div>
                     </div>
                     {!d.ok && (
-                      <div className="mt-1 text-neutral-300">
+                      <div className={cx('mt-1', textMuted)}>
                         <div className="break-words">
                           <span className="opacity-70">期待値：</span>
                           <code className="select-all"> {JSON.stringify(d.expected)}</code>
@@ -466,12 +440,12 @@ export default function PyCodingProblemsPage() {
               </ul>
             </div>
           ) : (
-            <div className="text-sm text-neutral-400">まだ実行していません。「テストを実行」をクリックしてください。</div>
+            <div className={cx('text-sm', isDark ? 'text-neutral-400' : 'text-neutral-500')}>まだ実行していません。「テストを実行」をクリックしてください。</div>
           )}
         </section>
 
         {/* ヒント */}
-        <section className="mt-6 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4 text-sm text-neutral-300">
+        <section className={cx('mt-6 rounded-2xl border p-4 text-sm', cardBorder, cardBg, textMuted)}>
           <h3 className="mb-2 font-medium">ヒント</h3>
           <ul className="list-disc pl-5">
             <li>問題文で指定された関数名・引数・戻り値の型に従って実装してください。</li>
@@ -483,3 +457,4 @@ export default function PyCodingProblemsPage() {
     </div>
   );
 }
+
