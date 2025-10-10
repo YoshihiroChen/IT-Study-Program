@@ -41,6 +41,169 @@ type Chapter = {
 
 /** ---------- 示例课程大纲 ---------- */
 const CURRICULUM: Chapter[] = [
+  {
+    "key": "vscode-local-dev",
+    "title": "Local開発の準備",
+    "lessons": [
+      {
+        "id": "install",
+        "title": "VS Codeのインストール",
+        "summary": "Visual Studio Codeをダウンロードしてローカル開発環境を整えます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Visual Studio Code（VS Code）は、Web開発からPython、機械学習、クラウド開発まで幅広く利用されている軽量かつ高機能なエディタです。この教材では、VS Codeを使ってローカル開発を行う方法を学びます。"
+          },
+          {
+            "type": "p",
+            "text": "まずは公式サイトからVS Codeをダウンロードします。自分のOS（macOS / Windows / Linux）に合ったインストーラーを選んでください。"
+          },
+          {
+            "type": "p",
+            "text": "👉 [Visual Studio Code公式サイト](https://code.visualstudio.com/)"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-0.png",
+            "alt": "VS Code公式サイトのトップページ",
+            "caption": "公式サイトから「Download」をクリックしてインストールします。"
+          },
+          {
+            "type": "p",
+            "text": "インストールが完了したら、VS Codeを起動してみましょう。最初に表示されるのが次のような「Welcome画面」です。ここから新しいファイルを作成したり、既存のフォルダーを開いたりできます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-1.png",
+            "alt": "VS CodeのWelcome画面",
+            "caption": "起動直後のWelcomeページ。左上のExplorerをクリックします。"
+          }
+        ]
+      },
+      {
+        "id": "open-folder",
+        "title": "フォルダーを開いてプロジェクトを始める",
+        "summary": "エクスプローラーを使って開発するフォルダーを選びましょう。",
+        "content": [
+          {
+            "type": "p",
+            "text": "VS Codeで開発を始める基本は、まず「フォルダーを開く」ことです。これは、プロジェクト全体を1つのフォルダーとして管理するためです。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-2.png",
+            "alt": "エクスプローラーを開く",
+            "caption": "左側の（Open Folder）をクリックすると、プロジェクト全体を1つのフォルダーとして管理します"
+          },
+          {
+            "type": "p",
+            "text": "「Open Folder...」をクリックすると、フォルダー選択ダイアログが表示されます。ここで、自分の開発用フォルダー（例：example-projectなど）を選びましょう。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-3.png",
+            "alt": "Open Folderのダイアログ",
+            "caption": "フォルダー選択画面。プロジェクト用に新しいフォルダーを作ることもできます。"
+          },
+          {
+            "type": "p",
+            "text": "フォルダーを開くとき、「このフォルダー内のファイルの作者を信頼しますか？」というメッセージが表示される場合があります。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-4.png",
+            "alt": "Trust the authors ダイアログ",
+            "caption": "信頼できるフォルダーであれば「Yes, I trust the authors」を選択してください。"
+          },
+          {
+            "type": "p",
+            "text": "フォルダーを開くと、左側にファイルツリー（ディレクトリ構成）が表示されます。これが開発のスタート地点になります。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-5.png",
+            "alt": "フォルダーを開いた後のエクスプローラー画面",
+            "caption": "左側にファイル構成が表示され、ここからファイルを作成・編集できます。"
+          }
+        ]
+      },
+      {
+        "id": "command-terminal",
+        "title": "コマンドパレットとターミナルの使い方",
+        "summary": "開発中に必要なターミナルやコマンドをVS Code内で開く方法を学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "VS Codeでは、開発中にさまざまなコマンド（例：ファイル作成、実行、設定変更）を「コマンドパレット」から実行できます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-6.png",
+            "alt": "コマンドパレットの開き方",
+            "caption": "上部の検索バーをクリックするか、ショートカット（Mac：⌘ + Shift + P / Windows：Ctrl + Shift + P）で開けます。"
+          },
+          {
+            "type": "p",
+            "text": "「Show and Run Commands」と入力すると、VS Codeが提供するすべてのコマンド一覧が表示されます。ここから「Create New Terminal」を選びます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-7.png",
+            "alt": "Create New Terminalを選択",
+            "caption": "コマンドパレットから「Terminal: Create New Terminal」を選ぶと、下部にターミナルが開きます。"
+          },
+          {
+            "type": "p",
+            "text": "「Create New Terminal」をクリックすると、シェル（コマンド実行環境）を選択することができます。bash、zsh、PowerShell、またはJavaScript Debug Terminalなどから選べます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-8.png",
+            "alt": "ターミナルの種類選択画面",
+            "caption": "ターミナル種別の選択。macOSではbashやzsh、WindowsではPowerShellが一般的です。"
+          },
+          {
+            "type": "p",
+            "text": "VS Codeで新しいターミナルを開くときは、使用するシェル（Shell）を選択できます。ここでは、開発でよく使われる3つのターミナルを紹介します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "bash（バッシュ）：LinuxやmacOSで標準的に使われるシェル。EC2などのサーバーでも一般的で、ファイル操作・Git・プログラム実行など多用途に使われます。",
+              "zsh（ゼットシェル）：macOSの新しいデフォルトシェル。bashとほぼ同じ操作ができ、補完機能やカスタマイズ性が高いのが特徴です。",
+              "JavaScript Debug Terminal：Node.jsアプリケーションをデバッグするための特別なターミナル。コードを実行すると同時に、ブレークポイントや変数の状態をVS Code上で確認できます。"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "通常の開発作業ではbashまたはzshを使い、JavaScript Debug TerminalはNode.jsやNext.jsのデバッグ時に利用します。"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-8.png",
+            "alt": "ターミナルの種類選択画面",
+            "caption": "bash、zsh、JavaScript Debug Terminalなどから選択できます。macOSではzsh、Linuxではbashが一般的です。"
+          },
+          {
+            "type": "p",
+            "text": "ターミナルが表示されたら、コマンドを入力して操作できます。ここの例として、「pwd」というコマンドを実行します"
+          },
+          {
+            "type": "img",
+            "src": "/images/vs-code-9.png",
+            "alt": "ターミナルの画面"
+          },
+          
+          {
+            "type": "p",
+            "text": "これで、VS Codeを使ってローカル開発を始める準備が整いました。次の章では、クラウド（AWS EC2）に接続して開発する方法を学びます。"
+          }
+        ]
+      }
+    ]
+  }
+  
+  
   
   
   
