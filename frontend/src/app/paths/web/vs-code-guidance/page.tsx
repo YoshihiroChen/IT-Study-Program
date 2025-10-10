@@ -201,7 +201,257 @@ const CURRICULUM: Chapter[] = [
         ]
       }
     ]
+  },
+  {
+    "key": "vscode-cloud-dev",
+    "title": "クラウド開発の準備",
+    "lessons": [
+      {
+        "id": "ec2-create",
+        "title": "AWSでEC2インスタンスを作成する",
+        "summary": "AWSコンソールから新しいEC2インスタンスを立ち上げて、クラウド上の開発環境を準備します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "まずはAWSの公式コンソールにログインし、サービス一覧から「EC2」を選択します。左上の「Instances」をクリックし、「Launch instances」を押すと新しいサーバーを作成する画面が開きます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-1.png",
+            "alt": "GoogleでAWSを検索",
+            "caption": "GoogleでAWSを検索、公式サイトを開きます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-2.png",
+            "alt": "公式サイトでアカウント作成",
+            "caption": "公式サイトでアカウント作成"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-3.png",
+            "alt": "公式サイトで「コンソールにサインイン」をクリック",
+            "caption": "アカウント作成したら公式サイトで「コンソールにサインイン」をクリック"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-4.png",
+            "alt": "サインインした後はコンソールのトップページに到着",
+            "caption": "サインインした後はコンソールのトップページに到着"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-5.png",
+            "alt": "上側の検索バーでEC2を入力、EC2仮想サーバーを開く",
+            "caption": "上側の検索バーでEC2を入力、EC2仮想サーバーを開く"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-6.png",
+            "alt": "右上から地域を変更する",
+            "caption": "右上から地域を変更する"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-7.png",
+            "alt": "地域を変更した後は「Launch Instance」を開く",
+            "caption": "地域を変更した後は「インスタンスを起動」をクリック"
+          },
+          {
+            "type": "p",
+            "text": "「インスタンスを起動」をクリックした後、以下の設定で"
+          },
+          
+          {
+            "type": "ul",
+            "items": [
+              "Name：任意（例：my-vscode-server）",
+              "AMI（OS）：Amazon Linux 2023 Kernel-6.1 AMI",
+              "Instance type：t2.micro（無料枠）または t3.small（性能重視）",
+              "Key pair：新しく作成（.pemファイルを必ずダウンロード）",
+              "Network settings：「からの SSH トラフィックを許可」にチェックを入れる",
+              "Storage：8GB（必要に応じて拡張可）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "設定が終わったら右下の「インスタンスを起動」をクリックし、インスタンスを起動します。"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-8.png",
+            "alt": "AMI（OS）：Amazon Linux 2023 Kernel-6.1 AMI",
+            "caption": "AMI（OS）：Amazon Linux 2023 Kernel-6.1 AMI"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-8.png",
+            "alt": "AMI（OS）：Amazon Linux 2023 Kernel-6.1 AMI",
+            "caption": "AMI（OS）：Amazon Linux 2023 Kernel-6.1 AMI"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-9.png",
+            "alt": "Instance type：t2.micro（無料枠）または t3.small（性能重視）",
+            "caption": "Instance type：t2.micro（無料枠）または t3.small（性能重視）"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-11.png",
+            "alt": "Network settings：「からの SSH トラフィックを許可」にチェックを入れる",
+            "caption": "Network settings：「からの SSH トラフィックを許可」にチェックを入れる"
+          },
+        ]
+      },
+      {
+        "id": "keypair",
+        "title": "Key Pair（秘密鍵）の作成",
+        "summary": "SSH接続に必要な秘密鍵（.pemファイル）を作成し、安全に保管します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "EC2に接続するには「Key Pair」と呼ばれる秘密鍵が必要です。これはサーバーへのログインを許可する“鍵”のようなものです。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Step 3: Key pair (login) の欄で「Create new key pair」を選択",
+              "Key pair name：任意（自分で決める）",
+              "Key pair type：RSA",
+              "Private key file format：macOS / Linux → .pem、Windows（PuTTY使用時）→ .ppk"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "「Create key pair」をクリックすると、.pem ファイル（例：my-ec2-key.pem）が自動的にダウンロードされます。"
+          },
+          {
+            "type": "p",
+            "text": "このファイルは一度しかダウンロードできません。ここではDownloadsフォルダにダウンロードしてください。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "mac / Linux：~/.ssh/<あなたのキーペア名>.pem",
+              "Windows：C:\\Users\\あなたのユーザー名\\.ssh\\<あなたのキーペア名>.pem"
+            ]
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-10.png",
+            "alt": "Create key pair",
+            "caption": "Create key pair"
+          },
+        ]
+      },
+      {
+        "id": "ec2-launch",
+        "title": "インスタンスの起動とパブリックIP確認",
+        "summary": "起動したインスタンスの状態とIPアドレスを確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "インスタンスの設定が完了したら、「Launch instance」をクリックして起動します。数分後、ステータスが「Running」になれば成功です。"
+          },
+          {
+            "type": "p",
+            "text": "左のメニューから「Instances」を開き、起動したサーバーを選びましょう。「Public IPv4 address」に表示されている数値（例：xx.xxx.xx.xx）が接続に使うIPアドレスです。"
+          },
+          {
+            "type": "p",
+            "text": "このIPアドレスをメモしておきましょう。次のステップでSSH接続に使用します。"
+          }
+        ]
+      },
+      {
+        "id": "ssh-connect",
+        "title": "ターミナルからSSH接続を確認する",
+        "summary": "ローカル端末からEC2にSSH接続できるか確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "次に、自分のパソコンのターミナルを使ってEC2へ接続できるか確認します。まずはダウンロードした.pemファイルを適切な場所に移動し、アクセス権限を設定します。"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "mv ~/Downloads/<あなたのキーペア名>.pem ~/.ssh/\nchmod 400 ~/.ssh/<あなたのキーペア名>.pem"
+          },
+          {
+            "type": "p",
+            "text": "次に、SSHコマンドでサーバーに接続します。"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "ssh -i ~/.ssh/<あなたのキーペア名>.pem ec2-user@<あなたのPublic IP>\n\n# 例：\n# ssh -i ~/.ssh/あなたのキーペア名.pem ec2-user@<あなたのPublic IP>"
+          },
+          {
+            "type": "p",
+            "text": "接続に成功すると、次のようなプロンプトが表示されます。"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "[ec2-user@ip-xx.xxx.xx.xx ~]$"
+          },
+          {
+            "type": "p",
+            "text": "これで、ローカル端末からクラウド上のEC2サーバーにログインできるようになりました。"
+          }
+        ]
+      },
+      {
+        "id": "vscode-remote",
+        "title": "VS CodeでEC2にリモート接続する",
+        "summary": "VS CodeのRemote-SSH機能を使って、クラウドサーバーに直接接続します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "VS Codeを開き、拡張機能（Extensions）から「Remote - SSH」を検索してインストールします。"
+          },
+          {
+            "type": "p",
+            "text": "次に、ショートカット（macOS：Cmd + Shift + P / Windows：Ctrl + Shift + P）でコマンドパレットを開き、「Remote-SSH: Add New SSH Host」を選択します。"
+          },
+          {
+            "type": "p",
+            "text": "表示された入力欄に以下のコマンドを入力し、自分の鍵とIPに置き換えます。"
+          },
+          {
+            "type": "code",
+            "filename": "ssh-config-example",
+            "lang": "bash",
+            "code": "ssh -i ~/.ssh/<あなたのキーペア名>.pem ec2-user@<あなたのPublic IP>"
+          },
+          {
+            "type": "p",
+            "text": "保存先は「Save to default SSH config file（~/.ssh/config）」を選びます。"
+          },
+          {
+            "type": "p",
+            "text": "再びコマンドパレットを開き、「Remote-SSH: Connect to Host」を実行し、保存したホストを選択します。"
+          },
+          {
+            "type": "p",
+            "text": "初回接続時はVS Codeが自動的に必要なサーバーコンポーネントをインストールします。1〜2分ほど待つと、左下に「SSH: <接続先名>」と表示され、クラウド上の環境に接続完了です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "リモート上のファイルを直接開ける",
+              "VS Code内でリモートターミナルを利用できる",
+              "クラウドとローカルを一体化した開発が可能"
+            ]
+          }
+        ]
+      }
+    ]
   }
+   
   
   
   
