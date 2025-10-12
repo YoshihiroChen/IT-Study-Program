@@ -475,7 +475,7 @@ const CURRICULUM: Chapter[] = [
     "lessons": [
       {
         "id": "create-structure",
-        "title": "プロジェクト構造を作る",
+        "title": "（静的アプリを作る）プロジェクト構造を作る",
         "summary": "HTML、CSS、JavaScriptの3つのファイルを作成して、基本的な静的Webアプリの構造を理解します。",
         "content": [
           {
@@ -491,6 +491,12 @@ const CURRICULUM: Chapter[] = [
             ]
           },
           {
+            "type": "img",
+            "src": "/images/aws-15.png",
+            "alt": "インスタンスを開く",
+            "caption": "このボタンを押してファイルを作る"
+          },
+          {
             "type": "p",
             "text": "まずはHTMLファイルを作成し、ページの骨格を定義します。"
           },
@@ -499,6 +505,12 @@ const CURRICULUM: Chapter[] = [
             "filename": "index.html",
             "lang": "html",
             "code": "<!DOCTYPE html>\n<html lang=\"ja\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>My Static App</title>\n    <link rel=\"stylesheet\" href=\"style.css\" />\n  </head>\n  <body>\n    <h1>こんにちは、VS Code！</h1>\n    <button id=\"btn\">クリックしてみよう</button>\n    <p id=\"message\"></p>\n    <script src=\"script.js\"></script>\n  </body>\n</html>"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-16.png",
+            "alt": "index.htmlファイルを編集する",
+            "caption": "index.htmlファイルを編集する"
           },
           {
             "type": "p",
@@ -511,6 +523,12 @@ const CURRICULUM: Chapter[] = [
             "code": "body {\n  font-family: sans-serif;\n  text-align: center;\n  padding: 50px;\n  background-color: #f5f5f5;\n}\n\nh1 {\n  color: #333;\n}\n\nbutton {\n  background-color: #0078d7;\n  color: white;\n  border: none;\n  padding: 10px 20px;\n  border-radius: 5px;\n  cursor: pointer;\n}\n\nbutton:hover {\n  background-color: #005ea2;\n}"
           },
           {
+            "type": "img",
+            "src": "/images/aws-17.png",
+            "alt": "style.cssファイルを編集する",
+            "caption": "style.cssファイルを編集する"
+          },
+          {
             "type": "p",
             "text": "最後にJavaScriptファイルで、ページに動きをつけます。"
           },
@@ -519,6 +537,12 @@ const CURRICULUM: Chapter[] = [
             "filename": "script.js",
             "lang": "javascript",
             "code": "const button = document.getElementById('btn');\nconst message = document.getElementById('message');\n\nbutton.addEventListener('click', () => {\n  message.textContent = 'クリックありがとう！JavaScriptが動いています。';\n});"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-18.png",
+            "alt": "script.jsファイルを編集する",
+            "caption": "script.jsファイルを編集する"
           },
           {
             "type": "p",
@@ -544,18 +568,43 @@ const CURRICULUM: Chapter[] = [
             ]
           },
           {
+            "type": "img",
+            "src": "/images/aws-19.png",
+            "alt": "拡張機能（Extensions）で「Live Server」を検索してインストール",
+            "caption": "拡張機能（Extensions）で「Live Server」を検索してインストール"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-20.png",
+            "alt": "index.htmlを開き、右下の「Go Live」ボタンをクリック",
+            "caption": "index.htmlを開き、右下の「Go Live」ボタンをクリック"
+          },
+          {
             "type": "p",
             "text": "HTML・CSS・JavaScriptを保存するたびに自動で更新されます。これでリアルタイムにデザインや動作を確認できます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-21.png",
+            "alt": "ブラウザが自動的に起動し、http://127.0.0.1:5500 でページが表示される",
+            "caption": "ブラウザが自動的に起動し、http://127.0.0.1:5500 でページが表示される"
           },
           {
             "type": "p",
             "text": "次のようにボタンをクリックすると、JavaScriptが正しく動作してメッセージが表示されます。"
           },
+          
           {
             "type": "code",
             "filename": "terminal-output.txt",
             "lang": "bash",
             "code": "クリックありがとう！JavaScriptが動いています。"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-22.png",
+            "alt": "「クリックしてみよう」ボタンを押したら、メッセージが表示される",
+            "caption": "「クリックしてみよう」ボタンを押したら、メッセージが表示される"
           },
           {
             "type": "p",
