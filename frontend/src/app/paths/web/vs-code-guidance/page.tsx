@@ -468,7 +468,104 @@ const CURRICULUM: Chapter[] = [
         ]
       }
     ]
+  },
+  {
+    "key": "vscode-static-web",
+    "title": "HTML+CSS +JavaScriptで静的アプリをLOCAL開発",
+    "lessons": [
+      {
+        "id": "create-structure",
+        "title": "プロジェクト構造を作る",
+        "summary": "HTML、CSS、JavaScriptの3つのファイルを作成して、基本的な静的Webアプリの構造を理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "ここでは、最もシンプルなWebアプリの開発方法として「HTML + CSS + JavaScript」を使った静的サイトを作ります。サーバーを使わず、VS Codeだけで実行・プレビューが可能です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "新しいフォルダーを作成（例：static-app）",
+              "VS Codeでそのフォルダーを開く（File → Open Folder）",
+              "以下の3つのファイルを作成：index.html、style.css、script.js"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "まずはHTMLファイルを作成し、ページの骨格を定義します。"
+          },
+          {
+            "type": "code",
+            "filename": "index.html",
+            "lang": "html",
+            "code": "<!DOCTYPE html>\n<html lang=\"ja\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>My Static App</title>\n    <link rel=\"stylesheet\" href=\"style.css\" />\n  </head>\n  <body>\n    <h1>こんにちは、VS Code！</h1>\n    <button id=\"btn\">クリックしてみよう</button>\n    <p id=\"message\"></p>\n    <script src=\"script.js\"></script>\n  </body>\n</html>"
+          },
+          {
+            "type": "p",
+            "text": "次にCSSファイルを作って、デザインを整えます。"
+          },
+          {
+            "type": "code",
+            "filename": "style.css",
+            "lang": "css",
+            "code": "body {\n  font-family: sans-serif;\n  text-align: center;\n  padding: 50px;\n  background-color: #f5f5f5;\n}\n\nh1 {\n  color: #333;\n}\n\nbutton {\n  background-color: #0078d7;\n  color: white;\n  border: none;\n  padding: 10px 20px;\n  border-radius: 5px;\n  cursor: pointer;\n}\n\nbutton:hover {\n  background-color: #005ea2;\n}"
+          },
+          {
+            "type": "p",
+            "text": "最後にJavaScriptファイルで、ページに動きをつけます。"
+          },
+          {
+            "type": "code",
+            "filename": "script.js",
+            "lang": "javascript",
+            "code": "const button = document.getElementById('btn');\nconst message = document.getElementById('message');\n\nbutton.addEventListener('click', () => {\n  message.textContent = 'クリックありがとう！JavaScriptが動いています。';\n});"
+          },
+          {
+            "type": "p",
+            "text": "これで、最小構成の静的アプリが完成しました。"
+          }
+        ]
+      },
+      {
+        "id": "run-preview",
+        "title": "VS Codeでプレビューする",
+        "summary": "Live Server拡張機能を使って、ブラウザでHTMLを表示・確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "静的サイトはサーバーを起動しなくてもブラウザで直接開けますが、VS Codeの「Live Server」拡張機能を使うと変更を即時反映できて便利です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "拡張機能（Extensions）で「Live Server」を検索してインストール",
+              "index.htmlを開き、右下の「Go Live」ボタンをクリック",
+              "ブラウザが自動的に起動し、http://127.0.0.1:5500 でページが表示される"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "HTML・CSS・JavaScriptを保存するたびに自動で更新されます。これでリアルタイムにデザインや動作を確認できます。"
+          },
+          {
+            "type": "p",
+            "text": "次のようにボタンをクリックすると、JavaScriptが正しく動作してメッセージが表示されます。"
+          },
+          {
+            "type": "code",
+            "filename": "terminal-output.txt",
+            "lang": "bash",
+            "code": "クリックありがとう！JavaScriptが動いています。"
+          },
+          {
+            "type": "p",
+            "text": "このように、HTML + CSS + JavaScriptの構成で作るWebアプリは、もっとも基本的で軽量な開発方法です。今後ReactやNext.jsなどのフレームワークを学ぶ際にも、この構造を理解しておくことがとても重要です。"
+          }
+        ]
+      }
+    ]
   }
+  
    
   
   
