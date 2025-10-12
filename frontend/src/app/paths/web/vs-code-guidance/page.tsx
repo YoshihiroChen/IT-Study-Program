@@ -358,6 +358,18 @@ const CURRICULUM: Chapter[] = [
             "text": "左のメニューから「Instances」を開き、起動したサーバーを選びましょう。「Public IPv4 address」に表示されている数値（例：xx.xxx.xx.xx）が接続に使うIPアドレスです。"
           },
           {
+            "type": "img",
+            "src": "/images/aws-12.png",
+            "alt": "インスタンスを開く",
+            "caption": "インスタンスを開く"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-13.png",
+            "alt": "パブリックIPアドレスを確認する",
+            "caption": "パブリックIPアドレスを確認する"
+          },
+          {
             "type": "p",
             "text": "このIPアドレスをメモしておきましょう。次のステップでSSH接続に使用します。"
           }
@@ -412,6 +424,12 @@ const CURRICULUM: Chapter[] = [
           {
             "type": "p",
             "text": "VS Codeを開き、拡張機能（Extensions）から「Remote - SSH」を検索してインストールします。"
+          },
+          {
+            "type": "img",
+            "src": "/images/aws-14.png",
+            "alt": "拡張機能（Extensions）から「Remote - SSH」を検索する",
+            "caption": "拡張機能（Extensions）から「Remote - SSH」を検索する"
           },
           {
             "type": "p",
