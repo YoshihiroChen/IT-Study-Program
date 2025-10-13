@@ -363,7 +363,152 @@ const CURRICULUM: Chapter[] = [
         ]
       }
     ]
+  },
+  {
+    "key": "github-interface",
+    "title": "GitHubリポジトリ画面の構成と各機能",
+    "lessons": [
+      {
+        "id": "overview",
+        "title": "リポジトリ画面の全体構成",
+        "summary": "GitHubのリポジトリ画面には、多くのタブと情報が整理されています。それぞれの意味を理解することで、開発状況を把握できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "GitHubのリポジトリページは、プロジェクトのすべてを管理する中心的な場所です。上部にあるタブや右側のサイドバーには、開発状況やコラボレーションのための重要な機能が集まっています。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "① Code：ソースコードとファイル構造を表示するメインタブ。",
+              "② Issues：バグ報告や改善提案などの課題を管理する機能。",
+              "③ Pull requests：他のブランチやメンバーからの変更提案を管理するページ。",
+              "④ Actions：CI/CD（自動テスト・自動デプロイなど）の設定と実行状況。",
+              "⑤ Projects：タスク管理ボード（Kanban形式）で進捗を可視化。",
+              "⑥ Wiki：ドキュメントや開発手順をまとめる社内用のWiki機能。",
+              "⑦ Security：脆弱性スキャンや依存関係チェック。",
+              "⑧ Insights：コミット数、貢献者、トラフィックなどの統計情報。",
+              "⑨ Settings：リポジトリの基本設定（公開・非公開、ブランチ保護、連携設定など）。"
+            ]
+          },
+          {
+            "type": "img",
+            "src": "/images/github-8.png",
+            "alt": "GitHubリポジトリの上部にあるタブ"
+          },
+        ]
+      },
+      {
+        "id": "repo-top-info",
+        "title": "リポジトリ上部の情報エリア",
+        "summary": "リポジトリ名、公開設定、ブランチ数、タグ数などが表示されています。",
+        "content": [
+          {
+            "type": "ul",
+            "items": [
+              "Repository Name（例：git-practice）：プロジェクトの名前。",
+              "Public / Private：公開リポジトリか非公開リポジトリかを示す。",
+              "Branches（例：2 Branches）：存在するブランチの数（main, topic1など）。",
+              "Tags（例：0 Tags）：特定のリリースに付けるバージョンラベル。"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "ブランチを切り替えたいときは、左上のブランチメニュー（`main ▼`）から選択します。"
+          },
+          {
+            "type": "img",
+            "src": "/images/github-9.png",
+            "alt": "リポジトリ上部の情報エリア"
+          },
+        ]
+      },
+      {
+        "id": "readme-section",
+        "title": "README.mdファイルの役割",
+        "summary": "リポジトリのトップページに表示される説明文です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "README.md は、プロジェクトの概要や使い方を説明するMarkdownファイルです。GitHubでは自動的に画面下部に表示され、他の人が最初に見る情報になります。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "プロジェクトの目的・概要を書く",
+              "インストール方法や実行手順を記載",
+              "ライセンス情報を明記する",
+              "他の開発者へのメッセージを書く"
+            ]
+          },
+          {
+            "type": "code",
+            "filename": "README.md",
+            "lang": "markdown",
+            "code": "# git-practice\nこのリポジトリはGitHubの練習用です。\n\n## 使い方\n```\ngit clone https://github.com/xxxxxxxxxxxxx/git-practice.git\ncd git-practice\n```"
+          },
+          {
+            "type": "img",
+            "src": "/images/github-10.png",
+            "alt": "リポジトリのREADME.mdファイル"
+          },
+        ]
+      },
+      {
+        "id": "right-sidebar",
+        "title": "右側のサイドバー（About, Releases, Packages）",
+        "summary": "プロジェクトの概要、公開情報、活動状況などを確認できます。",
+        "content": [
+          {
+            "type": "ul",
+            "items": [
+              "About：プロジェクトの説明文（Description）、公式サイトURL、トピックタグを設定可能。",
+              "Packages：GitHub Packagesに公開したライブラリやDockerイメージなど。",
+              "Readme / Activity：最近の変更内容や更新履歴。",
+              "Star：リポジトリを「お気に入り登録」したユーザー数（人気度指標）。",
+              "Fork：他のユーザーがこのリポジトリを複製した回数（派生数）。",
+              "watch：このリポジトリをフォローする"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "特に「Star」と「Fork」はGitHubでの人気と貢献度を示す重要な指標です。"
+          },
+          {
+            "type": "img",
+            "src": "/images/github-11.png",
+            "alt": "右側のサイドバー（About, Releases, Packages）"
+          },
+        ]
+      },
+      {
+        "id": "social-metrics",
+        "title": "Star / Fork / Watch / Contributionsとは",
+        "summary": "GitHubにおける貢献度や人気度を表す重要な指標です。",
+        "content": [
+          {
+            "type": "ul",
+            "items": [
+              "Star：プロジェクトを気に入ったときに押す「いいね」のようなボタン。人気プロジェクトの目安になります。",
+              "Fork：他の人のリポジトリを自分のアカウントにコピーして改良・派生開発を行うための機能。",
+              "Watch：特定のリポジトリの更新情報を受け取る機能（Pull RequestやIssueなどの通知）。",
+              "Contributions（貢献度）：自分がどのリポジトリにどれだけcommit・PR・レビューなどを行ったかを示す統計。GitHubのプロフィールページで可視化されます。"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "例えば、毎日のコミットやPull Requestを続けると、GitHubプロフィールに緑の貢献マップ（contribution graph）が表示され、活動量の証明になります。"
+          },
+          {
+            "type": "img",
+            "src": "/images/github-7.png",
+            "alt": "ユーザーのプロフィールページの貢献度"
+          },
+        ]
+      },
+    ]
   }
+  
   
   
    
