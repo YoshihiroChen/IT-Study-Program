@@ -65,7 +65,7 @@ const tracks: Track[] = [
       { id: "web-3", label: "プログラミング言語学習（Python）", href: "/paths/web/py-basics", summary: "文、データ構造、クラス" },
       { id: "web-4", label: "開発フローとツールの紹介", href: "/paths/web/deploy-flow", summary: "アジャイル開発、ウォーターフォール開発、VsCode、Github等" },
       { id: "web-5", label: "開発フレームワークの紹介", href: "/paths/web/deploy-framework", summary: "Next.js、React、FastApi" },
-      { id: "web-6", label: "Fastapiの学習", href: "/paths/web/fastapi", summary: "Next.js、React、FastApi" },
+      { id: "web-6", label: "分離式のフルスタック開発実践", href: "/paths/web/fullstack-development", summary: "Next.js、React、FastApiなどを用いて開発を実践する" },
       // 分支补讲：与 web-2 同列，位于上一行，不参与默认横向连线
       {
         id: "web-2a",
@@ -148,6 +148,15 @@ const tracks: Track[] = [
         row: 0.9,
         chain: false,
       },
+      {
+        id: "web-5a",
+        label: "Fastapiの学習",
+        href: "/paths/web/fastapi",
+        summary: "Fastapiの特徴と基本操作を学習する",
+        col: 4,
+        row: -1,
+        chain: false,
+      },
     ],
   },
   {
@@ -219,6 +228,7 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-4b", target: "web-4c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-4c", target: "web-4d", sourceHandle: "right-out", targetHandle: "left-in", type: "straight", animated: true },
   { source: "web-4", target: "web-4e", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "web-5", target: "web-5a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   
 
 ];
