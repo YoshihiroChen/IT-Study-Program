@@ -140,7 +140,7 @@ const CURRICULUM: Chapter[] = [
         ]
       },
       {
-        "id": "summary",
+        "id": "summary1",
         "title": "まとめ：開発基盤の準備完了",
         "summary": "ここまでで、バックエンド開発に必要なDocker環境が整いました。",
         "content": [
@@ -302,7 +302,7 @@ const CURRICULUM: Chapter[] = [
         ]
       },
       {
-        "id": "summary",
+        "id": "summary2",
         "title": "まとめ：バックエンド骨格の完成",
         "summary": "Docker上で動作するFastAPIの最小構成が完成しました。",
         "content": [
@@ -323,189 +323,240 @@ const CURRICULUM: Chapter[] = [
     ]
   },
   {
-    "key": "backend-enhancement",
-    "title": "バックエンドの拡張：PostgreSQLとJWT認証の導入",
+    "key": "backend-setup-postgres",
+    "title": "接入 PostgreSQL 数据库与后端结构初始化",
     "lessons": [
       {
-        "id": "add-postgres",
-        "title": "PostgreSQLをComposeに追加",
-        "summary": "既存のdocker-compose.ymlにPostgresサービスを追加し、バックエンドと連携できるようにします。",
+        "id": "compose-postgres",
+        "title": "在 docker-compose 里加入 Postgres",
+        "summary": "覆盖或更新 docker-compose.yml 文件，新增 db 服务，并让 backend 依赖 db。",
         "content": [
-          {
-            "type": "p",
-            "text": "まず、既存の `docker-compose.yml` を上書きし、`db` サービスを追加します。以下のコマンドをEC2のターミナルで実行してください。"
-          },
           {
             "type": "code",
             "filename": "terminal",
             "lang": "bash",
-            "code": "cat > docker-compose.yml <<'YAML'\nservices:\n  db:\n    image: postgres:16\n    container_name: csb-postgres\n    environment:\n      POSTGRES_USER: cs_user\n      POSTGRES_PASSWORD: cs_pass\n      POSTGRES_DB: cs_app\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    ports:\n      - \"5432:5432\"\n    restart: unless-stopped\n\n  backend:\n    build: ./backend\n    container_name: csb-backend\n    env_file:\n      - ./backend/.env\n    volumes:\n      - ./backend:/app\n    ports:\n      - \"8000:8000\"\n    depends_on:\n      - db\n    restart: unless-stopped\n\nvolumes:\n  pgdata:\nYAML"
+            "code": "# 覆盖/更新 docker-compose.yml（新增 db 服务，并让 backend 依赖 db）\ncat > docker-compose.yml <<'YAML'\nservices:\n  db:\n    image: postgres:16\n    container_name: csb-postgres\n    environment:\n      POSTGRES_USER: cs_user\n      POSTGRES_PASSWORD: cs_pass\n      POSTGRES_DB: cs_app\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    ports:\n      - \"5432:5432\"\n    restart: unless-stopped\n\n  backend:\n    build: ./backend\n    container_name: csb-backend\n    env_file:\n      - ./backend/.env\n    volumes:\n      - ./backend:/app\n    ports:\n      - \"8000:8000\"\n    depends_on:\n      - db\n    restart: unless-stopped\n\nvolumes:\n  pgdata:\nYAML"
           },
           {
             "type": "p",
-            "text": "次に、バックエンドが読み込む `.env` ファイルを作成します。"
+            "text": "创建 `.env` 文件（供后端读取数据库连接和 JWT 配置）："
           },
           {
             "type": "code",
             "filename": "terminal",
             "lang": "bash",
             "code": "cat > backend/.env <<'ENV'\nDATABASE_URL=postgresql://cs_user:cs_pass@db:5432/cs_app\nJWT_SECRET=change_me_to_a_long_random_string\nJWT_ALG=HS256\nACCESS_TOKEN_EXPIRE_MINUTES=60\nENV"
-          },
-          {
-            "type": "p",
-            "text": "これで、データベースとJWT設定を環境変数として管理できるようになりました。"
           }
         ]
       },
       {
-        "id": "update-dockerfile",
-        "title": "Dockerfileの更新（依存追加）",
-        "summary": "FastAPIに加えてSQLAlchemy・JWT・Passlibなどをインストールします。",
+        "id": "install-deps",
+        "title": "安装后端依赖并添加代码结构",
+        "summary": "更新 Dockerfile 安装 SQLAlchemy、Passlib、JOSE，并创建后端的目录与核心文件。",
         "content": [
           {
+            "type": "p",
+            "text": "2.1 更新 Dockerfile（安装 SQLAlchemy、Passlib、JOSE）："
+          },
+          {
             "type": "code",
-            "filename": "terminal",
+            "filename": "backend/Dockerfile",
             "lang": "bash",
-            "code": "cat > backend/Dockerfile <<'DOCKER'\nFROM python:3.11-slim\n\nENV PYTHONDONTWRITEBYTECODE=1 \\\n    PYTHONUNBUFFERED=1\n\nWORKDIR /app\n\n# 固定版本，确保兼容性\nRUN pip install --no-cache-dir \\\n    fastapi==0.115.0 uvicorn[standard]==0.30.6 \\\n    pydantic[email]==2.9.2 pydantic-settings==2.5.2 \\\n    sqlalchemy==2.0.36 psycopg2-binary==2.9.9 \\\n    passlib[bcrypt]==1.7.4 bcrypt==4.0.1 \\\n    python-jose[cryptography]==3.3.0\n\nCOPY app ./app\nEXPOSE 8000\nCMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\", \"--reload\"]\nDOCKER"
+            "code": "cat > backend/Dockerfile <<'DOCKER'\nFROM python:3.11-slim\n\nENV PYTHONDONTWRITEBYTECODE=1 \\\n    PYTHONUNBUFFERED=1\n\nWORKDIR /app\n\n# 固定兼容版本，避免 bcrypt 4.x 触发兼容性问题\nRUN pip install --no-cache-dir \\\n    fastapi==0.115.0 uvicorn[standard]==0.30.6 \\\n    pydantic[email]==2.9.2 pydantic-settings==2.5.2 \\\n    sqlalchemy==2.0.36 psycopg2-binary==2.9.9 \\\n    passlib[bcrypt]==1.7.4 bcrypt==4.0.1 \\\n    python-jose[cryptography]==3.3.0\n\nCOPY app ./app\n\nEXPOSE 8000\nCMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\", \"--reload\"]\nDOCKER"
           },
           {
             "type": "p",
-            "text": "このDockerfileでは、データベース操作・パスワードハッシュ・トークン生成に必要なライブラリをまとめてインストールしています。"
-          }
-        ]
-      },
-      {
-        "id": "db-models",
-        "title": "DB接続とモデル定義",
-        "summary": "SQLAlchemyを使ってDBセッションとテーブルを定義します。",
-        "content": [
+            "text": "2.2 新增数据库与模型文件："
+          },
           {
             "type": "code",
             "filename": "terminal",
             "lang": "bash",
-            "code": "mkdir -p backend/app/{db,models,schemas,core/security,api/routers}\n\ncat > backend/app/db/session.py <<'PY'\nfrom sqlalchemy import create_engine\nfrom sqlalchemy.orm import sessionmaker, declarative_base\nfrom app.core.config import settings\n\nengine = create_engine(settings.DATABASE_URL, future=True)\nSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, future=True)\nBase = declarative_base()\nPY"
+            "code": "mkdir -p backend/app/{api,core,db,models,schemas}"
           },
           {
             "type": "p",
-            "text": "次に、UserモデルとNoteモデルを作成します。"
+            "text": "新增 core/config.py 文件："
           },
           {
             "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "cat > backend/app/models/user.py <<'PY'\nfrom sqlalchemy import Column, Integer, String, DateTime, func\nfrom app.db.session import Base\n\nclass User(Base):\n    __tablename__ = 'users'\n    id = Column(Integer, primary_key=True, index=True)\n    email = Column(String(255), unique=True, index=True, nullable=False)\n    hashed_password = Column(String(255), nullable=False)\n    created_at = Column(DateTime(timezone=True), server_default=func.now())\nPY"
-          },
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "cat > backend/app/models/note.py <<'PY'\nfrom sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, func\nfrom sqlalchemy.orm import relationship\nfrom app.db.session import Base\n\nclass Note(Base):\n    __tablename__ = 'notes'\n    id = Column(Integer, primary_key=True, index=True)\n    owner_id = Column(Integer, ForeignKey('users.id'), nullable=False)\n    title = Column(String(200), nullable=False)\n    project_type = Column(String(20), nullable=False)\n    frontend_stack = Column(String(200), nullable=False)\n    backend_stack = Column(String(200), nullable=False)\n    description = Column(Text)\n    created_at = Column(DateTime(timezone=True), server_default=func.now())\n    owner = relationship('User')\nPY"
-          }
-        ]
-      },
-      {
-        "id": "auth-security",
-        "title": "セキュリティと認証の追加",
-        "summary": "Passlibでパスワードをハッシュ化し、JWTトークンを生成します。",
-        "content": [
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "cat > backend/app/core/security/hash.py <<'PY'\nfrom passlib.context import CryptContext\npwd_ctx = CryptContext(schemes=['bcrypt'], deprecated='auto')\n\ndef hash_password(p: str) -> str:\n    return pwd_ctx.hash(p)\n\ndef verify_password(p: str, hashed: str) -> bool:\n    return pwd_ctx.verify(p, hashed)\nPY"
-          },
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "cat > backend/app/core/security/jwt.py <<'PY'\nfrom datetime import datetime, timedelta, timezone\nfrom jose import jwt\nfrom app.core.config import settings\n\ndef create_access_token(sub: str) -> str:\n    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)\n    payload = {'sub': sub, 'exp': expire}\n    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALG)\nPY"
-          }
-        ]
-      },
-      {
-        "id": "routers",
-        "title": "APIルーターの作成",
-        "summary": "ユーザー登録・ログイン・ノート投稿APIを追加します。",
-        "content": [
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "cat > backend/app/api/routers/auth.py <<'PY'\nfrom fastapi import APIRouter, Depends, HTTPException, status\nfrom sqlalchemy.orm import Session\nfrom app.api.deps import get_db\nfrom app.schemas.auth import RegisterIn, TokenOut\nfrom app.models.user import User\nfrom app.core.security.hash import hash_password, verify_password\nfrom app.core.security.jwt import create_access_token\n\nrouter = APIRouter(prefix='/auth', tags=['auth'])\n\n@router.post('/register', response_model=TokenOut)\ndef register(data: RegisterIn, db: Session = Depends(get_db)):\n    if db.query(User).filter(User.email == data.email).first():\n        raise HTTPException(status_code=400, detail='Email already registered')\n    new_user = User(email=data.email, hashed_password=hash_password(data.password))\n    db.add(new_user)\n    db.commit()\n    return TokenOut(access_token=create_access_token(new_user.email))\n\n@router.post('/login', response_model=TokenOut)\ndef login(data: RegisterIn, db: Session = Depends(get_db)):\n    user = db.query(User).filter(User.email == data.email).first()\n    if not user or not verify_password(data.password, user.hashed_password):\n        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid credentials')\n    return TokenOut(access_token=create_access_token(user.email))\nPY"
-          },
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "cat > backend/app/api/routers/notes.py <<'PY'\nfrom fastapi import APIRouter, Depends\nfrom sqlalchemy.orm import Session\nfrom typing import List\nfrom app.api.deps import get_db, get_current_user\nfrom app.schemas.note import NoteCreate, NoteOut\nfrom app.models.note import Note\nfrom app.models.user import User\n\nrouter = APIRouter(prefix='/notes', tags=['notes'])\n\n@router.get('', response_model=List[NoteOut])\ndef list_notes(db: Session = Depends(get_db), user: User = Depends(get_current_user)):\n    return db.query(Note).order_by(Note.id.desc()).all()\n\n@router.post('', response_model=NoteOut)\ndef create_note(payload: NoteCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):\n    note = Note(\n        owner_id=user.id,\n        title=payload.title,\n        project_type=payload.project_type,\n        frontend_stack=payload.frontend_stack,\n        backend_stack=payload.backend_stack,\n        description=payload.description,\n    )\n    db.add(note)\n    db.commit()\n    db.refresh(note)\n    return note\nPY"
-          }
-        ]
-      },
-      {
-        "id": "main-update",
-        "title": "main.pyの更新と動作確認",
-        "summary": "テーブルの自動生成とルーター登録を追加して動作確認します。",
-        "content": [
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "cat > backend/app/main.py <<'PY'\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom sqlalchemy import inspect\nfrom app.core.config import settings\nfrom app.db.session import Base, engine\nfrom app.api.routers.auth import router as auth_router\nfrom app.api.routers.notes import router as notes_router\n\napp = FastAPI(title=settings.PROJECT_NAME)\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=['*'], allow_credentials=True,\n    allow_methods=['*'], allow_headers=['*'],\n)\n\n@app.on_event('startup')\ndef on_startup():\n    insp = inspect(engine)\n    Base.metadata.create_all(bind=engine)\n\n@app.get('/health')\ndef health():\n    return {'status': 'ok'}\n\napp.include_router(auth_router)\napp.include_router(notes_router)\nPY"
-          },
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "# コンテナ起動\ncd ~/code-share\ndocker-compose up -d --build\ndocker logs -f csb-backend"
+            "filename": "backend/app/core/config.py",
+            "lang": "python",
+            "code": "cat > backend/app/core/config.py <<'PY'\nfrom pydantic_settings import BaseSettings\n\nclass Settings(BaseSettings):\n    PROJECT_NAME: str = \"Code Share API\"\n    DATABASE_URL: str = \"postgresql://cs_user:cs_pass@db:5432/cs_app\"\n\n    JWT_SECRET: str = \"CHANGE_ME\"\n    JWT_ALG: str = \"HS256\"\n    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60\n\n    class Config:\n        env_file = \".env\"\n\nsettings = Settings()\nPY"
           },
           {
             "type": "p",
-            "text": "ログに `Application startup complete.` が表示されたら、curlでAPIを確認します。"
+            "text": "新增 db/session.py 文件："
           },
           {
             "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "# 健康チェック\ncurl http://localhost:8000/health\n\n# ユーザー登録（アクセストークンが返る）\ncurl -s -X POST http://localhost:8000/auth/register \\\n -H 'Content-Type: application/json' \\\n -d '{\"email\":\"test@example.com\",\"password\":\"pass1234\"}'"
+            "filename": "backend/app/db/session.py",
+            "lang": "python",
+            "code": "cat > backend/app/db/session.py <<'PY'\nfrom sqlalchemy import create_engine\nfrom sqlalchemy.orm import sessionmaker, declarative_base\nfrom app.core.config import settings\n\nengine = create_engine(settings.DATABASE_URL, future=True)\nSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, future=True)\nBase = declarative_base()\nPY"
           },
           {
             "type": "p",
-            "text": "トークンをコピーして、次のコマンドでノートを作成します。"
+            "text": "新增 models/user.py 文件："
           },
           {
             "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "TOKEN=\"(上で取得した access_token)\"\n\ncurl -s -X POST http://localhost:8000/notes \\\n -H \"Authorization: Bearer $TOKEN\" \\\n -H 'Content-Type: application/json' \\\n -d '{\n  \"title\":\"我的第一个转码项目\",\n  \"project_type\":\"动态\",\n  \"frontend_stack\":\"Next.js(TypeScript)\",\n  \"backend_stack\":\"FastAPI + Postgres\",\n  \"description\":\"用Docker搭建的全栈项目\"\n }'"
+            "filename": "backend/app/models/user.py",
+            "lang": "python",
+            "code": "cat > backend/app/models/user.py <<'PY'\nfrom sqlalchemy import Column, Integer, String, DateTime, func\nfrom app.db.session import Base\n\nclass User(Base):\n    __tablename__ = \"users\"\n    id = Column(Integer, primary_key=True, index=True)\n    email = Column(String(255), unique=True, index=True, nullable=False)\n    hashed_password = Column(String(255), nullable=False)\n    created_at = Column(DateTime(timezone=True), server_default=func.now())\nPY"
           },
           {
             "type": "p",
-            "text": "成功すると、ノートのJSONデータが返り、バックエンドが完全に動作していることを確認できます。"
-          }
-        ]
-      },
-      {
-        "id": "summary",
-        "title": "まとめ：完全なバックエンド基盤",
-        "summary": "Postgres＋FastAPI＋JWTの構成で本格的なAPI基盤が完成しました。",
-        "content": [
+            "text": "新增 models/note.py 文件："
+          },
           {
-            "type": "ul",
-            "items": [
-              "Docker ComposeでPostgresとFastAPIを連携",
-              "SQLAlchemyでORMモデルを定義",
-              "JWTで認証・認可を実装",
-              "ノート登録・取得までのフローを確認済み"
-            ]
+            "type": "code",
+            "filename": "backend/app/models/note.py",
+            "lang": "python",
+            "code": "cat > backend/app/models/note.py <<'PY'\nfrom sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, func\nfrom sqlalchemy.orm import relationship\nfrom app.db.session import Base\n\nclass Note(Base):\n    __tablename__ = \"notes\"\n    id = Column(Integer, primary_key=True, index=True)\n    owner_id = Column(Integer, ForeignKey(\"users.id\"), nullable=False)\n\n    title = Column(String(200), nullable=False)\n    project_type = Column(String(20), nullable=False)  # \"静态\" or \"动态\"\n    frontend_stack = Column(String(200), nullable=False)\n    backend_stack = Column(String(200), nullable=False)\n    description = Column(Text)\n\n    created_at = Column(DateTime(timezone=True), server_default=func.now())\n\n    owner = relationship(\"User\")\nPY"
           },
           {
             "type": "p",
-            "text": "次の章では、このAPIをNext.jsフロントエンドから呼び出し、ログイン後にノートを管理できるようにします。"
+            "text": "新增 schemas（Pydantic）文件："
+          },
+          {
+            "type": "code",
+            "filename": "backend/app/schemas/auth.py",
+            "lang": "python",
+            "code": "cat > backend/app/schemas/auth.py <<'PY'\nfrom pydantic import BaseModel, EmailStr\n\nclass RegisterIn(BaseModel):\n    email: EmailStr\n    password: str\n\nclass TokenOut(BaseModel):\n    access_token: str\n    token_type: str = \"bearer\"\nPY"
+          },
+          {
+            "type": "code",
+            "filename": "backend/app/schemas/note.py",
+            "lang": "python",
+            "code": "cat > backend/app/schemas/note.py <<'PY'\nfrom pydantic import BaseModel\nfrom typing import Optional\n\nclass NoteBase(BaseModel):\n    title: str\n    project_type: str\n    frontend_stack: str\n    backend_stack: str\n    description: Optional[str] = None\n\nclass NoteCreate(NoteBase):\n    pass\n\nclass NoteOut(NoteBase):\n    id: int\n    owner_id: int\n\n    class Config:\n        from_attributes = True\nPY"
+          },
+          {
+            "type": "p",
+            "text": "新增简单的安全工具与依赖："
+          },
+          {
+            "type": "code",
+            "filename": "backend/app/core/security/hash.py",
+            "lang": "python",
+            "code": "mkdir -p backend/app/core/security\ncat > backend/app/core/security/hash.py <<'PY'\nfrom passlib.context import CryptContext\npwd_ctx = CryptContext(schemes=[\"bcrypt\"], deprecated=\"auto\")\n\ndef hash_password(p: str) -> str:\n    return pwd_ctx.hash(p)\n\ndef verify_password(p: str, hashed: str) -> bool:\n    return pwd_ctx.verify(p, hashed)\nPY"
           }
         ]
       }
     ]
   },
+  {
+    "key": "backend-auth-and-routes",
+    "title": "添加认证、依赖与路由模块",
+    "lessons": [
+      {
+        "id": "jwt-and-deps",
+        "title": "实现 JWT 令牌与依赖注入",
+        "summary": "创建 JWT 令牌生成工具，设置数据库 Session 与当前用户依赖。",
+        "content": [
+          {
+            "type": "p",
+            "text": "新增 JWT 生成模块："
+          },
+          {
+            "type": "code",
+            "filename": "backend/app/core/security/jwt.py",
+            "lang": "python",
+            "code": "cat > backend/app/core/security/jwt.py <<'PY'\nfrom datetime import datetime, timedelta, timezone\nfrom jose import jwt\nfrom app.core.config import settings\n\ndef create_access_token(sub: str) -> str:\n    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)\n    payload = {\"sub\": sub, \"exp\": expire}\n    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALG)\nPY"
+          },
+          {
+            "type": "p",
+            "text": "新增依赖模块：DB Session 与当前用户"
+          },
+          {
+            "type": "code",
+            "filename": "backend/app/api/deps.py",
+            "lang": "python",
+            "code": "cat > backend/app/api/deps.py <<'PY'\nfrom typing import Generator, Optional\nfrom fastapi import Depends, HTTPException, status\nfrom fastapi.security import OAuth2PasswordBearer\nfrom jose import jwt, JWTError\nfrom sqlalchemy.orm import Session\nfrom app.db.session import SessionLocal\nfrom app.core.config import settings\nfrom app.models.user import User\n\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\"/auth/login\")\n\ndef get_db() -> Generator[Session, None, None]:\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()\n\ndef get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:\n    credentials_error = HTTPException(\n        status_code=status.HTTP_401_UNAUTHORIZED,\n        detail=\"Could not validate credentials\",\n        headers={\"WWW-Authenticate\":\"Bearer\"},\n    )\n    try:\n        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALG])\n        sub: Optional[str] = payload.get(\"sub\")\n        if sub is None:\n            raise credentials_error\n    except JWTError:\n        raise credentials_error\n\n    user = db.query(User).filter(User.email == sub).first()\n    if not user:\n        raise credentials_error\n    return user\nPY"
+          }
+        ]
+      },
+      {
+        "id": "auth-router",
+        "title": "添加认证路由",
+        "summary": "实现注册与登录功能，用 JWT 令牌管理身份认证。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "mkdir -p backend/app/api/routers"
+          },
+          {
+            "type": "code",
+            "filename": "backend/app/api/routers/auth.py",
+            "lang": "python",
+            "code": "cat > backend/app/api/routers/auth.py <<'PY'\nfrom fastapi import APIRouter, Depends, HTTPException, status\nfrom sqlalchemy.orm import Session\nfrom app.api.deps import get_db\nfrom app.schemas.auth import RegisterIn, TokenOut\nfrom app.models.user import User\nfrom app.core.security.hash import hash_password, verify_password\nfrom app.core.security.jwt import create_access_token\n\nrouter = APIRouter(prefix=\"/auth\", tags=[\"auth\"])\n\n@router.post(\"/register\", response_model=TokenOut)\ndef register(data: RegisterIn, db: Session = Depends(get_db)):\n    if db.query(User).filter(User.email == data.email).first():\n        raise HTTPException(status_code=400, detail=\"Email already registered\")\n    new_user = User(email=data.email, hashed_password=hash_password(data.password))\n    db.add(new_user)\n    db.commit()\n    return TokenOut(access_token=create_access_token(new_user.email))\n\n@router.post(\"/login\", response_model=TokenOut)\ndef login(data: RegisterIn, db: Session = Depends(get_db)):\n    user = db.query(User).filter(User.email == data.email).first()\n    if not user or not verify_password(data.password, user.hashed_password):\n        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=\"Invalid credentials\")\n    return TokenOut(access_token=create_access_token(user.email))\nPY"
+          }
+        ]
+      },
+      {
+        "id": "notes-router",
+        "title": "添加笔记路由（受保护）",
+        "summary": "实现笔记的创建与列表功能，仅限认证用户访问。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "backend/app/api/routers/notes.py",
+            "lang": "python",
+            "code": "cat > backend/app/api/routers/notes.py <<'PY'\nfrom fastapi import APIRouter, Depends\nfrom sqlalchemy.orm import Session\nfrom typing import List\nfrom app.api.deps import get_db, get_current_user\nfrom app.schemas.note import NoteCreate, NoteOut\nfrom app.models.note import Note\nfrom app.models.user import User\n\nrouter = APIRouter(prefix=\"/notes\", tags=[\"notes\"])\n\n@router.get(\"\", response_model=List[NoteOut])\ndef list_notes(db: Session = Depends(get_db), user: User = Depends(get_current_user)):\n    return db.query(Note).order_by(Note.id.desc()).all()\n\n@router.post(\"\", response_model=NoteOut)\ndef create_note(payload: NoteCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):\n    note = Note(\n        owner_id=user.id,\n        title=payload.title,\n        project_type=payload.project_type,\n        frontend_stack=payload.frontend_stack,\n        backend_stack=payload.backend_stack,\n        description=payload.description,\n    )\n    db.add(note)\n    db.commit()\n    db.refresh(note)\n    return note\nPY"
+          }
+        ]
+      },
+      {
+        "id": "main-program",
+        "title": "更新主程序 main.py",
+        "summary": "整合所有路由、CORS 中间件与启动时建表逻辑。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "backend/app/main.py",
+            "lang": "python",
+            "code": "cat > backend/app/main.py <<'PY'\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom sqlalchemy import inspect\nfrom app.core.config import settings\nfrom app.db.session import Base, engine\nfrom app.api.routers.auth import router as auth_router\nfrom app.api.routers.notes import router as notes_router\n\napp = FastAPI(title=settings.PROJECT_NAME)\n\n# CORS：开发期先放开\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"], allow_credentials=True,\n    allow_methods=[\"*\"], allow_headers=[\"*\"],\n)\n\n# 启动时建表（开发方便；后续可切 Alembic）\n@app.on_event(\"startup\")\ndef on_startup():\n    insp = inspect(engine)\n    # 如果表不存在则创建\n    Base.metadata.create_all(bind=engine)\n\n@app.get(\"/health\")\ndef health():\n    return {\"status\": \"ok\"}\n\napp.include_router(auth_router)\napp.include_router(notes_router)\nPY"
+          }
+        ]
+      },
+      {
+        "id": "run-and-verify",
+        "title": "启动并验证接口",
+        "summary": "使用 Docker Compose 启动后端，并通过 curl 验证注册、登录与笔记发布。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "# 在项目根（~/code-share-backend）\ndocker-compose up -d --build\ndocker logs -f csb-backend"
+          },
+          {
+            "type": "p",
+            "text": "当终端出现 “Application startup complete.” 时表示启动成功。"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "# 健康检查\ncurl http://localhost:8000/health\n\n# 注册（返回 access_token）\ncurl -s -X POST http://localhost:8000/auth/register \\\n -H 'Content-Type: application/json' \\\n -d '{\"email\":\"test@example.com\",\"password\":\"pass1234\"}'\n\nTOKEN=\"把上面返回的 access_token 粘这里\"\n\n# 创建一条笔记（需要 Bearer Token）\ncurl -s -X POST http://localhost:8000/notes \\\n -H \"Authorization: Bearer $TOKEN\" \\\n -H 'Content-Type: application/json' \\\n -d '{\n   \"title\":\"我的首个转码项目\",\n   \"project_type\":\"动态\",\n   \"frontend_stack\":\"Next.js(TypeScript)\",\n   \"backend_stack\":\"FastAPI + Postgres\",\n   \"description\":\"登录后可发布的项目记录\"\n }'"
+          },
+          {
+            "type": "p",
+            "text": "若输出如下 JSON 内容，即表示接口工作正常："
+          },
+          {
+            "type": "code",
+            "filename": "output",
+            "lang": "json",
+            "code": "[{\"title\":\"我的第一个转码项目\",\"project_type\":\"动态\",\"frontend_stack\":\"Next.js(TypeScript)\",\"backend_stack\":\"FastAPI + Postgres\",\"description\":\"用Docker搭建的全栈项目\",\"id\":1,\"owner_id\":1}]"
+          }
+        ]
+      }
+    ]
+  },
+  
+  
   {
     "key": "backend-extend-apis",
     "title": "バックエンド機能の拡張：ログイン・ユーザー情報・ノート編集削除",
