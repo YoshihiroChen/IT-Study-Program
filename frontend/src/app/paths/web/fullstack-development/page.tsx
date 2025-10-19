@@ -136,7 +136,19 @@ const CURRICULUM: Chapter[] = [
               "Composeコマンド（`docker-compose`）も利用可能",
               "これで `docker-compose up -d` などの操作ができるようになります"
             ]
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-1.png",
+            "alt": "Docker Composeのインストール",
+            "caption": "Docker Composeのインストール(1)"
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-2.png",
+            "alt": "Docker Composeのインストール-2",
+            "caption": "Docker Composeのインストール(2)"
+          },
         ]
       },
       {
@@ -298,7 +310,31 @@ const CURRICULUM: Chapter[] = [
               "“/notes” で2件の仮データが表示されればOK",
               "見えない場合はセキュリティグループで TCP 8000 を開放"
             ]
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-3.png",
+            "alt": "curlまたはブラウザでAPIの応答を確認します。",
+            "caption": "curlでAPIの応答を確認する"
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-4.png",
+            "alt": "ブラウザでAPIの応答を確認する(1)",
+            "caption": "ブラウザでAPIの応答を確認する(1)"
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-5.png",
+            "alt": "ブラウザでAPIの応答を確認する(2)",
+            "caption": "ブラウザでAPIの応答を確認する(2)"
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-6.png",
+            "alt": "ブラウザでAPIの応答を確認する(3)",
+            "caption": "ブラウザでAPIの応答を確認する(3)"
+          },
         ]
       },
       {
@@ -324,22 +360,22 @@ const CURRICULUM: Chapter[] = [
   },
   {
     "key": "backend-setup-postgres",
-    "title": "接入 PostgreSQL 数据库与后端结构初始化",
+    "title": "PostgreSQLデータベースの接続とバックエンド構造の初期化",
     "lessons": [
       {
         "id": "compose-postgres",
-        "title": "在 docker-compose 里加入 Postgres",
-        "summary": "覆盖或更新 docker-compose.yml 文件，新增 db 服务，并让 backend 依赖 db。",
+        "title": "docker-compose に Postgres を追加する",
+        "summary": "docker-compose.yml ファイルを上書きまたは更新し、db サービスを追加して、backend が db に依存するように設定する。",
         "content": [
           {
             "type": "code",
             "filename": "terminal",
             "lang": "bash",
-            "code": "# 覆盖/更新 docker-compose.yml（新增 db 服务，并让 backend 依赖 db）\ncat > docker-compose.yml <<'YAML'\nservices:\n  db:\n    image: postgres:16\n    container_name: csb-postgres\n    environment:\n      POSTGRES_USER: cs_user\n      POSTGRES_PASSWORD: cs_pass\n      POSTGRES_DB: cs_app\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    ports:\n      - \"5432:5432\"\n    restart: unless-stopped\n\n  backend:\n    build: ./backend\n    container_name: csb-backend\n    env_file:\n      - ./backend/.env\n    volumes:\n      - ./backend:/app\n    ports:\n      - \"8000:8000\"\n    depends_on:\n      - db\n    restart: unless-stopped\n\nvolumes:\n  pgdata:\nYAML"
+            "code": "# docker-compose.yml を上書き/更新（db サービスを追加し、backend が db に依存するように設定）\ncat > docker-compose.yml <<'YAML'\nservices:\n  db:\n    image: postgres:16\n    container_name: csb-postgres\n    environment:\n      POSTGRES_USER: cs_user\n      POSTGRES_PASSWORD: cs_pass\n      POSTGRES_DB: cs_app\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    ports:\n      - \"5432:5432\"\n    restart: unless-stopped\n\n  backend:\n    build: ./backend\n    container_name: csb-backend\n    env_file:\n      - ./backend/.env\n    volumes:\n      - ./backend:/app\n    ports:\n      - \"8000:8000\"\n    depends_on:\n      - db\n    restart: unless-stopped\n\nvolumes:\n  pgdata:\nYAML"
           },
           {
             "type": "p",
-            "text": "创建 `.env` 文件（供后端读取数据库连接和 JWT 配置）："
+            "text": "`.env` ファイルを作成（バックエンドがデータベース接続と JWT 設定を読み取るため）："
           },
           {
             "type": "code",
@@ -351,22 +387,22 @@ const CURRICULUM: Chapter[] = [
       },
       {
         "id": "install-deps",
-        "title": "安装后端依赖并添加代码结构",
-        "summary": "更新 Dockerfile 安装 SQLAlchemy、Passlib、JOSE，并创建后端的目录与核心文件。",
+        "title": "バックエンド依存関係のインストールとコード構造の追加",
+        "summary": "Dockerfile を更新して SQLAlchemy、Passlib、JOSE をインストールし、バックエンドのディレクトリと主要ファイルを作成する。",
         "content": [
           {
             "type": "p",
-            "text": "2.1 更新 Dockerfile（安装 SQLAlchemy、Passlib、JOSE）："
+            "text": "2.1 Dockerfile を更新（SQLAlchemy、Passlib、JOSE をインストール）："
           },
           {
             "type": "code",
             "filename": "backend/Dockerfile",
             "lang": "bash",
-            "code": "cat > backend/Dockerfile <<'DOCKER'\nFROM python:3.11-slim\n\nENV PYTHONDONTWRITEBYTECODE=1 \\\n    PYTHONUNBUFFERED=1\n\nWORKDIR /app\n\n# 固定兼容版本，避免 bcrypt 4.x 触发兼容性问题\nRUN pip install --no-cache-dir \\\n    fastapi==0.115.0 uvicorn[standard]==0.30.6 \\\n    pydantic[email]==2.9.2 pydantic-settings==2.5.2 \\\n    sqlalchemy==2.0.36 psycopg2-binary==2.9.9 \\\n    passlib[bcrypt]==1.7.4 bcrypt==4.0.1 \\\n    python-jose[cryptography]==3.3.0\n\nCOPY app ./app\n\nEXPOSE 8000\nCMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\", \"--reload\"]\nDOCKER"
+            "code": "cat > backend/Dockerfile <<'DOCKER'\nFROM python:3.11-slim\n\nENV PYTHONDONTWRITEBYTECODE=1 \\\n    PYTHONUNBUFFERED=1\n\nWORKDIR /app\n\n# 互換性を固定し、bcrypt 4.x による互換性問題を回避\nRUN pip install --no-cache-dir \\\n    fastapi==0.115.0 uvicorn[standard]==0.30.6 \\\n    pydantic[email]==2.9.2 pydantic-settings==2.5.2 \\\n    sqlalchemy==2.0.36 psycopg2-binary==2.9.9 \\\n    passlib[bcrypt]==1.7.4 bcrypt==4.0.1 \\\n    python-jose[cryptography]==3.3.0\n\nCOPY app ./app\n\nEXPOSE 8000\nCMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\", \"--reload\"]\nDOCKER"
           },
           {
             "type": "p",
-            "text": "2.2 新增数据库与模型文件："
+            "text": "2.2 データベースおよびモデルファイルを追加："
           },
           {
             "type": "code",
@@ -376,7 +412,7 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "新增 core/config.py 文件："
+            "text": "core/config.py ファイルを追加："
           },
           {
             "type": "code",
@@ -386,7 +422,7 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "新增 db/session.py 文件："
+            "text": "db/session.py ファイルを追加："
           },
           {
             "type": "code",
@@ -396,7 +432,7 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "新增 models/user.py 文件："
+            "text": "models/user.py ファイルを追加："
           },
           {
             "type": "code",
@@ -406,17 +442,17 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "新增 models/note.py 文件："
+            "text": "models/note.py ファイルを追加："
           },
           {
             "type": "code",
             "filename": "backend/app/models/note.py",
             "lang": "python",
-            "code": "cat > backend/app/models/note.py <<'PY'\nfrom sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, func\nfrom sqlalchemy.orm import relationship\nfrom app.db.session import Base\n\nclass Note(Base):\n    __tablename__ = \"notes\"\n    id = Column(Integer, primary_key=True, index=True)\n    owner_id = Column(Integer, ForeignKey(\"users.id\"), nullable=False)\n\n    title = Column(String(200), nullable=False)\n    project_type = Column(String(20), nullable=False)  # \"静态\" or \"动态\"\n    frontend_stack = Column(String(200), nullable=False)\n    backend_stack = Column(String(200), nullable=False)\n    description = Column(Text)\n\n    created_at = Column(DateTime(timezone=True), server_default=func.now())\n\n    owner = relationship(\"User\")\nPY"
+            "code": "cat > backend/app/models/note.py <<'PY'\nfrom sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, func\nfrom sqlalchemy.orm import relationship\nfrom app.db.session import Base\n\nclass Note(Base):\n    __tablename__ = \"notes\"\n    id = Column(Integer, primary_key=True, index=True)\n    owner_id = Column(Integer, ForeignKey(\"users.id\"), nullable=False)\n\n    title = Column(String(200), nullable=False)\n    project_type = Column(String(20), nullable=False)  # 「静的」または「動的」\n    frontend_stack = Column(String(200), nullable=False)\n    backend_stack = Column(String(200), nullable=False)\n    description = Column(Text)\n\n    created_at = Column(DateTime(timezone=True), server_default=func.now())\n\n    owner = relationship(\"User\")\nPY"
           },
           {
             "type": "p",
-            "text": "新增 schemas（Pydantic）文件："
+            "text": "Pydantic スキーマファイルを追加："
           },
           {
             "type": "code",
@@ -432,7 +468,7 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "新增简单的安全工具与依赖："
+            "text": "簡単なセキュリティユーティリティと依存関係を追加："
           },
           {
             "type": "code",
@@ -446,16 +482,16 @@ const CURRICULUM: Chapter[] = [
   },
   {
     "key": "backend-auth-and-routes",
-    "title": "添加认证、依赖与路由模块",
+    "title": "認証、依存関係、およびルーティングモジュールの追加",
     "lessons": [
       {
         "id": "jwt-and-deps",
-        "title": "实现 JWT 令牌与依赖注入",
-        "summary": "创建 JWT 令牌生成工具，设置数据库 Session 与当前用户依赖。",
+        "title": "JWT トークンと依存性注入の実装",
+        "summary": "JWT トークン生成ツールを作成し、データベースセッションと現在のユーザー依存関係を設定する。",
         "content": [
           {
             "type": "p",
-            "text": "新增 JWT 生成模块："
+            "text": "JWT 生成モジュールを追加："
           },
           {
             "type": "code",
@@ -465,7 +501,7 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "新增依赖模块：DB Session 与当前用户"
+            "text": "依存モジュールを追加：DB セッションと現在のユーザー"
           },
           {
             "type": "code",
@@ -477,8 +513,8 @@ const CURRICULUM: Chapter[] = [
       },
       {
         "id": "auth-router",
-        "title": "添加认证路由",
-        "summary": "实现注册与登录功能，用 JWT 令牌管理身份认证。",
+        "title": "認証ルーターの追加",
+        "summary": "登録およびログイン機能を実装し、JWT トークンで認証を管理する。",
         "content": [
           {
             "type": "code",
@@ -496,8 +532,8 @@ const CURRICULUM: Chapter[] = [
       },
       {
         "id": "notes-router",
-        "title": "添加笔记路由（受保护）",
-        "summary": "实现笔记的创建与列表功能，仅限认证用户访问。",
+        "title": "ノートルーター（保護付き）の追加",
+        "summary": "ノートの作成と一覧機能を実装し、認証済みユーザーのみアクセス可能にする。",
         "content": [
           {
             "type": "code",
@@ -509,48 +545,54 @@ const CURRICULUM: Chapter[] = [
       },
       {
         "id": "main-program",
-        "title": "更新主程序 main.py",
-        "summary": "整合所有路由、CORS 中间件与启动时建表逻辑。",
+        "title": "メインプログラム main.py の更新",
+        "summary": "すべてのルーター、CORS ミドルウェア、および起動時のテーブル作成ロジックを統合する。",
         "content": [
           {
             "type": "code",
             "filename": "backend/app/main.py",
             "lang": "python",
-            "code": "cat > backend/app/main.py <<'PY'\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom sqlalchemy import inspect\nfrom app.core.config import settings\nfrom app.db.session import Base, engine\nfrom app.api.routers.auth import router as auth_router\nfrom app.api.routers.notes import router as notes_router\n\napp = FastAPI(title=settings.PROJECT_NAME)\n\n# CORS：开发期先放开\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"], allow_credentials=True,\n    allow_methods=[\"*\"], allow_headers=[\"*\"],\n)\n\n# 启动时建表（开发方便；后续可切 Alembic）\n@app.on_event(\"startup\")\ndef on_startup():\n    insp = inspect(engine)\n    # 如果表不存在则创建\n    Base.metadata.create_all(bind=engine)\n\n@app.get(\"/health\")\ndef health():\n    return {\"status\": \"ok\"}\n\napp.include_router(auth_router)\napp.include_router(notes_router)\nPY"
+            "code": "cat > backend/app/main.py <<'PY'\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom sqlalchemy import inspect\nfrom app.core.config import settings\nfrom app.db.session import Base, engine\nfrom app.api.routers.auth import router as auth_router\nfrom app.api.routers.notes import router as notes_router\n\napp = FastAPI(title=settings.PROJECT_NAME)\n\n# CORS：開発期間中は全許可\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"], allow_credentials=True,\n    allow_methods=[\"*\"], allow_headers=[\"*\"],\n)\n\n# 起動時にテーブルを作成（開発用；後に Alembic に切り替え可）\n@app.on_event(\"startup\")\ndef on_startup():\n    insp = inspect(engine)\n    # テーブルが存在しない場合は作成\n    Base.metadata.create_all(bind=engine)\n\n@app.get(\"/health\")\ndef health():\n    return {\"status\": \"ok\"}\n\napp.include_router(auth_router)\napp.include_router(notes_router)\nPY"
           }
         ]
       },
       {
         "id": "run-and-verify",
-        "title": "启动并验证接口",
-        "summary": "使用 Docker Compose 启动后端，并通过 curl 验证注册、登录与笔记发布。",
+        "title": "起動と API 検証",
+        "summary": "Docker Compose でバックエンドを起動し、curl を使って登録、ログイン、ノート投稿を検証する。",
         "content": [
           {
             "type": "code",
             "filename": "terminal",
             "lang": "bash",
-            "code": "# 在项目根（~/code-share-backend）\ndocker-compose up -d --build\ndocker logs -f csb-backend"
+            "code": "# プロジェクトルート（~/code-share-backend）で実行\ndocker-compose up -d --build\ndocker logs -f csb-backend"
           },
           {
             "type": "p",
-            "text": "当终端出现 “Application startup complete.” 时表示启动成功。"
+            "text": "ターミナルに “Application startup complete.” と表示されたら、起動成功。"
           },
           {
             "type": "code",
             "filename": "terminal",
             "lang": "bash",
-            "code": "# 健康检查\ncurl http://localhost:8000/health\n\n# 注册（返回 access_token）\ncurl -s -X POST http://localhost:8000/auth/register \\\n -H 'Content-Type: application/json' \\\n -d '{\"email\":\"test@example.com\",\"password\":\"pass1234\"}'\n\nTOKEN=\"把上面返回的 access_token 粘这里\"\n\n# 创建一条笔记（需要 Bearer Token）\ncurl -s -X POST http://localhost:8000/notes \\\n -H \"Authorization: Bearer $TOKEN\" \\\n -H 'Content-Type: application/json' \\\n -d '{\n   \"title\":\"我的首个转码项目\",\n   \"project_type\":\"动态\",\n   \"frontend_stack\":\"Next.js(TypeScript)\",\n   \"backend_stack\":\"FastAPI + Postgres\",\n   \"description\":\"登录后可发布的项目记录\"\n }'"
+            "code": "# ヘルスチェック\ncurl http://localhost:8000/health\n\n# 登録（access_token を返す）\ncurl -s -X POST http://localhost:8000/auth/register \\\n -H 'Content-Type: application/json' \\\n -d '{\"email\":\"test@example.com\",\"password\":\"pass1234\"}'\n\nTOKEN=\"上で返された access_token をここに貼り付ける\"\n\n# ノートを作成（Bearer Token が必要）\ncurl -s -X POST http://localhost:8000/notes \\\n -H \"Authorization: Bearer $TOKEN\" \\\n -H 'Content-Type: application/json' \\\n -d '{\n   \"title\":\"私の最初の転職プロジェクト\",\n   \"project_type\":\"動的\",\n   \"frontend_stack\":\"Next.js(TypeScript)\",\n   \"backend_stack\":\"FastAPI + Postgres\",\n   \"description\":\"ログイン後に投稿できるプロジェクト記録\"\n }'"
           },
           {
             "type": "p",
-            "text": "若输出如下 JSON 内容，即表示接口工作正常："
+            "text": "以下のような JSON が出力されれば、API が正常に動作していることを意味する："
           },
           {
             "type": "code",
             "filename": "output",
             "lang": "json",
-            "code": "[{\"title\":\"我的第一个转码项目\",\"project_type\":\"动态\",\"frontend_stack\":\"Next.js(TypeScript)\",\"backend_stack\":\"FastAPI + Postgres\",\"description\":\"用Docker搭建的全栈项目\",\"id\":1,\"owner_id\":1}]"
-          }
+            "code": "[{\"title\":\"私の最初の転職プロジェクト\",\"project_type\":\"動的\",\"frontend_stack\":\"Next.js(TypeScript)\",\"backend_stack\":\"FastAPI + Postgres\",\"description\":\"Dockerで構築したフルスタックプロジェクト\",\"id\":1,\"owner_id\":1}]"
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-7.png",
+            "alt": "起動と API 検証",
+            "caption": "起動と API 検証"
+          },
         ]
       }
     ]
@@ -627,6 +669,12 @@ const CURRICULUM: Chapter[] = [
             "filename": "terminal",
             "lang": "bash",
             "code": "# 重建并启动\ncd ~/code-share\ndocker-compose build backend\ndocker-compose up -d\n\n# 登录获取token（假设已注册 test@example.com）\ncurl -s -X POST http://localhost:8000/auth/login \\\n -H 'Content-Type: application/json' \\\n -d '{\"email\":\"test@example.com\",\"password\":\"pass1234\"}'\n\n# 保存token\nTOKEN=\"(在这里粘贴access_token)\"\n\n# 获取当前用户\ncurl -s http://localhost:8000/auth/me -H \"Authorization: Bearer $TOKEN\"\n\n# 创建一条笔记\ncurl -s -X POST http://localhost:8000/notes \\\n -H \"Authorization: Bearer $TOKEN\" -H 'Content-Type: application/json' \\\n -d '{\"title\":\"二号项目\",\"project_type\":\"静态\",\"frontend_stack\":\"Next.js\",\"backend_stack\":\"—\",\"description\":\"静态展示\"}'\n\n# 查看详情（假设是id=2）\ncurl -s http://localhost:8000/notes/2 -H \"Authorization: Bearer $TOKEN\"\n\n# 更新\ncurl -s -X PUT http://localhost:8000/notes/2 \\\n -H \"Authorization: Bearer $TOKEN\" -H 'Content-Type: application/json' \\\n -d '{\"title\":\"二号项目（更新）\",\"project_type\":\"静态\",\"frontend_stack\":\"Next.js\",\"backend_stack\":\"—\",\"description\":\"更新后的描述\"}'\n\n# 删除\ncurl -s -X DELETE http://localhost:8000/notes/2 -H \"Authorization: Bearer $TOKEN\" -i"
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-8.png",
+            "alt": "新しいAPIを検証する",
+            "caption": "新しいAPIを検証する"
           },
           {
             "type": "p",
@@ -776,7 +824,25 @@ const CURRICULUM: Chapter[] = [
           {
             "type": "p",
             "text": "これでAlembicによる初回マイグレーションが完了しました。"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-9.png",
+            "alt": "データベース移行管理1",
+            "caption": "データベース移行管理1"
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-10.png",
+            "alt": "データベース移行管理2",
+            "caption": "データベース移行管理2"
+          },
+          {
+            "type": "img",
+            "src": "/images/backend-11.png",
+            "alt": "データベース移行管理3",
+            "caption": "データベース移行管理3"
+          },
         ]
       },
       {
