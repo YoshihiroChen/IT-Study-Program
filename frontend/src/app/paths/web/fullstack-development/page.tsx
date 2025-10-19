@@ -977,7 +977,7 @@ export default function TsBasicsPage() {
 
           <BookOpen className="w-5 h-5 opacity-80 ml-2" />
           <h1 className="text-lg font-semibold tracking-wide">
-            フルスタック開発実践（バックエンド）
+            フルスタック開発実践（バックエンドとデータベース）
           </h1>
 
           <button

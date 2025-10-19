@@ -170,7 +170,19 @@ const CURRICULUM: Chapter[] = [
           {
             "type": "p",
             "text": "設定を即時反映させます。"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-1.png",
+            "alt": "EC2でのSwap領域の設定1",
+            "caption": "EC2でのSwap領域の設定1"
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-2.png",
+            "alt": "EC2でのSwap領域の設定2",
+            "caption": "EC2でのSwap領域の設定2"
+          },
         ]
       }
     ]
@@ -234,6 +246,18 @@ const CURRICULUM: Chapter[] = [
             "text": "Yarn（クラシック版）をインストールします。"
           },
           {
+            "type": "img",
+            "src": "/images/frontend-3.png",
+            "alt": "必要なフロントエンドツールをインストール(1)",
+            "caption": "必要なフロントエンドツールをインストール(1)"
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-4.png",
+            "alt": "必要なフロントエンドツールをインストール(2)",
+            "caption": "必要なフロントエンドツールをインストール(2)"
+          },
+          {
             "type": "code",
             "filename": "terminal",
             "lang": "bash",
@@ -252,7 +276,13 @@ const CURRICULUM: Chapter[] = [
           {
             "type": "p",
             "text": "Next.jsアプリをTypeScript構成で初期化します。Turbopackは「Yes」を選び、Tailwind CSSは後で追加するため「No」を選びます。"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-5.png",
+            "alt": "Next.jsアプリをTypeScript構成で初期化する",
+            "caption": "Next.jsアプリをTypeScript構成で初期化する"
+          },
         ]
       },
       {
@@ -282,7 +312,19 @@ const CURRICULUM: Chapter[] = [
           {
             "type": "p",
             "text": "値が `524288` と表示されれば修正完了です。"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-6.png",
+            "alt": "Turbopackの監視制限エラー修正",
+            "caption": "Turbopackの監視制限エラー修正"
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-7.png",
+            "alt": "監視制限エラー修正後、ブラウザで動作確認",
+            "caption": "監視制限エラー修正後、ブラウザで動作確認"
+          },
         ]
       },
       {
@@ -334,7 +376,13 @@ const CURRICULUM: Chapter[] = [
           {
             "type": "p",
             "text": "これでフロントエンド（Next.js）、バックエンド（FastAPI）、データベース（PostgreSQL）の3つがDockerで連携して起動します。"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-8.png",
+            "alt": "sudo docker-compose up -d --buildのコマンドを実行",
+            "caption": "sudo docker-compose up -d --buildのコマンドを実行"
+          },
         ]
       },
       {
@@ -355,12 +403,30 @@ const CURRICULUM: Chapter[] = [
             ]
           },
           {
+            "type": "img",
+            "src": "/images/frontend-9.png",
+            "alt": "対象インスタンスを選択 → Security → Security groups（セキュリティグループ）",
+            "caption": "対象インスタンスを選択 → Security → Security groups（セキュリティグループ）"
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-10.png",
+            "alt": "Inbound rules（インバウンドルール） → Edit inbound rules（編集）",
+            "caption": "Inbound rules（インバウンドルール） → Edit inbound rules（編集）"
+          },
+          {
             "type": "ul",
             "items": [
               "Type: Custom TCP",
               "Port range: 8000（※フロントエンド用に3000も追加することを推奨）",
               "Source: My IP（開発中は自分のグローバルIPを指定。0.0.0.0/0は避ける）"
             ]
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-11.png",
+            "alt": "Port range: 8000（※フロントエンド用に3000も追加することを推奨）",
+            "caption": "Port range: 8000（※フロントエンド用に3000も追加することを推奨）"
           },
           {
             "type": "p",
@@ -370,7 +436,7 @@ const CURRICULUM: Chapter[] = [
             "type": "code",
             "filename": "terminal",
             "lang": "bash",
-            "code": "curl http://54.250.207.1:8000/health"
+            "code": "curl http://<あなたのパブリックIP>:8000/health"
           },
           {
             "type": "p",
@@ -381,7 +447,26 @@ const CURRICULUM: Chapter[] = [
             "filename": "terminal",
             "lang": "json",
             "code": "{\"status\": \"ok\"}"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-12.png",
+            "alt": "http://<あなたのパブリックIP>:8000/healthのレスボンスを確認する",
+            "caption": "http://<あなたのパブリックIP>:8000/healthのレスボンスを確認する"
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-13.png",
+            "alt": "http://<あなたのパブリックIP>:8000のレスボンスを確認する",
+            "caption": "http://<あなたのパブリックIP>:8000のレスボンスを確認する"
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-14.png",
+            "alt": "http://<あなたのパブリックIP>:8000/notesのレスボンスを確認する",
+            "caption": "http://<あなたのパブリックIP>:8000/notesのレスボンスを確認する"
+          },
+
         ]
       }      
     ]
@@ -422,7 +507,7 @@ const CURRICULUM: Chapter[] = [
             "type": "ul",
             "items": [
               "args 内の `NEXT_PUBLIC_API_BASE: http://backend:8000` を以下に変更：",
-              "NEXT_PUBLIC_API_BASE: \"http://54.250.207.1:8000\"  # ブラウザから直接アクセス可能なURL",
+              "NEXT_PUBLIC_API_BASE: \"http://<あなたのパブリックIP>:8000\"  # ブラウザから直接アクセス可能なURL",
               "INTERNAL_API_BASE: \"http://backend:8000\"          # コンテナ内部通信用"
             ]
           }
@@ -444,14 +529,20 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "ファイルを保存したら再度ビルドを行い、ブラウザで `http://54.250.207.1:3000` にアクセスします。以下のように表示されれば成功です："
+            "text": "ファイルを保存したら再度ビルドを行い、ブラウザで `http://<あなたのパブリックIP>:3000` にアクセスします。以下のように表示されれば成功です："
           },
           {
             "type": "code",
             "filename": "output",
             "lang": "text",
-            "code": "Backend: http://54.250.207.1:8000\nHealth: ok"
-          }
+            "code": "Backend: http://<あなたのパブリックIP>:8000\nHealth: ok"
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-16.png",
+            "alt": "http://<あなたのパブリックIP>:3000の確認",
+            "caption": "http://<あなたのパブリックIP>:3000の確認"
+          },
         ]
       },
       {
@@ -530,10 +621,10 @@ const CURRICULUM: Chapter[] = [
           {
             "type": "ul",
             "items": [
-              "http://54.250.207.1:3000/register",
-              "http://54.250.207.1:3000/login"
+              "http://<あなたのパブリックIP>:3000/register",
+              "http://<あなたのパブリックIP>:3000/login"
             ]
-          }
+          },
         ]
       }
     ]
@@ -555,7 +646,13 @@ const CURRICULUM: Chapter[] = [
             "filename": "src/app/login/page.tsx",
             "lang": "typescript",
             "code": "'use client';\n\nimport { useState, type ReactElement } from 'react';\nimport { useRouter } from 'next/navigation';\nimport { apiRequest } from '@/lib/api';\n\nexport default function LoginPage(): ReactElement {\n  const router = useRouter();\n  const [email, setEmail] = useState<string>('');\n  const [password, setPassword] = useState<string>('');\n  const [message, setMessage] = useState<string>('');\n  const [loading, setLoading] = useState<boolean>(false);\n\n  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {\n    e.preventDefault();\n    setLoading(true);\n    setMessage('正在登录…');\n    try {\n      const data = await apiRequest<{ access_token: string }>('/auth/login', 'POST', { email, password });\n      localStorage.setItem('token', data.access_token);\n      setMessage('登录成功，正在跳转…');\n      router.push('/notes');\n    } catch (err: unknown) {\n      setMessage(err instanceof Error ? `登录失败：${err.message}` : '登录失败：未知错误');\n    } finally {\n      setLoading(false);\n    }\n  }\n\n  return (\n    <main className=\"mx-auto my-10 max-w-md px-4\">\n      <div className=\"rounded-2xl border border-neutral-200/70 p-6 shadow-sm\">\n        <h1 className=\"mb-6 text-2xl font-semibold\">登录</h1>\n        <form onSubmit={handleSubmit} className=\"space-y-4\">\n          <div>\n            <label className=\"mb-1 block text-sm\">邮箱</label>\n            <input\n              type=\"email\"\n              value={email}\n              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}\n              required\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n              placeholder=\"you@example.com\"\n              autoComplete=\"email\"\n            />\n          </div>\n          <div>\n            <label className=\"mb-1 block text-sm\">密码</label>\n            <input\n              type=\"password\"\n              value={password}\n              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}\n              required\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n              placeholder=\"••••••••\"\n              autoComplete=\"current-password\"\n            />\n          </div>\n\n          <button\n            type=\"submit\"\n            disabled={loading}\n            className=\"w-full rounded-xl border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60\"\n            aria-busy={loading}\n          >\n            {loading ? '登录中…' : '登录'}\n          </button>\n        </form>\n\n        <p className=\"mt-4 text-sm text-neutral-600\">{message}</p>\n\n        <div className=\"mt-6 text-sm\">\n          还没有账号？{' '}\n          <button\n            className=\"text-indigo-600 underline underline-offset-2 hover:text-indigo-700\"\n            onClick={() => router.push('/register')}\n          >\n            去注册\n          </button>\n        </div>\n      </div>\n    </main>\n  );\n}\n"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-17.png",
+            "alt": "src/app/login/page.tsx の美化",
+            "caption": "src/app/login/page.tsx の美化"
+          },
         ]
       },
       {
@@ -571,7 +668,13 @@ const CURRICULUM: Chapter[] = [
             "filename": "src/app/register/page.tsx",
             "lang": "typescript",
             "code": "'use client';\n\nimport { useState, type ReactElement } from 'react';\nimport { useRouter } from 'next/navigation';\nimport { apiRequest } from '@/lib/api';\n\nexport default function RegisterPage(): ReactElement {\n  const router = useRouter();\n  const [email, setEmail] = useState<string>('');\n  const [password, setPassword] = useState<string>('');\n  const [message, setMessage] = useState<string>('');\n  const [loading, setLoading] = useState<boolean>(false);\n\n  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {\n    e.preventDefault();\n    setLoading(true);\n    setMessage('正在注册中…');\n    try {\n      const data = await apiRequest<{ access_token: string }>('/auth/register', 'POST', { email, password });\n      localStorage.setItem('token', data.access_token);\n      setMessage('注册成功，正在跳转…');\n      router.push('/notes');\n    } catch (err: unknown) {\n      setMessage(err instanceof Error ? `注册失败：${err.message}` : '注册失败：未知错误');\n    } finally {\n      setLoading(false);\n    }\n  }\n\n  return (\n    <main className=\"mx-auto my-10 max-w-md px-4\">\n      <div className=\"rounded-2xl border border-neutral-200/70 p-6 shadow-sm\">\n        <h1 className=\"mb-6 text-2xl font-semibold\">注册账号</h1>\n        <form onSubmit={handleSubmit} className=\"space-y-4\">\n          <div>\n            <label className=\"mb-1 block text-sm\">邮箱</label>\n            <input\n              type=\"email\"\n              value={email}\n              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}\n              required\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n              placeholder=\"you@example.com\"\n              autoComplete=\"email\"\n            />\n          </div>\n          <div>\n            <label className=\"mb-1 block text-sm\">密码</label>\n            <input\n              type=\"password\"\n              value={password}\n              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}\n              required\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n              placeholder=\"至少 8 位\"\n              autoComplete=\"new-password\"\n            />\n          </div>\n\n          <button\n            type=\"submit\"\n            disabled={loading}\n            className=\"w-full rounded-xl border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60\"\n            aria-busy={loading}\n          >\n            {loading ? '注册中…' : '注册'}\n          </button>\n        </form>\n\n        <p className=\"mt-4 text-sm text-neutral-600\">{message}</p>\n\n        <div className=\"mt-6 text-sm\">\n          已有账号？{' '}\n          <button\n            className=\"text-indigo-600 underline underline-offset-2 hover:text-indigo-700\"\n            onClick={() => router.push('/login')}\n          >\n            去登录\n          </button>\n        </div>\n      </div>\n    </main>\n  );\n}\n"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-20.png",
+            "alt": "src/app/register/page.tsx の美化",
+            "caption": "src/app/register/page.tsx の美化"
+          },
         ]
       }
     ]
@@ -593,7 +696,14 @@ const CURRICULUM: Chapter[] = [
             "filename": "src/app/notes/new/page.tsx",
             "lang": "typescript",
             "code": "'use client';\n\nimport React, { useEffect, useState, type ReactElement } from 'react';\nimport { useRouter } from 'next/navigation';\n\n/** ---- バックエンドの NoteCreate に合わせた型 ----\n * title, project_type, frontend_stack, backend_stack は必須\n * description は任意\n */\ntype NoteCreate = {\n  title: string;\n  project_type: string;\n  frontend_stack: string;\n  backend_stack: string;\n  description?: string;\n};\n\n/** 認証付き POST /notes */\nasync function createNoteWithToken(\n  baseURL: string,\n  token: string,\n  payload: NoteCreate\n): Promise<void> {\n  const res = await fetch(`${baseURL}/notes`, {\n    method: 'POST',\n    headers: {\n      'Authorization': `Bearer ${token}`,\n      'Content-Type': 'application/json',\n    },\n    body: JSON.stringify(payload),\n  });\n\n  if (!res.ok) {\n    const text = await res.text();\n    throw new Error(`${res.status} ${res.statusText} - ${text}`);\n  }\n}\n\nexport default function NewNotePage(): ReactElement {\n  const router = useRouter();\n\n  // フォーム状態\n  const [title, setTitle] = useState<string>('');\n  const [projectType, setProjectType] = useState<string>('静的'); // 初期値はお好みで\n  const [frontendStack, setFrontendStack] = useState<string>('TypeScript, Next.js');\n  const [backendStack, setBackendStack] = useState<string>('Python, FastAPI');\n  const [description, setDescription] = useState<string>('');\n\n  // UI 状態\n  const [loading, setLoading] = useState<boolean>(false);\n  const [message, setMessage] = useState<string>('');\n\n  // トークン未所持ならログインへ\n  useEffect(() => {\n    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;\n    if (!token) {\n      router.replace('/login');\n    }\n  }, [router]);\n\n  function validate(): string | null {\n    if (title.trim().length < 2) return 'タイトルは2文字以上で入力してください。';\n    if (projectType.trim() === '') return '種別を選択してください。';\n    if (frontendStack.trim() === '') return 'フロントエンド技術スタックを入力してください。';\n    if (backendStack.trim() === '') return 'バックエンド技術スタックを入力してください。';\n    return null;\n  }\n\n  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {\n    e.preventDefault();\n    const err = validate();\n    if (err) {\n      setMessage(err);\n      return;\n    }\n\n    const token = localStorage.getItem('token');\n    if (!token) {\n      router.replace('/login');\n      return;\n    }\n\n    const base = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';\n    const payload: NoteCreate = {\n      title: title.trim(),\n      project_type: projectType.trim(),\n      frontend_stack: frontendStack.trim(),\n      backend_stack: backendStack.trim(),\n      description: description.trim() === '' ? undefined : description.trim(),\n    };\n\n    setLoading(true);\n    setMessage('投稿中…');\n\n    try {\n      await createNoteWithToken(base, token, payload);\n      setMessage('作成に成功しました。一覧へ移動します…');\n      router.push('/notes');\n    } catch (err: unknown) {\n      if (err instanceof Error) {\n        // 401 ならログインへ\n        if (err.message.startsWith('401')) {\n          localStorage.removeItem('token');\n          router.replace('/login');\n          return;\n        }\n        setMessage(`作成に失敗しました：${err.message}`);\n      } else {\n        setMessage('作成に失敗しました：未知のエラー');\n      }\n    } finally {\n      setLoading(false);\n    }\n  }\n\n  return (\n    <main className=\"mx-auto my-10 max-w-2xl px-4\">\n      <div className=\"rounded-2xl border border-neutral-200/70 p-6 shadow-sm\">\n        <header className=\"mb-6 flex items-center justify-between\">\n          <h1 className=\"text-2xl font-semibold\">新規ノート作成</h1>\n          <div className=\"flex gap-2\">\n            <button\n              className=\"rounded-xl border px-3 py-2 hover:bg-neutral-50\"\n              onClick={() => router.push('/notes')}\n            >\n              一覧へ戻る\n            </button>\n          </div>\n        </header>\n\n        <form onSubmit={handleSubmit} className=\"space-y-5\">\n          {/* タイトル */}\n          <div>\n            <label className=\"mb-1 block text-sm\">タイトル <span className=\"text-red-600\">*</span></label>\n            <input\n              type=\"text\"\n              value={title}\n              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}\n              required\n              minLength={2}\n              placeholder=\"例）ポートフォリオ用ミニブログ\"\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n            />\n          </div>\n\n          {/* 種別 */}\n          <div>\n            <label className=\"mb-1 block text-sm\">種別 <span className=\"text-red-600\">*</span></label>\n            <select\n              value={projectType}\n              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setProjectType(e.target.value)}\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n            >\n              <option value=\"静的\">静的（Static）</option>\n              <option value=\"動的\">動的（Dynamic）</option>\n              <option value=\"Web API\">Web API</option>\n              <option value=\"フルスタック\">フルスタック</option>\n              <option value=\"その他\">その他</option>\n            </select>\n            <p className=\"mt-1 text-xs text-neutral-500\">\n              バックエンド無しの静的サイト、API 中心のサービス、フルスタック等から選択してください（自由に編集可）。\n            </p>\n          </div>\n\n          {/* フロントエンド技術スタック */}\n          <div>\n            <label className=\"mb-1 block text-sm\">フロントエンド技術スタック <span className=\"text-red-600\">*</span></label>\n            <input\n              type=\"text\"\n              value={frontendStack}\n              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFrontendStack(e.target.value)}\n              required\n              placeholder=\"例）TypeScript, Next.js, Tailwind CSS\"\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n            />\n            <p className=\"mt-1 text-xs text-neutral-500\">カンマ区切りで複数入力できます。</p>\n          </div>\n\n          {/* バックエンド技術スタック */}\n          <div>\n            <label className=\"mb-1 block text-sm\">バックエンド技術スタック <span className=\"text-red-600\">*</span></label>\n            <input\n              type=\"text\"\n              value={backendStack}\n              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBackendStack(e.target.value)}\n              required\n              placeholder=\"例）Python, FastAPI, PostgreSQL\"\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n            />\n            <p className=\"mt-1 text-xs text-neutral-500\">こちらもカンマ区切りで入力可能です。</p>\n          </div>\n\n          {/* 説明（任意） */}\n          <div>\n            <label className=\"mb-1 block text-sm\">説明（任意）</label>\n            <textarea\n              value={description}\n              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}\n              rows={5}\n              placeholder=\"プロジェクトの概要、目的、学んだ点などを記入してください。\"\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500\"\n            />\n          </div>\n\n          {/* ボタン行 */}\n          <div className=\"flex items-center justify-end gap-2\">\n            <button\n              type=\"button\"\n              className=\"rounded-xl border px-4 py-2 hover:bg-neutral-50\"\n              onClick={() => router.push('/notes')}\n            >\n              キャンセル\n            </button>\n            <button\n              type=\"submit\"\n              disabled={loading}\n              className=\"rounded-xl border border-transparent bg-indigo-600 px-5 py-2 font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60\"\n              aria-busy={loading}\n            >\n              {loading ? '作成中…' : '作成する'}\n            </button>\n          </div>\n\n          {/* メッセージ */}\n          {message && <p className=\"text-sm text-neutral-600\">{message}</p>}\n        </form>\n      </div>\n    </main>\n  );\n}\n"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-22.png",
+            "alt": "新規ノート作成ページ（/notes/new）の実装",
+            "caption": "新規ノート作成ページ（/notes/new）の実装"
+          },
+
         ]
       },
       {
@@ -609,7 +719,13 @@ const CURRICULUM: Chapter[] = [
             "filename": "src/app/notes/page.tsx",
             "lang": "typescript",
             "code": "'use client';\n\nimport React, { useEffect, useMemo, useState, type ReactElement } from 'react';\nimport { useRouter } from 'next/navigation';\n\n/** ====== 後端スキーマに合わせた型 ======\n * FastAPI の NoteOut をフロント側で表現\n */\ntype Note = {\n  id: number;\n  owner_id: number;\n  title: string;\n  project_type: string;\n  frontend_stack: string;\n  backend_stack: string;\n  description?: string;\n};\n\ntype FetchNotesResponse = Note[] | { items: Note[] };\n\n/** ====== 型ガード・正規化ユーティリティ ====== */\nfunction isRecord(x: unknown): x is Record<string, unknown> {\n  return typeof x === 'object' && x !== null;\n}\n\nfunction pickString(obj: Record<string, unknown>, keys: string[]): string | undefined {\n  for (const k of keys) {\n    const v = obj[k];\n    if (typeof v === 'string' && v.trim() !== '') return v;\n  }\n  return undefined;\n}\n\nfunction pickNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {\n  for (const k of keys) {\n    const v = obj[k];\n    if (typeof v === 'number') return v;\n    if (typeof v === 'string' && v.trim() !== '' && !Number.isNaN(Number(v))) return Number(v);\n  }\n  return undefined;\n}\n\nfunction hasItemsArray(x: unknown): x is { items: unknown[] } {\n  if (!isRecord(x)) return false;\n  return Array.isArray((x as Record<string, unknown>).items);\n}\n\n/** 後端が想定スキーマで返す/多少ズレても吸収できるように正規化 */\nfunction normalizeNote(raw: unknown): Note | null {\n  if (!isRecord(raw)) return null;\n\n  const id = pickNumber(raw, ['id', 'note_id']) ?? Math.floor(Math.random() * 1e9);\n  const owner_id = pickNumber(raw, ['owner_id', 'ownerId']) ?? 0;\n\n  const title =\n    pickString(raw, ['title', 'name', 'subject']) ?? '(無題)';\n  const project_type =\n    pickString(raw, ['project_type', 'projectType', 'type']) ?? '不明';\n  const frontend_stack =\n    pickString(raw, ['frontend_stack', 'frontendStack', 'frontend']) ?? '未指定';\n  const backend_stack =\n    pickString(raw, ['backend_stack', 'backendStack', 'backend']) ?? '未指定';\n  const description =\n    pickString(raw, ['description', 'content', 'body', 'text', 'detail', 'message']);\n\n  return { id, owner_id, title, project_type, frontend_stack, backend_stack, description };\n}\n\n/** ====== API ====== */\nasync function fetchNotesWithToken(baseURL: string, token: string): Promise<Note[]> {\n  const res = await fetch(`${baseURL}/notes`, {\n    method: 'GET',\n    headers: { Authorization: `Bearer ${token}` },\n  });\n  if (!res.ok) {\n    const text = await res.text();\n    throw new Error(`${res.status} ${res.statusText} - ${text}`);\n  }\n\n  const data: unknown = await res.json();\n  const arr: unknown[] = Array.isArray(data)\n    ? data\n    : hasItemsArray(data)\n      ? (data as { items: unknown[] }).items\n      : [];\n\n  const normalized: Note[] = [];\n  for (const item of arr) {\n    const n = normalizeNote(item);\n    if (n) normalized.push(n);\n  }\n  return normalized;\n}\n\n/** ====== 表示用ヘルパ ====== */\nfunction badgeColorByProjectType(t: string): string {\n  const key = t.toLowerCase();\n  if (key.includes('静') || key.includes('static')) return 'bg-emerald-100 text-emerald-700 border-emerald-200';\n  if (key.includes('動') || key.includes('dynamic')) return 'bg-sky-100 text-sky-700 border-sky-200';\n  return 'bg-neutral-100 text-neutral-700 border-neutral-200';\n}\n\nfunction splitStack(s: string): string[] {\n  return s\n    .split(/[\\,\\|/、\\s]+/g)\n    .map((x) => x.trim())\n    .filter((x) => x.length > 0);\n}\n\n/** ====== ページ本体 ====== */\nexport default function NotesPage(): ReactElement {\n  const router = useRouter();\n  const [notes, setNotes] = useState<Note[]>([]);\n  const [loading, setLoading] = useState<boolean>(true);\n  const [error, setError] = useState<string | null>(null);\n  const [q, setQ] = useState<string>('');\n\n  useEffect(() => {\n    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;\n    if (!token) {\n      router.replace('/login');\n      return;\n    }\n\n    const base = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';\n\n    (async () => {\n      try {\n        const data = await fetchNotesWithToken(base, token);\n        setNotes(data);\n      } catch (err: unknown) {\n        if (err instanceof Error && err.message.startsWith('401')) {\n          localStorage.removeItem('token');\n          router.replace('/login');\n          return;\n        }\n        setError(err instanceof Error ? err.message : '未知のエラー');\n      } finally {\n        setLoading(false);\n      }\n    })();\n  }, [router]);\n\n  const filtered = useMemo<Note[]>(\n    () =>\n      notes.filter((n) => {\n        const k = q.toLowerCase().trim();\n        if (k === '') return true;\n        return (\n          n.title.toLowerCase().includes(k) ||\n          (n.description?.toLowerCase().includes(k) ?? false) ||\n          n.frontend_stack.toLowerCase().includes(k) ||\n          n.backend_stack.toLowerCase().includes(k) ||\n          n.project_type.toLowerCase().includes(k)\n        );\n      }),\n    [notes, q]\n  );\n\n  if (loading) return <div className=\"p-6 text-lg\">読み込み中…</div>;\n\n  if (error) {\n    return (\n      <div className=\"p-6\">\n        <h1 className=\"mb-3 text-xl font-semibold\">ノート一覧</h1>\n        <p className=\"text-red-600\">エラー: {error}</p>\n        <button\n          className=\"mt-4 rounded-xl border px-3 py-2 hover:bg-neutral-50\"\n          onClick={() => router.push('/login')}\n        >\n          ログインへ\n        </button>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"mx-auto max-w-5xl p-6\">\n      {/* ヘッダー */}\n      <header className=\"mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between\">\n        <h1 className=\"text-2xl font-semibold\">ノート一覧</h1>\n        <div className=\"flex flex-col gap-3 sm:flex-row sm:items-center\">\n          <div className=\"relative\">\n            <input\n              value={q}\n              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)}\n              placeholder=\"タイトル・説明・技術スタックで検索…\"\n              className=\"w-full rounded-xl border border-neutral-300 px-3 py-2 pr-8 outline-none focus:ring-2 focus:ring-indigo-500 sm:w-80\"\n            />\n            {q !== '' && (\n              <button\n                aria-label=\"クリア\"\n                className=\"absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-neutral-500 hover:bg-neutral-100\"\n                onClick={() => setQ('')}\n              >\n                ×\n              </button>\n            )}\n          </div>\n          <div className=\"flex gap-2\">\n            <button\n              className=\"rounded-xl border px-3 py-2 hover:bg-neutral-50\"\n              onClick={() => router.push('/')}\n            >\n              ホーム\n            </button>\n            <button\n              className=\"rounded-xl border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700\"\n              onClick={() => router.push('/notes/new')}\n              title=\"※ 後で /notes/new ページを作成して投稿できるようにできます\"\n            >\n              新規ノート\n            </button>\n            <button\n              className=\"rounded-xl border px-3 py-2 hover:bg-neutral-50\"\n              onClick={() => {\n                localStorage.removeItem('token');\n                router.replace('/login');\n              }}\n            >\n              ログアウト\n            </button>\n          </div>\n        </div>\n      </header>\n\n      {/* リスト */}\n      {filtered.length === 0 ? (\n        <p className=\"rounded-xl border border-dashed p-6 text-neutral-600\">\n          条件に一致するノートがありません{q ? '（検索条件あり）' : ''}。\n        </p>\n      ) : (\n        <ul className=\"grid grid-cols-1 gap-4 sm:grid-cols-2\">\n          {filtered.map((n) => {\n            const fe = splitStack(n.frontend_stack);\n            const be = splitStack(n.backend_stack);\n            const badgeCls = `inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${badgeColorByProjectType(\n              n.project_type\n            )}`;\n\n            return (\n              <li\n                key={n.id}\n                className=\"rounded-2xl border border-neutral-200/70 p-5 shadow-sm transition hover:shadow-md\"\n              >\n                {/* タイトル＋種別 */}\n                <div className=\"mb-3 flex items-start justify-between gap-3\">\n                  <h2 className=\"text-lg font-semibold leading-snug\">{n.title}</h2>\n                  <span className={badgeCls} title={`owner_id: ${n.owner_id}`}>\n                    {n.project_type}\n                  </span>\n                </div>\n\n                {/* 説明 */}\n                {n.description ? (\n                  <p className=\"whitespace-pre-wrap text-sm text-neutral-700\">\n                    {n.description.length > 180 ? `${n.description.slice(0, 180)}…` : n.description}\n                  </p>\n                ) : (\n                  <p className=\"text-sm text-neutral-500\">（説明なし）</p>\n                )}\n\n                {/* 技術スタック */}\n                <div className=\"mt-4 space-y-2 text-sm\">\n                  <div className=\"flex flex-wrap items-start gap-2\">\n                    <span className=\"shrink-0 rounded-md bg-neutral-100 px-2 py-1 text-xs text-neutral-700\">\n                      Frontend\n                    </span>\n                    <div className=\"flex flex-wrap gap-2\">\n                      {fe.length > 0 ? (\n                        fe.map((t, i) => (\n                          <span\n                            key={`${n.id}-fe-${i}-${t}`}\n                            className=\"rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-700 ring-1 ring-indigo-100\"\n                          >\n                            {t}\n                          </span>\n                        ))\n                      ) : (\n                        <span className=\"text-neutral-500\">未指定</span>\n                      )}\n                    </div>\n                  </div>\n\n                  <div className=\"flex flex-wrap items-start gap-2\">\n                    <span className=\"shrink-0 rounded-md bg-neutral-100 px-2 py-1 text-xs text-neutral-700\">\n                      Backend\n                    </span>\n                    <div className=\"flex flex-wrap gap-2\">\n                      {be.length > 0 ? (\n                        be.map((t, i) => (\n                          <span\n                            key={`${n.id}-be-${i}-${t}`}\n                            className=\"rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700 ring-1 ring-emerald-100\"\n                          >\n                            {t}\n                          </span>\n                        ))\n                      ) : (\n                        <span className=\"text-neutral-500\">未指定</span>\n                      )}\n                    </div>\n                  </div>\n                </div>\n\n                {/* 予備のアクション行（後で詳細ページを作る場合） */}\n                {/* <div className=\"mt-4 text-right\">\n                  <button\n                    className=\"text-sm text-indigo-600 underline underline-offset-2 hover:text-indigo-700\"\n                    onClick={() => router.push(`/notes/${n.id}`)}\n                  >\n                    詳細を見る\n                  </button>\n                </div> */}\n              </li>\n            );\n          })}\n        </ul>\n      )}\n    </div>\n  );\n}\n"
-          }
+          },
+          {
+            "type": "img",
+            "src": "/images/frontend-21.png",
+            "alt": "ノート一覧ページ（/notes）の実装",
+            "caption": "ノート一覧ページ（/notes）の実装"
+          },
         ]
       }
     ]
@@ -721,7 +837,7 @@ export default function TsBasicsPage() {
 
           <BookOpen className="w-5 h-5 opacity-80 ml-2" />
           <h1 className="text-lg font-semibold tracking-wide">
-            FASTAPIの学習
+            フルスタック開発実践（フロントエンド）
           </h1>
 
           <button
