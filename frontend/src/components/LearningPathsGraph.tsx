@@ -158,6 +158,15 @@ const tracks: Track[] = [
         row: -1,
         chain: false,
       },
+      {
+        id: "web-5b",
+        label: "Reactの学習",
+        href: "/paths/web/react-guidance",
+        summary: "Reactというフロントエンドフレームワークを学習する",
+        col: 4,
+        row: 0.9,
+        chain: false,
+      },
     ],
   },
   {
@@ -230,6 +239,7 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-4c", target: "web-4d", sourceHandle: "right-out", targetHandle: "left-in", type: "straight", animated: true },
   { source: "web-4", target: "web-4e", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-5", target: "web-5a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  { source: "web-5", target: "web-5b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   
 
 ];
