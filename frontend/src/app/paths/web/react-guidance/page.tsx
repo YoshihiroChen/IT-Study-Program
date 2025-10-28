@@ -215,10 +215,249 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "以上のように、JSXではreturn内でHTMLのような構文を書けますが、正しいタグ構造を守ることが重要です。次の章では、コンポーネントを分割してUIを構築する方法を学びます。"
+            "text": "以上のように、JSXではreturn内でHTMLのような構文を書けますが、正しいタグ構造を守ることが重要です。"
+          }
+        ]
+      },
+      {
+        "id": "react-components",
+        "title": "コンポーネントの使い方",
+        "summary": "Reactの基本単位であるコンポーネントを作成し、再利用する方法を学びましょう。",
+        "content": [
+          {
+            "type": "p",
+            "text": "ReactにおいてコンポーネントはUIを構成する最小の部品です。1つの画面は複数のコンポーネントを組み合わせて構築されます。ここでは、新しいファイルを作成してコンポーネントを定義し、実際に呼び出してみましょう。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-10.png",
+            "alt": "新しいapp.jsファイルを作成",
+            "caption": "まず、srcフォルダ内に新しいファイル「app.js」を作成します。"
+          },
+          {
+            "type": "p",
+            "text": "次に、作成した app.js に以下のようにReactコンポーネントを記述します。Reactでは関数を使ってUIを定義し、export文で外部から利用できるようにします。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-11.png",
+            "alt": "app.jsファイルの内容を編集",
+            "caption": "app.jsにReactコンポーネントを定義しましょう。"
+          },
+          {
+            "type": "p",
+            "text": "次に、index.jsファイルを編集して、このAppコンポーネントを読み込み、実際に画面に表示させます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-12.png",
+            "alt": "index.jsの編集例",
+            "caption": "index.jsにAppコンポーネントをimportし、レンダリングします。"
+          },
+          {
+            "type": "p",
+            "text": "これで、AppコンポーネントがReactアプリのメイン画面として表示されるようになりました。Reactでは、コンポーネント名を大文字で始める必要があります。小文字から始めると、HTMLタグとして認識されてしまうので注意しましょう。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-13.png",
+            "alt": "app.jsxへの変更",
+            "caption": "ファイル名を「app.jsx」に変更しても同様に動作します。Reactは.jsx拡張子を自動的に認識してJSX構文を扱います。"
+          },
+          {
+            "type": "p",
+            "text": "Reactでは、.jsファイルでもJSXを使うことができますが、コンポーネントを多く作成するプロジェクトでは、視覚的に区別しやすい.jsx拡張子を使うことが推奨されます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "コンポーネント名は必ず大文字で始める（例：App, Header, Button）",
+              "1つのコンポーネントは1つの機能・役割に集中させる",
+              "JSXを含むファイルは .jsx 拡張子を使用するとわかりやすい"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "このように、ReactではUIの要素を小さな関数として定義し、それらを組み合わせることで柔軟なWebアプリケーションを構築します。次の章では、このコンポーネントに動きをつける「イベント処理」について学びます。"
+          }
+        ]
+      },
+      {
+        "id": "react-events",
+        "title": "イベントを使ってみよう",
+        "summary": "ボタンをクリックしたときなど、ユーザーの操作に反応させるイベント処理を学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Reactでは、ボタンのクリックや入力フォームの変更など、ユーザーの操作（イベント）に応じて処理を実行することができます。ここでは、Appコンポーネントにボタンを追加して、クリック時にアラートを表示させる簡単な例を作ってみましょう。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-14.png",
+            "alt": "app.jsxにボタンを追加",
+            "caption": "app.jsxにボタンを追加し、クリックイベント用の関数を定義します。"
+          },
+          {
+            "type": "p",
+            "text": "まず、app.jsxファイルを開き、以下のようにボタンとイベント関数を追加します。関数名は「onClickButton」のようにキャメルケース（小文字＋大文字）で書くのがReactの一般的なルールです。"
+          },
+          {
+            "type": "p",
+            "text": "ボタンをクリックすると、アラートダイアログが表示されるはずです。これがReactでの基本的なイベント処理の仕組みです。イベントを活用することで、動的でインタラクティブなWebアプリケーションを作ることができます。"
+          },
+          {
+            "type": "p",
+            "text": "次の章では、イベントに合わせてデータを変化させる「State（useState）」の使い方を学びましょう。"
+          }
+        ]
+      },
+      {
+        "id": "react-props",
+        "title": "Props（プロップス）を使ってみよう",
+        "summary": "親コンポーネントから子コンポーネントへデータ（見た目や文字列など）を渡す仕組みを学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Props（プロップス）は、親コンポーネントから子コンポーネントへ値を渡すための仕組みです。HTMLの属性のように記述し、子側では引数（props）として受け取ります。ここでは、まずapp.jsxにスタイルを定義し、次にColoredMessageという子コンポーネントを作って、最終的にpropsで色や文言を切り替えられるようにしていきます。"
+          },
+      
+          {
+            "type": "img",
+            "src": "/images/react-15.png",
+            "alt": "app.jsxにcontentPinkStyleを追加して、文言を表示",
+            "caption": "app.jsxにconst contentPinkStyleを定義し、画面に「元気です！」を表示します。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-16.png",
+            "alt": "componentsフォルダを作り、ColoredMessage.jsxを追加",
+            "caption": "src配下にcomponentsフォルダを作成し、ColoredMessage.jsxを追加します。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-17.png",
+            "alt": "ColoredMessage.jsxを編集（まずは固定色）",
+            "caption": "最初は固定の色でテキストを表示するだけのシンプルなコンポーネントにします。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-18.png",
+            "alt": "app.jsxからColoredMessage.jsxを読み込み・表示",
+            "caption": "app.jsxでColoredMessageを読み込み、画面に表示してみます。"
+          },      
+          {
+            "type": "img",
+            "src": "/images/react-21.png",
+            "alt": "ColoredMessage.jsxでpropsを受け取るように変更",
+            "caption": "ColoredMessage.jsxを修正し、propsで色や文言を受け取れるようにします。"
+          },      
+          {
+            "type": "img",
+            "src": "/images/react-23.png",
+            "alt": "app.jsx側でpropsを渡す",
+            "caption": "app.jsxで色や文言をpropsとして渡してみます。childrenとmessageのどちらでも指定可能。"
+          },      
+          {
+            "type": "p",
+            "text": "ポイント：Propsは読み取り専用です。子コンポーネント内でpropsの値を直接書き換えるのではなく、必要があれば親側で値を更新して再度渡します。また、スタイルのプロパティ名はキャメルケース（fontSize, backgroundColor など）で表記し、関数名やイベント名（onClick など）もキャメルケースで統一するのがReactの慣習です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "propsは親から子へデータを渡すための“引数”",
+              "子側では関数引数（props）として受け取り、JSX内で利用する",
+              "propsは読み取り専用（不変）",
+              "childrenを使うと、タグで挟んだ中身を子に渡せる",
+              "スタイル・関数・イベント名はキャメルケースで記述"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "react-children",
+        "title": "childrenを使ってみよう",
+        "summary": "Propsの一種であるchildrenを使って、タグの中身を柔軟に子コンポーネントへ渡す方法を学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Reactでは、親コンポーネントから子コンポーネントへ文字列や要素を渡す方法として「children」という特別なプロパティが用意されています。これを使うと、より柔軟なコンポーネント設計が可能になります。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-24.png",
+            "alt": "app.jsxのreturn部分を変更",
+            "caption": "まずはapp.jsxのreturn部分を修正し、ColoredMessageコンポーネントのタグの中に直接テキストを記述します。"
+          },
+          {
+            "type": "p",
+            "text": "このように書くことで、<ColoredMessage>タグで囲まれた中身が自動的にchildrenとして渡されます。propsとして明示的にmessageを渡すのではなく、タグの中に入れた要素を柔軟に受け取ることができるようになります。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-25.png",
+            "alt": "ColoredMessage.jsxの修正",
+            "caption": "次に、ColoredMessage.jsxの内容を修正します。これまでprops.messageを使っていた部分をprops.childrenに置き換えましょう。"
+          },
+          {
+            "type": "p",
+            "text": "props.childrenを使用することで、ColoredMessageコンポーネントは任意の文字列や要素を受け取り、それをそのまま表示できます。これにより、再利用性の高い柔軟なUIパーツを作ることができます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "childrenはタグの中身を受け取るための特別なprops",
+              "props.messageのように固定値を渡す代わりに、より自由な表現が可能",
+              "テキストだけでなく、HTMLタグや他のReactコンポーネントも渡せる"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "このようにchildrenを活用することで、コンポーネント設計の柔軟性が大きく向上します。次の章では、動的に値を変化させるState（useState）について学びましょう。"
+          }
+        ]
+      },
+      {
+        "id": "react-usestate",
+        "title": "State（useState）を使ってみよう",
+        "summary": "コンポーネント内で値を保持・更新し、動的に画面を変化させる方法を学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Reactでは、コンポーネント内で変化する値（状態）を管理するために「State（ステート）」という仕組みを使います。Stateを使うと、ボタンをクリックしたときなどに画面の表示内容を動的に変えることができます。"
+          },
+          {
+            "type": "img",
+            "src": "/images/react-26.png",
+            "alt": "app.jsxでuseStateを使って状態管理を追加",
+            "caption": "app.jsxファイルを修正し、useStateフックを使って状態（num）を定義します。ボタンをクリックするたびに値が1ずつ増えるように設定します。"
+          },
+          {
+            "type": "p",
+            "text": "Stateを定義するには、`useState`というReactのフックを使用します。フックとは、関数コンポーネント内でReactの機能を利用するための仕組みです。useStateは「現在の値」と「値を更新する関数」の2つをセットで返します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "useState(初期値) を呼び出して、状態変数を作成する",
+              "配列の1つ目が現在の値、2つ目が更新用関数",
+              "更新用関数を呼ぶと、自動的に再レンダリングされて画面が更新される"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "この例では、`const [num, setNum] = useState(0);` と書くことで、`num`に現在の数値、`setNum`に値を更新する関数が格納されています。ボタンのクリックイベントで `setNum(num + 1)` を呼び出すことで、カウントが1ずつ増えていくようになります。"
+          },
+          {
+            "type": "p",
+            "text": "このように、useStateを使うことでユーザーの操作に応じた動的なUIを簡単に実現できます。Reactのコンポーネントが“再描画される”という仕組みを体験できる大切なステップです。"
           }
         ]
       }
+      
+      
+      
+      
+      
     ]
   }
   
