@@ -1266,10 +1266,6 @@ const CURRICULUM: Chapter[] = [
             "type": "p",
             "text": "ただし注意点として、`memo` は浅い比較（shallow comparison）しか行わないため、propsがオブジェクトや配列のときには同一参照を維持するよう工夫（useMemo, useCallbackの併用）が必要になります。"
           },
-          {
-            "type": "p",
-            "text": "次の章では、こうした複雑なprops比較の最適化を扱う`useMemo`と`useCallback`の使い方を学びます。"
-          }
         ]
       },
       {
@@ -1289,7 +1285,7 @@ const CURRICULUM: Chapter[] = [
             "type": "code",
             "filename": "src/App.jsx",
             "lang": "jsx",
-            "code": "import { useState, useCallback } from 'react';\nimport Profile from './Profile';\n\nfunction App() {\n  const [count, setCount] = useState(0);\n  const [userName, setUserName] = useState('山田太郎');\n\n  console.log('Appコンポーネントが再レンダリングされました');\n\n  // ✅ useCallbackで関数をメモ化\n  const handleReset = useCallback(() => {\n    setUserName('山田太郎');\n  }, []);\n\n  return (\n    <div>\n      <h1>useCallbackによる最適化</h1>\n      <button onClick={() => setCount(count + 1)}>カウント: {count}</button>\n      <Profile name={userName} age={25} onReset={handleReset} />\n    </div>\n  );\n}\n\nexport default App;"
+            "code": "import { useState, useCallback } from 'react';\nimport Profile from './Profile';\n\nfunction App() {\n  const [count, setCount] = useState(0);\n  const [userName, setUserName] = useState('山田太郎');\n\n  console.log('Appコンポーネントが再レンダリングされました');\n\n  // useCallbackで関数をメモ化\n  const handleReset = useCallback(() => {\n    setUserName('山田太郎');\n  }, []);\n\n  return (\n    <div>\n      <h1>useCallbackによる最適化</h1>\n      <button onClick={() => setCount(count + 1)}>カウント: {count}</button>\n      <Profile name={userName} age={25} onReset={handleReset} />\n    </div>\n  );\n}\n\nexport default App;"
           },
           {
             "type": "p",
@@ -1341,10 +1337,6 @@ const CURRICULUM: Chapter[] = [
             "type": "p",
             "text": "また、関数が重い処理を行う場合や、propsを経由して複数の子コンポーネントに渡される場合に特に効果的です。"
           },
-          {
-            "type": "p",
-            "text": "次の章では、計算コストの高い処理結果をキャッシュする`useMemo`について学びます。"
-          }
         ]
       }
       
