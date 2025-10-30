@@ -1129,13 +1129,227 @@ const CURRICULUM: Chapter[] = [
               "親が再レンダリングされると、子も再レンダリングされる（デフォルト動作）",
               "React.memoを使うと不要な再レンダリングを防ぐことができる"
             ]
+          }
+        ]
+      },
+      {
+        "id": "react-parent-child-example",
+        "title": "親コンポーネントと子コンポーネントの関係",
+        "summary": "複数ファイルに分けてコンポーネントを作成し、親子関係を理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Reactでは、コンポーネントを複数のファイルに分けて構成します。親コンポーネントが子コンポーネントを呼び出し、子がさらに孫コンポーネントを呼び出すような構造を作ることができます。"
           },
           {
             "type": "p",
-            "text": "次の節では、これらの再レンダリングを最適化するための手法（React.memo、useMemo、useCallbackなど）について学びます。"
+            "text": "以下の3つのファイル構成を例に見てみましょう。"
+          },
+          {
+            "type": "code",
+            "filename": "src/App.jsx",
+            "lang": "jsx",
+            "code": "import Profile from './Profile';\n\nfunction App() {\n  return (\n    <div>\n      <h1>Reactの親子関係</h1>\n      <Profile name=\"山田太郎\" age={25} />\n    </div>\n  );\n}\n\nexport default App;"
+          },
+          {
+            "type": "p",
+            "text": "App.jsx は全体の親コンポーネントです。`<Profile />` を呼び出すことで、データを props 経由で渡しています。"
+          },
+          {
+            "type": "code",
+            "filename": "src/Profile.jsx",
+            "lang": "jsx",
+            "code": "import UserInfo from './UserInfo';\n\nfunction Profile({ name, age }) {\n  return (\n    <div style={{ border: '1px solid gray', padding: '10px', borderRadius: '8px' }}>\n      <h2>プロフィール</h2>\n      <UserInfo name={name} age={age} />\n    </div>\n  );\n}\n\nexport default Profile;"
+          },
+          {
+            "type": "p",
+            "text": "Profile.jsx は子コンポーネントです。App から受け取った props（name, age）をそのまま UserInfo に渡しています。"
+          },
+          {
+            "type": "code",
+            "filename": "src/UserInfo.jsx",
+            "lang": "jsx",
+            "code": "function UserInfo({ name, age }) {\n  return (\n    <p>{name}さんは {age} 歳です。</p>\n  );\n}\n\nexport default UserInfo;"
+          },
+          {
+            "type": "p",
+            "text": "UserInfo.jsx は孫コンポーネントです。Profile から渡された props を使って実際の表示を行います。"
+          },
+          {
+            "type": "p",
+            "text": "このように、App → Profile → UserInfo という階層構造になります。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "App（親コンポーネント）: アプリ全体の入口",
+              "Profile（子コンポーネント）: 親からデータを受け取り、中間で加工・渡す",
+              "UserInfo（孫コンポーネント）: 最終的に表示を担当"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "データの流れは必ず「上から下」へ（one-way data flow）であり、App から Profile、そして UserInfo へ props が渡されます。"
+          }
+        ]
+      },
+      {
+        "id": "react-rendering-optimization-memo",
+        "title": "レンダリング最適化（React.memo）",
+        "summary": "React.memoを使って、不要な再レンダリングを防ぐ方法を学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Reactでは、親コンポーネントが再レンダリングされると、子コンポーネントも自動的に再レンダリングされます。しかし、propsの内容が変わっていないのに再描画されるのは、パフォーマンスの無駄です。"
+          },
+          {
+            "type": "p",
+            "text": "この問題を防ぐために使用するのが `React.memo` です。`memo` でラップされたコンポーネントは、propsが変更された場合のみ再レンダリングされます。"
+          },
+          {
+            "type": "p",
+            "text": "ここでは前節の App → Profile → UserInfo の3層構造を使って、`memo` を導入した最適化例を見てみましょう。"
+          },
+          {
+            "type": "code",
+            "filename": "src/App.jsx",
+            "lang": "jsx",
+            "code": "import { useState } from 'react';\nimport Profile from './Profile';\n\nfunction App() {\n  const [count, setCount] = useState(0);\n  const [userName] = useState('山田太郎');\n\n  console.log('Appコンポーネントが再レンダリングされました');\n\n  return (\n    <div>\n      <h1>React.memoによる最適化</h1>\n      <button onClick={() => setCount(count + 1)}>カウント: {count}</button>\n      <Profile name={userName} age={25} />\n    </div>\n  );\n}\n\nexport default App;"
+          },
+          {
+            "type": "p",
+            "text": "この App コンポーネントでは、`count` が変わるたびに再レンダリングされます。しかし、Profile に渡している props（name, age）は一切変化していません。"
+          },
+          {
+            "type": "code",
+            "filename": "src/Profile.jsx",
+            "lang": "jsx",
+            "code": "import React, { memo } from 'react';\nimport UserInfo from './UserInfo';\n\nconst Profile = memo(function Profile({ name, age }) {\n  console.log('Profileコンポーネントが再レンダリングされました');\n\n  return (\n    <div style={{ border: '1px solid gray', padding: '10px', borderRadius: '8px' }}>\n      <h2>プロフィール</h2>\n      <UserInfo name={name} age={age} />\n    </div>\n  );\n});\n\nexport default Profile;"
+          },
+          {
+            "type": "p",
+            "text": "`Profile` コンポーネントを `React.memo` でラップしました。これにより、`props`（nameとage）が変化しない限り、再レンダリングがスキップされます。"
+          },
+          {
+            "type": "code",
+            "filename": "src/UserInfo.jsx",
+            "lang": "jsx",
+            "code": "import React, { memo } from 'react';\n\nconst UserInfo = memo(function UserInfo({ name, age }) {\n  console.log('UserInfoコンポーネントが再レンダリングされました');\n  return <p>{name}さんは {age} 歳です。</p>;\n});\n\nexport default UserInfo;"
+          },
+          {
+            "type": "p",
+            "text": "UserInfoも `memo` で包むことで、Profileから渡された `props` に変更がない限り再レンダリングされません。"
+          },
+          {
+            "type": "p",
+            "text": "このコードを実行すると、ボタンをクリックしてカウントを更新しても、`Profile` と `UserInfo` のコンソールログは出力されません。つまり、無駄な再レンダリングが起きていないことがわかります。"
+          },
+          {
+            "type": "p",
+            "text": "【再レンダリングの挙動まとめ】"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "① 初回表示時：すべてのコンポーネントが描画される（App, Profile, UserInfo）",
+              "② ボタンをクリック → App の state(count) が更新",
+              "③ React は App を再レンダリングするが、Profile の props は変わらない",
+              "④ memo により Profile の再レンダリングがスキップされる",
+              "⑤ 当然、UserInfo も再レンダリングされない"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "このように、`React.memo` を使うことで、親の状態変化によって無関係な子コンポーネントが再描画されるのを防ぐことができます。"
+          },
+          {
+            "type": "p",
+            "text": "ただし注意点として、`memo` は浅い比較（shallow comparison）しか行わないため、propsがオブジェクトや配列のときには同一参照を維持するよう工夫（useMemo, useCallbackの併用）が必要になります。"
+          },
+          {
+            "type": "p",
+            "text": "次の章では、こうした複雑なprops比較の最適化を扱う`useMemo`と`useCallback`の使い方を学びます。"
+          }
+        ]
+      },
+      {
+        "id": "react-rendering-optimization-usecallback",
+        "title": "レンダリング最適化（useCallback）",
+        "summary": "useCallbackを使って、関数をpropsとして渡すときの再レンダリングを防ぎます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Reactでは、コンポーネントに関数をpropsとして渡すことがよくあります。しかし、このとき注意が必要です。関数はJavaScript上で「毎回新しく生成されるオブジェクト」として扱われるため、親コンポーネントが再レンダリングされるたびに関数も新しくなり、結果的に子コンポーネントの再レンダリングを引き起こします。"
+          },
+          {
+            "type": "p",
+            "text": "この問題を防ぐために、`useCallback`を使って関数の再生成を抑制します。これにより、propsとして渡した関数が同一参照のまま維持され、無駄な再レンダリングを防ぐことができます。"
+          },
+          {
+            "type": "code",
+            "filename": "src/App.jsx",
+            "lang": "jsx",
+            "code": "import { useState, useCallback } from 'react';\nimport Profile from './Profile';\n\nfunction App() {\n  const [count, setCount] = useState(0);\n  const [userName, setUserName] = useState('山田太郎');\n\n  console.log('Appコンポーネントが再レンダリングされました');\n\n  // ✅ useCallbackで関数をメモ化\n  const handleReset = useCallback(() => {\n    setUserName('山田太郎');\n  }, []);\n\n  return (\n    <div>\n      <h1>useCallbackによる最適化</h1>\n      <button onClick={() => setCount(count + 1)}>カウント: {count}</button>\n      <Profile name={userName} age={25} onReset={handleReset} />\n    </div>\n  );\n}\n\nexport default App;"
+          },
+          {
+            "type": "p",
+            "text": "上記では、Appコンポーネント内で `handleReset` という関数を定義しています。この関数は `useCallback` によってメモ化されるため、依存配列（[]）が変化しない限り、同じ関数参照が再利用されます。"
+          },
+          {
+            "type": "code",
+            "filename": "src/Profile.jsx",
+            "lang": "jsx",
+            "code": "import React, { memo } from 'react';\nimport UserInfo from './UserInfo';\n\nconst Profile = memo(function Profile({ name, age, onReset }) {\n  console.log('Profileコンポーネントが再レンダリングされました');\n\n  return (\n    <div style={{ border: '1px solid gray', padding: '10px', borderRadius: '8px' }}>\n      <h2>プロフィール</h2>\n      <UserInfo name={name} age={age} />\n      <button onClick={onReset}>名前をリセット</button>\n    </div>\n  );\n});\n\nexport default Profile;"
+          },
+          {
+            "type": "p",
+            "text": "Profileコンポーネントは `memo` で包まれています。もし `onReset` の関数が毎回新しく生成されていたら、propsが変わったと認識され、`memo` の効果がなくなってしまいます。しかし `useCallback` によって同じ参照を維持することで、不要な再レンダリングを防げます。"
+          },
+          {
+            "type": "code",
+            "filename": "src/UserInfo.jsx",
+            "lang": "jsx",
+            "code": "import React, { memo } from 'react';\n\nconst UserInfo = memo(function UserInfo({ name, age }) {\n  console.log('UserInfoコンポーネントが再レンダリングされました');\n  return <p>{name}さんは {age} 歳です。</p>;\n});\n\nexport default UserInfo;"
+          },
+          {
+            "type": "p",
+            "text": "この構成を実行して、カウントボタンをクリックしてみましょう。コンソールには `Appコンポーネントが再レンダリングされました` とだけ表示され、ProfileやUserInfoは再描画されません。"
+          },
+          {
+            "type": "p",
+            "text": "【再レンダリングの挙動まとめ】"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "① 初回描画時：App、Profile、UserInfo 全てが描画される",
+              "② ボタンをクリック → countが更新される",
+              "③ ReactはAppを再レンダリングする",
+              "④ しかしuseCallbackでhandleResetが同じ参照のままなので、Profileのpropsは変化しない",
+              "⑤ Profileはmemoでスキップされ、UserInfoも再レンダリングされない"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "このように、useCallbackは「関数をpropsとして渡す場合の最適化」に非常に有効です。"
+          },
+          {
+            "type": "p",
+            "text": "ただし注意点として、依存配列（第二引数）に指定した値が変わると、そのたびに関数が再生成されます。そのため、useCallbackの依存関係を正しく管理することが重要です。"
+          },
+          {
+            "type": "p",
+            "text": "また、関数が重い処理を行う場合や、propsを経由して複数の子コンポーネントに渡される場合に特に効果的です。"
+          },
+          {
+            "type": "p",
+            "text": "次の章では、計算コストの高い処理結果をキャッシュする`useMemo`について学びます。"
           }
         ]
       }
+      
+      
+      
     ]
   }
   
