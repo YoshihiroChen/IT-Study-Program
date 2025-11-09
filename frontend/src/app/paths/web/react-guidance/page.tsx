@@ -1801,7 +1801,67 @@ const CURRICULUM: Chapter[] = [
       
       
     ]
+  },
+
+  {
+    "key": "custom-hooks",
+    "title": "カスタムフック",
+    "lessons": [
+      {
+        "id": "overview",
+        "title": "カスタムフックとは（総覧）",
+        "summary": "まずはこれまで学んだHooksを整理し、カスタムフックの役割と価値を理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "カスタムフック（Custom Hook）とは、既存のReact Hooks（useStateやuseEffectなど）を自由に組み合わせて、再利用できるロジックとしてまとめた関数のことです。"
+          },
+          {
+            "type": "p",
+            "text": "カスタムフックの名前は必ず use から始まり（例：useFetch, useScroll）、UIではなく「ロジック（処理）」だけを切り出すのがポイントです。"
+          },
+          {
+            "type": "p",
+            "text": "まず、カスタムフックを理解するために、今まで学んだReactの標準Hooksを振り返りましょう。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "・useState：コンポーネント内で状態（State）を持つ",
+              "・useEffect：再レンダリングやデータ取得などの副作用（サイドエフェクト）を実行する",
+              "・useMemo：重い計算の結果をメモ化し、無駄な再計算を防ぐ",
+              "・useCallback：関数をメモ化して、子コンポーネントへの無駄な再レンダリングを防ぐ",
+              "・memo（高階コンポーネント）：Propsが変わらない場合に再レンダリングを止める",
+              "・useContext：Contextの値を取得（Propsバケツリレー不要）",
+              "・createContext + Provider：グローバルにStateを共有する仕組み"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "これらの Hooks の特徴は「UI と ロジック を分ける」ことです。カスタムフックはさらにこれを応用し、ロジック自体を1つの関数にまとめて再利用できるようにする仕組みです。"
+          },
+          {
+            "type": "p",
+            "text": "例えば："
+          },
+          {
+            "type": "ul",
+            "items": [
+              "・useState + useEffect → 『画面サイズを追跡する useWindowSize』",
+              "・useState + useEffect → 『マウス座標を取得する useMousePosition』",
+              "・useState + fetch + useEffect → 『API からデータを取得する useFetch』",
+              "・useState + localStorage → 『入力内容を永続化する useLocalStorage』"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "結論：カスタムフックとは「自分だけのuse〇〇関数」であり、既存のHooksを組み合わせることで、複雑な処理や繰り返し使うロジックをキレイに分離・再利用できるようにするものです。"
+          }
+        ]
+      }
+    ]
   }
+  
   
   
   
