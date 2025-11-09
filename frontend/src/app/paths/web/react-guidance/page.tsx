@@ -1338,12 +1338,471 @@ const CURRICULUM: Chapter[] = [
             "text": "また、関数が重い処理を行う場合や、propsを経由して複数の子コンポーネントに渡される場合に特に効果的です。"
           },
         ]
+      },
+      {
+        "id": "react-rendering-optimization-usememo",
+        "title": "変数のmemo化（useMemo）",
+        "summary": "useMemoを使って、計算結果をキャッシュし再レンダリングを最適化します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Reactコンポーネント内では、レンダリングのたびにすべての処理が再実行されます。そのため、重い計算やリストのフィルタリングなどを毎回行うと、パフォーマンスに悪影響を及ぼします。"
+          },
+          {
+            "type": "p",
+            "text": "このような場合に使うのが `useMemo` です。`useMemo` は「特定の依存値が変わらない限り、前回の計算結果を再利用する」ためのフックです。"
+          },
+          {
+            "type": "p",
+            "text": "今回も、前回までと同じ構造（App → Profile → UserInfo）を使って説明します。ここでは年齢(age)を使って“年齢カテゴリ”を計算する処理を、useMemoで最適化します。"
+          },
+          {
+            "type": "code",
+            "filename": "src/App.jsx",
+            "lang": "jsx",
+            "code": "import { useState, useMemo } from 'react';\nimport Profile from './Profile';\n\nfunction App() {\n  const [count, setCount] = useState(0);\n  const [age, setAge] = useState(25);\n\n  console.log('Appコンポーネントが再レンダリングされました');\n\n  // 重い処理（仮想例）：年齢に基づくカテゴリ判定\n  const ageCategory = useMemo(() => {\n    console.log('年齢カテゴリを再計算しました');\n    if (age < 20) return '未成年';\n    if (age < 65) return '成人';\n    return 'シニア';\n  }, [age]);\n\n  return (\n    <div>\n      <h1>useMemoによる最適化</h1>\n      <p>年齢: {age}歳（カテゴリ: {ageCategory}）</p>\n      <button onClick={() => setCount(count + 1)}>カウント: {count}</button>\n      <button onClick={() => setAge(age + 1)}>年齢+1</button>\n      <Profile name=\"山田太郎\" age={age} category={ageCategory} />\n    </div>\n  );\n}\n\nexport default App;"
+          },
+          {
+            "type": "p",
+            "text": "この例では `useMemo` を使って、年齢からカテゴリを判定する処理をキャッシュしています。countが変わっても、ageが変わらない限り「年齢カテゴリを再計算しました」は出力されません。"
+          },
+          {
+            "type": "code",
+            "filename": "src/Profile.jsx",
+            "lang": "jsx",
+            "code": "import React, { memo } from 'react';\nimport UserInfo from './UserInfo';\n\nconst Profile = memo(function Profile({ name, age, category }) {\n  console.log('Profileコンポーネントが再レンダリングされました');\n\n  return (\n    <div style={{ border: '1px solid gray', padding: '10px', borderRadius: '8px' }}>\n      <h2>プロフィール</h2>\n      <UserInfo name={name} age={age} category={category} />\n    </div>\n  );\n});\n\nexport default Profile;"
+          },
+          {
+            "type": "p",
+            "text": "Profileコンポーネントは、Appから渡されたageやcategoryをpropsとして受け取ります。propsが変わらない限り、React.memoによって再レンダリングはスキップされます。"
+          },
+          {
+            "type": "code",
+            "filename": "src/UserInfo.jsx",
+            "lang": "jsx",
+            "code": "import React, { memo } from 'react';\n\nconst UserInfo = memo(function UserInfo({ name, age, category }) {\n  console.log('UserInfoコンポーネントが再レンダリングされました');\n  return (\n    <p>{name}さんは {age} 歳で、カテゴリは「{category}」です。</p>\n  );\n});\n\nexport default UserInfo;"
+          },
+          {
+            "type": "p",
+            "text": "この構成を実行すると、カウントボタンをクリックしても ageCategory の計算はスキップされ、Appのログだけが出力されます。一方で年齢ボタンをクリックすると age が変化し、useMemoが再評価されてカテゴリが更新されます。"
+          },
+          {
+            "type": "p",
+            "text": "【再レンダリングとuseMemoの動作まとめ】"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "① 初回描画時：useMemoが実行され、カテゴリを計算",
+              "② countを更新 → Appだけ再レンダリング、useMemoは再計算されない",
+              "③ ageを更新 → useMemoが再実行され、カテゴリを再計算",
+              "④ Profile・UserInfoも新しいpropsを受け取り再レンダリング"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "このように、useMemoを使うと「特定の値が変わったときだけ重い処理を再実行」でき、再レンダリング全体のパフォーマンスを改善できます。"
+          },
+          {
+            "type": "p",
+            "text": "useMemoは計算コストが高いロジック（データフィルタリング、配列のソート、数値計算など）を最適化する際に特に有効です。"
+          },
+          {
+            "type": "p",
+            "text": "ただし、軽い処理にまでuseMemoを多用すると、逆にメモリコストや可読性が下がることがあります。使いどころを見極めることが大切です。"
+          }
+        ]
+      },
+      {
+        "id": "react-rendering-optimization-memo-vs-usememo",
+        "title": "memoとuseMemoの違いと使い分け",
+        "summary": "React.memoとuseMemoは似ているようで、目的と使い方が全く異なります。この節では両者の違いを実例を通して整理します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "React.memoとuseMemoはどちらもパフォーマンス最適化のために使われますが、対象とするものが異なります。React.memoは「コンポーネントの再レンダリングを防ぐ」ための仕組みで、useMemoは「変数や計算結果の再計算を防ぐ」ためのフックです。"
+          },
+          {
+            "type": "p",
+            "text": "たとえば次のコードでは、useMemoを使うことで重い計算を毎回行わずに済みます。"
+          },
+          {
+            "type": "code",
+            "filename": "App.jsx",
+            "lang": "jsx",
+            "code": "const ageCategory = useMemo(() => {\n  console.log('年齢カテゴリを再計算しました');\n  if (age < 20) return '未成年';\n  if (age < 65) return '成人';\n  return 'シニア';\n}, [age]);"
+          },
+          {
+            "type": "p",
+            "text": "これにより、countなど他のstateが変わってもageが変わらない限り、上の処理は再実行されません。つまりuseMemoは「計算の再実行を防ぐ」ものです。"
+          },
+          {
+            "type": "p",
+            "text": "一方で、React.memoはコンポーネントの再レンダリングを防ぐものです。たとえばProfileコンポーネントを次のように包むと、propsに変化がない限り再レンダリングがスキップされます。"
+          },
+          {
+            "type": "code",
+            "filename": "Profile.jsx",
+            "lang": "jsx",
+            "code": "const Profile = memo(function Profile({ name, age, category }) {\n  console.log('Profileコンポーネントが再レンダリングされました');\n  return <p>{name}さんは{age}歳（{category}）です。</p>;\n});"
+          },
+          {
+            "type": "p",
+            "text": "ここで重要なのは、React.memoは「propsが変わらなければ再描画しない」だけであり、親コンポーネント内のロジック（たとえば年齢カテゴリの計算）は毎回実行されるという点です。"
+          },
+          {
+            "type": "p",
+            "text": "つまり、React.memoでは子コンポーネントの描画を防げても、親の処理が重いままだと意味がありません。そのため、親の重い計算にはuseMemoを、子の再描画にはReact.memoを使うのが基本です。"
+          },
+          {
+            "type": "p",
+            "text": "両者の関係を整理すると次のようになります。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "React.memo → コンポーネントレベルで再レンダリングを防ぐ",
+              "useMemo → 変数や計算処理の再実行を防ぐ",
+              "useCallback → 関数をpropsとして渡すときに再生成を防ぐ"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "例えば次のように組み合わせると、親と子の両方を効率化できます。"
+          },
+          {
+            "type": "code",
+            "filename": "App.jsx",
+            "lang": "jsx",
+            "code": "function App() {\n  const [count, setCount] = useState(0);\n  const [age, setAge] = useState(25);\n\n  // useMemoで重い計算をキャッシュ\n  const ageCategory = useMemo(() => {\n    console.log('年齢カテゴリを再計算しました');\n    return age < 65 ? '成人' : 'シニア';\n  }, [age]);\n\n  return (\n    <div>\n      <button onClick={() => setCount(count + 1)}>カウント: {count}</button>\n      <button onClick={() => setAge(age + 1)}>年齢+1</button>\n      <Profile age={age} category={ageCategory} />\n    </div>\n  );\n}"
+          },
+          {
+            "type": "code",
+            "filename": "Profile.jsx",
+            "lang": "jsx",
+            "code": "import React, { memo } from 'react';\n\nconst Profile = memo(function Profile({ age, category }) {\n  console.log('Profileコンポーネントが再レンダリングされました');\n  return (\n    <p>\n      年齢: {age}（カテゴリ: {category}）\n    </p>\n  );\n});\n\nexport default Profile;"
+          },
+          
+          {
+            "type": "p",
+            "text": "この例ではcountを更新してもProfileは再レンダリングされず、また年齢カテゴリも再計算されません。ageが変わった時だけ再計算・再描画が行われるため、Reactアプリのパフォーマンスを大きく改善できます。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると次のように使い分けます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "子コンポーネントの再描画を防ぎたい → React.memo",
+              "重い計算処理の再実行を防ぎたい → useMemo",
+              "propsに渡す関数が毎回新しくなってしまう → useCallback",
+              "ベストプラクティス → これら3つを組み合わせて最小限の再レンダリングを実現"
+            ]
+          }
+        ]
       }
+      
+      
+      
+      
+      
+    ]
+  },
+
+  {
+    "key": "react-global-state-management",
+    "title": "グローバルなState管理",
+    "lessons": [
+      {
+        "id": "why-global-state",
+        "title": "グローバルなState管理が必要な理由",
+        "summary": "コンポーネント間で共有したいデータが増えたとき、Propsだけでは限界があります。特にPropsのバケツリレー問題を解決するために、グローバルなState管理が必要になります。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Reactでは、基本的にState（状態）はコンポーネントの中で管理され、子コンポーネントへはPropsとして渡されます。これはシンプルで分かりやすい仕組みですが、アプリが大きくなると『どこからどこまでStateを渡すのか』という問題が発生します。"
+          },
+          {
+            "type": "p",
+            "text": "特に、コンポーネントA → B → C → D のように複数の階層を通してStateを渡す必要がある場合、実際にデータを使うのはDだけなのに、BやCでもPropsを受け取って次に渡さなければなりません。これを「Propsのバケツリレー（Prop Drilling）」と呼びます。"
+          },
+          {
+            "type": "p",
+            "text": "Propsのバケツリレーは次のような問題を引き起こします："
+          },
+          {
+            "type": "ul",
+            "items": [
+              "本当に使わないコンポーネントまでPropsを渡さないといけない",
+              "コードが読みにくくなる（どこで値が変わったか追うのが難しい）",
+              "コンポーネントの再利用性が下がる（どこでもPropsを要求するようになる）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "例えば次のような構造を考えてみましょう。"
+          },
+          {
+            "type": "code",
+            "filename": "App.jsx",
+            "lang": "jsx",
+            "code": "function App() {\n  const [user, setUser] = useState({ name: 'Taro', age: 25 });\n  return <Parent user={user} />;\n}\n\nfunction Parent({ user }) {\n  return <Child user={user} />;\n}\n\nfunction Child({ user }) {\n  return <GrandChild user={user} />;\n}\n\nfunction GrandChild({ user }) {\n  return <p>ユーザー名：{user.name}</p>;\n}"
+          },
+          {
+            "type": "p",
+            "text": "この例では、実際にuserを使うのはGrandChildだけですが、ParentとChildもuserを受け取って次に渡す必要があります。これがバケツリレーです。"
+          },
+          {
+            "type": "p",
+            "text": "アプリが大きくなればなるほど、この問題は深刻になります。そこで『どこからでもアクセスできる共通のState（グローバルState）』を作ることで、Propsのバケツリレーを減らすことができます。"
+          },
+          {
+            "type": "p",
+            "text": "この目的を達成するための方法として代表的なのが『Context API』です。また、ReduxやZustand、Recoilなどの外部ライブラリを使うこともあります。次の節では、まずContextを使ったグローバルState管理の方法を学びます。"
+          }
+        ]
+      },
+      {
+        "id": "context-basic",
+        "title": "ContextでのState管理",
+        "summary": "Propsバケツリレーの問題を解決し、深いコンポーネント階層でもStateを共有できる方法。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の節で説明したように、PropsだけでStateを子コンポーネントへ渡そうとすると、「Propsのバケツリレー」という問題が発生します。つまり、実際にデータを使わない中間コンポーネントにもpropsを渡し続けないといけない状態です。"
+          },
+          {
+            "type": "p",
+            "text": "Contextはこの問題を解決するためにReactが提供している仕組みで、親コンポーネントから“必要なコンポーネントだけ”に直接値を渡すことができます。中間のコンポーネントを経由しません。"
+          },
+          {
+            "type": "p",
+            "text": "Contextが改善するポイント："
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Propsだけ → 中間コンポーネントにもpropsを渡す必要がある（= バケツリレー）",
+              "Context → 子コンポーネントが直接“必要な値”を受け取れる（中間スルー可能）",
+              "コードが読みやすく保守しやすい"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "【Propsだけの場合】（バケツリレーになる）"
+          },
+          {
+            "type": "code",
+            "filename": "App.jsx",
+            "lang": "jsx",
+            "code": "function App() {\n  const [user, setUser] = useState('Yoshihiro');\n  return <Parent user={user} />;\n}\n\nfunction Parent({ user }) {\n  return <Child user={user} />;\n}\n\nfunction Child({ user }) {\n  return <p>こんにちは、{user}さん！</p>;\n}\n\nexport default App;"
+          },
+          {
+            "type": "p",
+            "text": "→ Childだけがuserを使いたいのに、Parentにも渡さないといけません。これが“バケツリレー”です。"
+          },
+          {
+            "type": "p",
+            "text": "【Contextを使った場合】（中間を通さず直接渡せる）"
+          },
+          {
+            "type": "code",
+            "filename": "UserContext.js",
+            "lang": "jsx",
+            "code": "import { createContext } from 'react';\nexport const UserContext = createContext();"
+          },
+          {
+            "type": "code",
+            "filename": "App.jsx",
+            "lang": "jsx",
+            "code": "import { useState } from 'react';\nimport { UserContext } from './UserContext';\nimport Parent from './Parent';\n\nfunction App() {\n  const [user, setUser] = useState('Yoshihiro');\n\n  return (\n    <UserContext.Provider value={{ user, setUser }}>\n      <Parent />\n    </UserContext.Provider>\n  );\n}\n\nexport default App;"
+          },
+          {
+            "type": "code",
+            "filename": "Child.jsx",
+            "lang": "jsx",
+            "code": "import { useContext } from 'react';\nimport { UserContext } from './UserContext';\n\nfunction Child() {\n  const { user } = useContext(UserContext);\n  return <p>こんにちは、{user}さん！</p>;\n}\n\nexport default Child;"
+          },
+          {
+            "type": "p",
+            "text": "これにより、Parentコンポーネントではpropsを何も受け渡していません。ChildはContextから直接値を取得しています。"
+          },
+          {
+            "type": "p",
+            "text": "✔ まとめ：Contextは何を解決する？"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "・Propsバケツリレーでコードが読みにくくなる問題を解決",
+              "・深い階層のコンポーネント間で、直接データを共有できる",
+              "・ただし、多用しすぎると逆に理解しづらくなるので注意（必要なときだけ使う）"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "context-flow",
+        "title": "Contextの実行の流れ（UserContext / App / Child）",
+        "summary": "UserContextを使ったとき、Reactアプリがどのように値を伝えるのかをステップごとに解説します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "この節では、UserContext.js / App.jsx / Child.jsx の3つのファイルを使って、ReactがどのようにContextを動かしているのか、実行の流れを順番に説明します。"
+          },
+          {
+            "type": "p",
+            "text": "【使用ファイル一覧】"
+          },
+          {
+            "type": "code",
+            "filename": "UserContext.js",
+            "lang": "jsx",
+            "code": "import { createContext } from 'react';\n\n// ① Context（共有データの箱）を作成\nexport const UserContext = createContext();"
+          },
+          {
+            "type": "code",
+            "filename": "App.jsx",
+            "lang": "jsx",
+            "code": "import { useState } from 'react';\nimport { UserContext } from './UserContext';\nimport Parent from './Parent';\n\nfunction App() {\n  const [user, setUser] = useState('Yoshihiro');\n\n  // ② Providerで子コンポーネントを包み、Contextに値を渡す\n  return (\n    <UserContext.Provider value={{ user, setUser }}>\n      <Parent />\n    </UserContext.Provider>\n  );\n}\n\nexport default App;"
+          },
+          {
+            "type": "code",
+            "filename": "Child.jsx",
+            "lang": "jsx",
+            "code": "import { useContext } from 'react';\nimport { UserContext } from './UserContext';\n\nfunction Child() {\n  // ③ useContextでContextの中の値を取得\n  const { user } = useContext(UserContext);\n  return <p>こんにちは、{user}さん！</p>;\n}\n\nexport default Child;"
+          },
+          {
+            "type": "p",
+            "text": "【プログラムが動く順番（実行フロー）】"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "1. Reactアプリが起動し、最初にAppコンポーネントがレンダリングされる。",
+              "2. App内で useState('Yoshihiro') が実行され、user = 'Yoshihiro' というStateが作られる。",
+              "3. <UserContext.Provider value={{ user, setUser }}> により、App以下のすべてのコンポーネントが user にアクセスできるようになる。",
+              "4. Parentコンポーネントがレンダリングされる（ただしPropsは何も受け取っていない）。",
+              "5. Parentの中でChildコンポーネントがレンダリングされる。",
+              "6. Childで useContext(UserContext) が実行され、Providerで渡された { user: 'Yoshihiro', setUser: ... } が取得できる。",
+              "7. Child内の return <p>こんにちは、{user}さん！</p> に 'Yoshihiro' が入り、画面に表示される。"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "つまり、Contextを動かしている重要ポイントは次の3つです："
+          },
+          {
+            "type": "ul",
+            "items": [
+              "① createContext() でContext（データの箱）を作ったこと",
+              "② <UserContext.Provider value={...}> で値を配ったこと",
+              "③ useContext(UserContext) で子コンポーネントがその値を取り出したこと"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "Propsとは異なり、Parentコンポーネントはuserを受け取らず、Childが直接Contextから値を取得できる点が最大の改善ポイントです。"
+          }
+        ]
+      },
+      {
+        "id": "other-global-state-methods",
+        "title": "その他のグローバルStateを扱う方法",
+        "summary": "Context以外にも、状態管理ライブラリやGraphQLなどを使ってグローバルなStateを扱う方法があります。ここではRedux・Recoil・Apollo Clientの3つを紹介します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Context APIは便利ですが、Stateの数が増えたり、ロジックが複雑になったりすると管理が難しくなることがあります。そんなときに使われるのが、Redux・Recoil・Apollo ClientなどのグローバルState管理ライブラリです。"
+          },
+          {
+            "type": "p",
+            "text": "それぞれの特徴をわかりやすく紹介します。"
+          },
+          {
+            "type": "p",
+            "text": "① Redux（もっとも有名なState管理ライブラリ）"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "・React以外のアプリでも使える（JavaScript全般で利用可能）",
+              "・Stateは1つの大きな\"store\"に集約して管理される",
+              "・Stateの変更は必ず\"action\"と\"reducer\"を通じて行う（状態の流れが明確）",
+              "・大規模開発やチーム開発でよく使われる"
+            ]
+          },
+          {
+            "type": "code",
+            "filename": "Reduxのイメージコード",
+            "lang": "js",
+            "code": "// Action\nconst increment = { type: 'INCREMENT' };\n\n// Reducer\nfunction counter(state = 0, action) {\n  if (action.type === 'INCREMENT') return state + 1;\n  return state;\n}\n\n// Store\nconst store = createStore(counter);\nstore.dispatch(increment);\nconsole.log(store.getState()); // → 1"
+          },
+          {
+            "type": "p",
+            "text": "② Recoil（Facebook製・よりReact的なState管理）"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "・React専用に作られたライブラリ",
+              "・Reduxよりもシンプルで、Hooksのように使える",
+              "・\"atom\"というStateの単位を作り、どのコンポーネントでも共有して使用できる",
+              "・Selectorで派生State（計算された値）も簡単に管理できる"
+            ]
+          },
+          {
+            "type": "code",
+            "filename": "Recoilのイメージコード",
+            "lang": "jsx",
+            "code": "import { atom, useRecoilState } from 'recoil';\n\n// atom（共有State）\nconst countState = atom({\n  key: 'countState',\n  default: 0,\n});\n\nfunction Counter() {\n  const [count, setCount] = useRecoilState(countState);\n  return <button onClick={() => setCount(count + 1)}>Count: {count}</button>;\n}"
+          },
+          {
+            "type": "p",
+            "text": "③ Apollo Client（グローバルState＋API通信を一括管理）"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "・GraphQLを使ったAPI通信ライブラリ",
+              "・サーバーから取得したデータを自動でキャッシュしてくれる",
+              "・\"useQuery\"でデータ取得、\"useMutation\"でデータ更新ができる",
+              "・データのキャッシュをグローバルStateのように扱える"
+            ]
+          },
+          {
+            "type": "code",
+            "filename": "Apollo Clientのイメージコード",
+            "lang": "jsx",
+            "code": "import { useQuery, gql } from '@apollo/client';\n\nconst GET_USER = gql`\n  query {\n    user(id: 1) {\n      name\n      age\n    }\n  }\n`;\n\nfunction User() {\n  const { data, loading } = useQuery(GET_USER);\n  if (loading) return <p>Loading...</p>;\n  return <p>{data.user.name}さん（{data.user.age}歳）</p>;\n}"
+          },
+          {
+            "type": "p",
+            "text": "🔍 まとめ：使い分けの目安"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "・小規模アプリやPropsバケツリレーを解消したい → Context API",
+              "・大規模・複雑・チーム開発向け → Redux",
+              "・React専用でシンプル＋関数型的に扱いたい → Recoil",
+              "・API通信＆データキャッシュも同時に管理したい → Apollo Client"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "これでグローバルState管理の代表的な方法を理解できました。次は実際にContextを使ったコード例や、Redux/ Recoilとの比較も学んでいきましょう。"
+          }
+        ]
+      }
+      
       
       
       
     ]
   }
+  
   
   
   
