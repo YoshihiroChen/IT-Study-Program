@@ -175,7 +175,7 @@ const tracks: Track[] = [
     color: "amber-500",
     steps: [
       { id: "sier-1", label: "日本SIer業界の現状", href: "/paths/sier/fundamentals", summary: "既存職種、選考フロー、代表企業、選考準備等の紹介" },
-      { id: "sier-2", label: "Java/DB/設計", href: "/paths/sier/java-db", summary: "RDB/ER図/ORM/レイヤード設計" },
+      { id: "sier-2", label: "System Engineerの紹介", href: "/paths/sier/system-engineer", summary: "SEの仕事内容、選考準備" },
       { id: "sier-3", label: "テスト/品質管理", href: "/paths/sier/qa", summary: "単体〜結合, コードレビュー, 品質指標" },
       { id: "sier-4", label: "運用保守/ITIL", href: "/paths/sier/ops", summary: "監視, 変更管理, 障害対応" },
       { id: "sier-4a", label: "運用保守/ITIL", href: "/paths/sier/ops", summary: "監視, 変更管理, 障害対応",col: 1,
