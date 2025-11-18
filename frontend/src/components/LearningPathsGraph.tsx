@@ -63,9 +63,9 @@ function GuideModal({
         "本网站根据日本就职的特点，区分了三条不同的就职路线。",
       ],
       bullets: [
-        ["蓝色路线：Web系IT企业（拥有自己的互联网产品）", "bg-sky-500"],
-        ["橙色路线：SIer企业（为甲方客户开发软件）", "bg-amber-500"],
-        ["紫色路线：IT咨询（为甲方客户提供IT改革的方案，并协助软件开发）", "bg-violet-500"],
+        ["蓝色路线：Web系IT企业（拥有自己的互联网产品）开发岗", "bg-sky-500"],
+        ["橙色路线：SIer企业（为甲方客户开发软件）SE岗", "bg-amber-500"],
+        ["紫色路线：IT咨询（为甲方客户提供IT改革的方案，并协助软件开发）咨询岗", "bg-violet-500"],
       ] as [string, string][],
       para2:
         "以上三条就职路线虽然都属于IT领域，但由于工作内容大不相同，且企业的选考内容也大不相同，因此需要采取完全不同的准备策略。",
@@ -77,7 +77,7 @@ function GuideModal({
         "各位同学可以根据自己的就职方向来选择相应的路线进行学习。",
       btnClose: "知道了（本次不再提示）",
       btnNever: "下次不再显示",
-      btnToggle: "切换到日文",
+      btnToggle: "日本語に切り替え",
     },
     ja: {
       title: "ご利用ガイド",
@@ -85,9 +85,9 @@ function GuideModal({
         "本サイトは日本の就職事情に合わせて、3つの就職ルートに分けて学べる構成になっています。",
       ],
       bullets: [
-        ["青ルート：Web系IT（自社のインターネット製品を持つ企業）", "bg-sky-500"],
-        ["橙ルート：SIer（クライアントのためにソフトウェアを受託開発）", "bg-amber-500"],
-        ["紫ルート：ITコンサル（IT改革の提案を行い、開発を支援）", "bg-violet-500"],
+        ["青ルート：Web系IT（自社のインターネット製品を持つ企業）開発職", "bg-sky-500"],
+        ["橙ルート：SIer（クライアントのためにソフトウェアを受託開発）SE職", "bg-amber-500"],
+        ["紫ルート：ITコンサル（IT改革の提案を行い、開発を支援）コンサルタント職", "bg-violet-500"],
       ] as [string, string][],
       para2:
         "いずれもIT領域ですが、日々の業務内容や選考内容が大きく異なるため、準備戦略はまったく別物になります。",
@@ -99,7 +99,7 @@ function GuideModal({
         "自身の志向に合わせて相応しいルートを選び、学習を進めてください。",
       btnClose: "了解（今回は閉じる）",
       btnNever: "次回から表示しない",
-      btnToggle: "中文に切り替え",
+      btnToggle: "切换到中文",
     },
   }[lang];
 
@@ -324,6 +324,24 @@ const tracks: Track[] = [
         row: 0.9,
         chain: false,
       },
+      {
+        id: "web-6a",
+        label: "スクラム開発法の学習",
+        href: "/paths/web/scrum-basics",
+        summary: "スクラム開発の方法について学習する",
+        col: 5,
+        row: -1,
+        chain: false,
+      },
+      {
+        id: "web-6b",
+        label: "チーム開発の正しい方法",
+        href: "/paths/web/team-development",
+        summary: "チーム開発の注意点と進め方を学ぶ",
+        col: 5,
+        row: 0.9,
+        chain: false,
+      },
     ],
   },
   {
@@ -348,9 +366,10 @@ const tracks: Track[] = [
     color: "violet-500",
     steps: [
       { id: "con-1", label: "日本ITコンサル業界の現状", href: "/paths/consulting/foundation", summary: "既存職種、選考フロー、代表企業、選考準備等の紹介" },
-      { id: "con-2", label: "要件×業務理解", href: "/paths/consulting/domain", summary: "業務フロー, As-Is→To-Be, ユースケース" },
-      { id: "con-3", label: "設計/PoC", href: "/paths/consulting/poc", summary: "仕様書, プロトタイピング, 成功基準" },
-      { id: "con-4", label: "提案/PM", href: "/paths/consulting/pm", summary: "WBS, 見積, 合意形成, リスク管理" },
+      { id: "con-2", label: "ケーススタディの学習", href: "/paths/consulting/case-study", summary: "コンサルティング業界でのケース分析法を学ぶ" },
+      { id: "con-3", label: "フェルミ推定の学習", href: "/paths/consulting/fermi-study", summary: "コンサルティング業界でのフェルミ推定法を学ぶ" },
+      { id: "con-4", label: "先端的なIT技術の応用", href: "/paths/consulting/advance-it", summary: "IT技術が各業界での応用を学習する" },
+      { id: "con-5", label: "資格取得：プロジェクトマネージャ", href: "/paths/consulting/project-manager", summary: "国家試験「プロジェクトマネージャ」に合格する" },
     ],
   },
 ];
@@ -399,6 +418,9 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-4", target: "web-4e", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-5", target: "web-5a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-5", target: "web-5b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "web-6", target: "web-6a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  { source: "web-6", target: "web-6b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "sier-4", target: "sier-4a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   
 
 ];
