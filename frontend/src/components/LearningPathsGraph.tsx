@@ -19,6 +19,163 @@ import type {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
+/** ============== 使用指南模态（中/日双语 + 语言切换） ============== */
+const GUIDE_VERSION = "v1";
+const LS_KEY = `lp_guide_seen_${GUIDE_VERSION}`;
+const LS_LANG_KEY = "lp_guide_lang"; // zh | ja
+
+function GuideModal({
+  open,
+  onClose,
+  onNeverShow,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onNeverShow: () => void;
+}) {
+  const [lang, setLang] = React.useState<"zh" | "ja">("zh");
+
+  // 初始化语言（从 localStorage 读取）
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LS_LANG_KEY) as "zh" | "ja" | null;
+      if (saved === "zh" || saved === "ja") setLang(saved);
+    } catch {}
+  }, []);
+
+  const toggleLang = React.useCallback(() => {
+    setLang((prev) => {
+      const next = prev === "zh" ? "ja" : "zh";
+      try {
+        localStorage.setItem(LS_LANG_KEY, next);
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  if (!open) return null;
+
+  // —— 文案：中文 & 日文 ——
+  const text = {
+    zh: {
+      title: "使用指南",
+      lines: [
+        "本网站根据日本就职的特点，区分了三条不同的就职路线。",
+      ],
+      bullets: [
+        ["蓝色路线：Web系IT企业（拥有自己的互联网产品）", "bg-sky-500"],
+        ["橙色路线：SIer企业（为甲方客户开发软件）", "bg-amber-500"],
+        ["紫色路线：IT咨询（为甲方客户提供IT改革的方案，并协助软件开发）", "bg-violet-500"],
+      ] as [string, string][],
+      para2:
+        "以上三条就职路线虽然都属于IT领域，但由于工作内容大不相同，且企业的选考内容也大不相同，因此需要采取完全不同的准备策略。",
+      para3:
+        "Web系IT企业（例如美国的 Google、Amazon，中国的 Tencent、Bytedance，日本的 Mercari、リクルート）要求学生有极强的技术力，在选考中也会有 coding 的笔试与技术性面试，因此该路线的准备内容大多为学习技术以及积攒项目经验。",
+      para4:
+        "SIer 企业以及 IT 咨询企业不要求学生拥有项目经验或者是技术力，但要求学生对其业界有着极强的志望动机以及语言能力。在选考中主要围绕学生个人的性格、过往的经历、语言沟通能力以及对业界的了解程度进行考察，因此这两条路线的学习重点在于凸显自己的志望度，并且提高自己的语言能力。",
+      para5:
+        "各位同学可以根据自己的就职方向来选择相应的路线进行学习。",
+      btnClose: "知道了（本次不再提示）",
+      btnNever: "下次不再显示",
+      btnToggle: "切换到日文",
+    },
+    ja: {
+      title: "ご利用ガイド",
+      lines: [
+        "本サイトは日本の就職事情に合わせて、3つの就職ルートに分けて学べる構成になっています。",
+      ],
+      bullets: [
+        ["青ルート：Web系IT（自社のインターネット製品を持つ企業）", "bg-sky-500"],
+        ["橙ルート：SIer（クライアントのためにソフトウェアを受託開発）", "bg-amber-500"],
+        ["紫ルート：ITコンサル（IT改革の提案を行い、開発を支援）", "bg-violet-500"],
+      ] as [string, string][],
+      para2:
+        "いずれもIT領域ですが、日々の業務内容や選考内容が大きく異なるため、準備戦略はまったく別物になります。",
+      para3:
+        "Web系IT（例：Google、Amazon、Tencent、Bytedance、メルカリ、リクルート）は高い技術力を重視し、選考ではコーディング筆記や技術面接が行われます。そのため学習の中心は技術力の習得とプロジェクト経験の蓄積です。",
+      para4:
+        "一方、SIer と ITコンサルはプロジェクト経験や高度な技術力を必須とはせず、業界への強い志望動機と言語運用能力を重視します。選考では、人物面・過去の経験・コミュニケーション・業界理解が主に評価されるため、学習の焦点は志望度の訴求と言語力の向上になります。",
+      para5:
+        "自身の志向に合わせて相応しいルートを選び、学習を進めてください。",
+      btnClose: "了解（今回は閉じる）",
+      btnNever: "次回から表示しない",
+      btnToggle: "中文に切り替え",
+    },
+  }[lang];
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="guide-title"
+      className="fixed inset-0 z-[100] flex items-center justify-center"
+    >
+      {/* 背景遮罩 */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* 弹窗卡片 */}
+      <div className="relative mx-4 max-w-3xl w-full rounded-2xl border bg-white dark:bg-zinc-900 dark:border-zinc-700 shadow-xl p-6">
+        {/* 标题 + 语言切换 */}
+        <div className="flex items-start justify-between gap-4">
+          <h2 id="guide-title" className="text-xl font-semibold">
+            {text.title}
+          </h2>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleLang}
+              className="rounded-lg border bg-white/90 dark:bg-zinc-900/90 dark:border-zinc-700 px-3 py-1.5 text-xs md:text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              title="切换语言 / 言語切替"
+            >
+              {text.btnToggle}
+            </button>
+            <button
+              aria-label="close"
+              onClick={onClose}
+              className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              title="关闭 / 閉じる"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* 正文 */}
+        <p className="mt-2 text-sm opacity-80">{text.lines[0]}</p>
+
+        <ul className="mt-3 list-disc pl-5 space-y-1 text-sm">
+          {text.bullets.map(([label, color]) => (
+            <li key={label} className="flex items-start">
+              <span className={`mt-1 inline-block w-2.5 h-2.5 rounded-full ${color} mr-2 flex-shrink-0`} />
+              <span className="align-middle">{label}</span>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-4 text-sm opacity-80">{text.para2}</p>
+        <p className="mt-3 text-sm opacity-80">{text.para3}</p>
+        <p className="mt-3 text-sm opacity-80">{text.para4}</p>
+        <p className="mt-3 text-sm font-medium">{text.para5}</p>
+
+        {/* 底部按钮 */}
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3 justify-end">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          >
+            {text.btnClose}
+          </button>
+          <button
+            onClick={onNeverShow}
+            className="inline-flex items-center justify-center rounded-lg bg-zinc-900 text-white px-4 py-2 text-sm dark:bg-white dark:text-zinc-900"
+          >
+            {text.btnNever}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** ---------- Data model ---------- */
 type Step = {
   id: string;
@@ -396,9 +553,53 @@ export default function LearningPathsGraph() {
     `}</style>
   );
 
+  /** ============== 使用指南显示控制（新增） ============== */
+  const [showGuide, setShowGuide] = React.useState(false);
+
+  React.useEffect(() => {
+    try {
+      const seen = localStorage.getItem(LS_KEY);
+      if (!seen) setShowGuide(true);
+    } catch {
+      // 隐私模式禁用 localStorage 时忽略
+    }
+  }, []);
+
+  const handleGuideCloseOnce = React.useCallback(() => {
+    // 本次会话内关闭（不写入持久标记）
+    setShowGuide(false);
+  }, []);
+
+  const handleGuideNeverShow = React.useCallback(() => {
+    try {
+      localStorage.setItem(LS_KEY, "1");
+    } catch {}
+    setShowGuide(false);
+  }, []);
+
+
   return (
     <div className="h-[calc(100vh-4rem)] w-full bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900 rounded-xl overflow-hidden">
       {themeVars}
+
+      {/* （新增）一次性使用指南模态 */}
+      <GuideModal
+        open={showGuide}
+        onClose={handleGuideCloseOnce}
+        onNeverShow={handleGuideNeverShow}
+      />
+
+      {/* （新增）右上角“使用指南”按钮，用户可随时再看 */}
+      <div className="absolute right-4 top-4 z-[60]">
+        <button
+          onClick={() => setShowGuide(true)}
+          className="rounded-full border bg-white/90 dark:bg-zinc-900/90 dark:border-zinc-700 px-3 py-1.5 text-xs md:text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          title="使用指南"
+        >
+          ヘルプ
+        </button>
+      </div>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
