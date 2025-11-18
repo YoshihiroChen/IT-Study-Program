@@ -176,11 +176,13 @@ const tracks: Track[] = [
     steps: [
       { id: "sier-1", label: "日本SIer業界の現状", href: "/paths/sier/fundamentals", summary: "既存職種、選考フロー、代表企業、選考準備等の紹介" },
       { id: "sier-2", label: "System Engineerの紹介", href: "/paths/sier/system-engineer", summary: "SEの仕事内容、選考準備" },
-      { id: "sier-3", label: "テスト/品質管理", href: "/paths/sier/qa", summary: "単体〜結合, コードレビュー, 品質指標" },
-      { id: "sier-4", label: "運用保守/ITIL", href: "/paths/sier/ops", summary: "監視, 変更管理, 障害対応" },
-      { id: "sier-4a", label: "運用保守/ITIL", href: "/paths/sier/ops", summary: "監視, 変更管理, 障害対応",col: 1,
+      { id: "sier-3", label: "ITパスポートの問題集", href: "/paths/sier/it-passport", summary: "ITパスポートの練習をする" },
+      { id: "sier-4", label: "基本情報技術者の問題集", href: "/paths/sier/basic-information", summary: "基本情報技術者試験の練習をする" },
+      { id: "sier-5", label: "プログラミング言語学習（Java）", href: "/paths/sier/java-basics", summary: "Javaの基礎的な知識を学ぶ" },
+      { id: "sier-4a", label: "応用情報技術者の問題集", href: "/paths/sier/appli-information", summary: "応用情報技術者試験の練習をする",col: 3,
         row: 0.75,
         chain: false, },
+      
     ],
   },
   {
