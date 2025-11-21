@@ -69,11 +69,11 @@ const CURRICULUM: Chapter[] = [
   
   {
     "key": "sier-role",
-    "title": "SI業界の役割",
+    "title": "SIer業界の役割",
     "lessons": [
       {
         "id": "what-sier-does",
-        "title": "SI業界とは何をしているのか",
+        "title": "SIer業界とは何をしているのか",
         "summary": "企業や行政の業務をITシステムで支える「総合請負型」の業界です。要件定義から設計・開発・運用保守までを一貫して提供します。",
         "content": [
           {
