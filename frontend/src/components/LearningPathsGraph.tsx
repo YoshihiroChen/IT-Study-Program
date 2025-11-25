@@ -189,7 +189,7 @@ type Step = {
 };
 
 type Track = {
-  key: "web" | "sier" | "consulting";
+  key: "web" | "sier" | "consulting"| "others";
   title: string;
   color: string;
   steps: Step[];
@@ -199,6 +199,7 @@ const ACCENTS: Record<Track["key"], string> = {
   web: "bg-sky-500",
   sier: "bg-amber-500",
   consulting: "bg-violet-500",
+  others: "bg-slate-400",
 };
 
 const tracks: Track[] = [
@@ -369,8 +370,38 @@ const tracks: Track[] = [
       { id: "con-1", label: "日本ITコンサル業界の現状", href: "/paths/consulting/foundation", summary: "既存職種、選考フロー、代表企業、選考準備等の紹介" },
       { id: "con-2", label: "ケーススタディの学習", href: "/paths/consulting/case-study", summary: "コンサルティング業界でのケース分析法を学ぶ" },
       { id: "con-3", label: "ITコンサルの企業分析法", href: "/paths/consulting/company-analysis", summary: "コンサルティング業界での企業分析例" },
-      { id: "con-4", label: "先端的なIT技術の応用", href: "/paths/consulting/advance-it", summary: "IT技術が各業界での応用を学習する" },
+      { id: "con-4", label: "AIコンサルの学習", href: "/paths/consulting/advance-it", summary: "IT技術が各業界での応用を学習する" },
       { id: "con-5", label: "資格取得：プロジェクトマネージャ", href: "/paths/consulting/project-manager", summary: "国家試験「プロジェクトマネージャ」に合格する" },
+      {
+        id: "con-2a",
+        label: "ITコンサルのケーススタディ集",
+        href: "/paths/consulting/case-study-set",
+        summary: "まとめたITコンサルのケーススタディ集",
+        col: 1,
+        row: 0.9,
+        chain: false,
+      },
+      {
+        id: "con-3a",
+        label: "ITコンサルの企業分析集",
+        href: "/paths/web/company-analysis-set",
+        summary: "まとめた有名企業の分析集",
+        col: 2,
+        row: 0.9,
+        chain: false,
+      },
+    ],
+  },
+  {
+    key: "others",
+    title: "その他",
+    color: "slate-500",
+    steps: [
+      { id: "oth-1", label: "データベースの学習", href: "/paths/others/database", summary: "開発におけるデータベースの学習" },
+      { id: "oth-2", label: "SQLの学習", href: "/paths/others/sql", summary: "データベースを操作するSQL言語を学習する" },
+      { id: "oth-3", label: "アルゴリズムの学習", href: "/paths/others/company-analysis", summary: "Javaにおけるアルゴリズムを学習する" },
+      { id: "oth-4", label: "インフラの学習", href: "/paths/others/infra", summary: "インフラエンジニアに関する知識を学習する" },
+      { id: "oth-5", label: "資格取得：プロジェクトマネージャ", href: "/paths/others/project-manager", summary: "国家試験「プロジェクトマネージャ」に合格する" },
     ],
   },
 ];
@@ -422,6 +453,8 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-6", target: "web-6a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-6", target: "web-6b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "sier-4", target: "sier-4a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "con-3", target: "con-3a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "con-2", target: "con-2a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   
 
 ];
