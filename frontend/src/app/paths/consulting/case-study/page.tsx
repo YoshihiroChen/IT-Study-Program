@@ -345,7 +345,7 @@ const CURRICULUM: Chapter[] = [
     "lessons": [
       {
         "id": "case-setting",
-        "title": "3.1 ケース設定",
+        "title": "3.1 ケース例１：ケース設定",
         "summary": "日本の即席麺メーカーA社が海外展開を検討するケースの背景と目的を整理する。",
         "content": [
           {
@@ -463,7 +463,7 @@ const CURRICULUM: Chapter[] = [
     "lessons": [
       {
         "id": "cafe-case-setting",
-        "title": "4.1 ケース設定",
+        "title": "4.1 ケース例２：ケース設定",
         "summary": "全国展開するカフェチェーンA社が、既存店舗の売上停滞という課題に直面している状況を整理する。",
         "content": [
           {
