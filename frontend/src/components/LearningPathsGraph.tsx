@@ -370,7 +370,7 @@ const tracks: Track[] = [
       { id: "con-1", label: "日本ITコンサル業界の現状", href: "/paths/consulting/foundation", summary: "既存職種、選考フロー、代表企業、選考準備等の紹介" },
       { id: "con-2", label: "ケーススタディの学習", href: "/paths/consulting/case-study", summary: "コンサルティング業界でのケース分析法を学ぶ" },
       { id: "con-3", label: "ITコンサルの企業分析法", href: "/paths/consulting/company-analysis", summary: "コンサルティング業界での企業分析例" },
-      { id: "con-4", label: "AIコンサルの学習", href: "/paths/consulting/advance-it", summary: "IT技術が各業界での応用を学習する" },
+      { id: "con-4", label: "AIコンサルの学習", href: "/paths/consulting/ai-it", summary: "先端的なAIコンサルを学ぶ" },
       { id: "con-5", label: "資格取得：プロジェクトマネージャ", href: "/paths/consulting/project-manager", summary: "国家試験「プロジェクトマネージャ」に合格する" },
       {
         id: "con-2a",
