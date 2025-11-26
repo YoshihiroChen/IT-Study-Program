@@ -401,7 +401,8 @@ const tracks: Track[] = [
       { id: "oth-2", label: "SQLの学習", href: "/paths/others/sql", summary: "データベースを操作するSQL言語を学習する" },
       { id: "oth-3", label: "アルゴリズムの学習", href: "/paths/others/company-analysis", summary: "Javaにおけるアルゴリズムを学習する" },
       { id: "oth-4", label: "インフラの学習", href: "/paths/others/infra", summary: "インフラエンジニアに関する知識を学習する" },
-      { id: "oth-5", label: "資格取得：プロジェクトマネージャ", href: "/paths/others/project-manager", summary: "国家試験「プロジェクトマネージャ」に合格する" },
+      { id: "oth-5", label: "データ分析の学習", href: "/paths/others/data-analysis", summary: "データ分析の基本知識を学ぶ" },
+      { id: "oth-6", label: "AIの学習", href: "/paths/others/ai-foundation", summary: "AIに関する基本知識を学ぶ" },
     ],
   },
 ];
