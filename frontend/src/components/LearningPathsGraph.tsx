@@ -343,6 +343,15 @@ const tracks: Track[] = [
         row: 0.9,
         chain: false,
       },
+      {
+        id: "web-7a",
+        label: "Webアプリケーションの構成",
+        href: "/paths/web/web-app",
+        summary: "Webアプリケーションのアーキテクチャを学ぶ",
+        col: 6,
+        row: -1,
+        chain: false,
+      },
     ],
   },
   {
@@ -403,6 +412,15 @@ const tracks: Track[] = [
       { id: "oth-4", label: "インフラの学習", href: "/paths/others/infra", summary: "インフラエンジニアに関する知識を学習する" },
       { id: "oth-5", label: "データ分析の学習", href: "/paths/others/data-analysis", summary: "データ分析の基本知識を学ぶ" },
       { id: "oth-6", label: "AIの学習", href: "/paths/others/ai-foundation", summary: "AIに関する基本知識を学ぶ" },
+      {
+        id: "oth-4a",
+        label: "クラウドの学習",
+        href: "/paths/others/cloud",
+        summary: "オンプレミスに相対するクラウドの学習",
+        col: 3,
+        row: -1,
+        chain: false,
+      },
     ],
   },
 ];
@@ -453,9 +471,11 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-5", target: "web-5b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-6", target: "web-6a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-6", target: "web-6b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "web-7", target: "web-7a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "sier-4", target: "sier-4a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "con-3", target: "con-3a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "con-2", target: "con-2a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "oth-4", target: "oth-4a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   
 
 ];
