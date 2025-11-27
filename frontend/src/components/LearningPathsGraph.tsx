@@ -365,9 +365,13 @@ const tracks: Track[] = [
       { id: "sier-4", label: "基本情報技術者の問題集", href: "/paths/sier/basic-information", summary: "基本情報技術者試験の練習をする" },
       { id: "sier-5", label: "プログラミング言語学習（Java）", href: "/paths/sier/java-basics", summary: "Javaの基礎的な知識を学ぶ" },
       { id: "sier-6", label: "業務システムの開発実践", href: "/paths/sier/work-system", summary: "仮想的な業務環境で、システムの開発を行う" },
+      { id: "sier-3a", label: "コンピューターアーキテクチャ", href: "/paths/sier/computer-ach", summary: "コンピュータの構成を学ぶ",col: 2,
+        row: 0.75,
+        chain: false, },
       { id: "sier-4a", label: "応用情報技術者の問題集", href: "/paths/sier/appli-information", summary: "応用情報技術者試験の練習をする",col: 3,
         row: 0.75,
         chain: false, },
+      
       
     ],
   },
@@ -473,6 +477,7 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-6", target: "web-6b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-7", target: "web-7a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "sier-4", target: "sier-4a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "sier-3", target: "sier-3a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "con-3", target: "con-3a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "con-2", target: "con-2a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "oth-4", target: "oth-4a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
