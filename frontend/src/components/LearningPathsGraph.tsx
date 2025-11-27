@@ -246,7 +246,7 @@ const tracks: Track[] = [
       },
       {
         id: "web-3b",
-        label: "資格取得：python3 エンジニア認定基礎試験",
+        label: "python3エンジニア認定基礎試験の問題集",
         href: "/paths/web/py-certificates",
         summary: "オフラインの資格試験",
         col: 2,
@@ -257,7 +257,7 @@ const tracks: Track[] = [
         id: "web-3c",
         label: "Pythonコーディング環境：Jupyternotebook",
         href: "/paths/web/py-jupyternotebook",
-        summary: "オフラインの資格試験",
+        summary: "Jupyternotebookの使用方法を学ぶ",
         col: 2,
         row: -2,
         chain: false,
@@ -412,7 +412,7 @@ const tracks: Track[] = [
     steps: [
       { id: "oth-1", label: "データベースの学習", href: "/paths/others/database", summary: "開発におけるデータベースの学習" },
       { id: "oth-2", label: "SQLの学習", href: "/paths/others/sql", summary: "データベースを操作するSQL言語を学習する" },
-      { id: "oth-3", label: "アルゴリズムの学習", href: "/paths/others/company-analysis", summary: "Javaにおけるアルゴリズムを学習する" },
+      { id: "oth-3", label: "データ構造とアルゴリズム", href: "/paths/others/company-analysis", summary: "Javaにおけるデータ構造とアルゴリズムを学習する" },
       { id: "oth-4", label: "インフラの学習", href: "/paths/others/infra", summary: "インフラエンジニアに関する知識を学習する" },
       { id: "oth-5", label: "データ分析の学習", href: "/paths/others/data-analysis", summary: "データ分析の基本知識を学ぶ" },
       { id: "oth-6", label: "AIの学習", href: "/paths/others/ai-foundation", summary: "AIに関する基本知識を学ぶ" },
