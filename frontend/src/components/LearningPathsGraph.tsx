@@ -55,7 +55,7 @@ function GuideModal({
 
   if (!open) return null;
 
-  // —— 文案：中文 & 日文 ——
+  // —— 文案：中文 & 日文（总览版） ——
   const text = {
     zh: {
       title: "使用指南",
@@ -176,6 +176,189 @@ function GuideModal({
   );
 }
 
+/** ============== 每条路线专用：问号弹出的模块框 ============== */
+
+type TrackKey = "web" | "sier" | "consulting" | "others";
+
+function LaneGuideModal({
+  open,
+  laneKey,
+  onClose,
+}: {
+  open: boolean;
+  laneKey: TrackKey | null;
+  onClose: () => void;
+}) {
+  const [lang, setLang] = React.useState<"zh" | "ja">("zh");
+
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LS_LANG_KEY) as "zh" | "ja" | null;
+      if (saved === "zh" || saved === "ja") setLang(saved);
+    } catch {}
+  }, []);
+
+  const toggleLang = React.useCallback(() => {
+    setLang((prev) => {
+      const next = prev === "zh" ? "ja" : "zh";
+      try {
+        localStorage.setItem(LS_LANG_KEY, next);
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  if (!open || !laneKey) return null;
+
+  const content = {
+    web: {
+      zh: {
+        title: "Web系IT路线使用指南",
+        subtitle: "面向希望成为“Web开发工程师”的同学",
+        bullets: [
+          "首先学习 Typescript / Python 等编程语言，打牢编程的基础语法。",
+          "再学习vscode，jupyternotebook等写码工具以及terminal，git，github等等辅助开发的工具",
+          "最后进行前后端分离式的实战开发，积累开发经验。",
+          "除以上技术层面的练习以外，还需要有针对编程语言，开发框架以及项目经验的模拟面试。",
+        ],
+        note: "如果你的目标是 Mercari、リクルート 等“自社開発”的企业，可以优先从本路线开始，一边学技术一边做项目。",
+      },
+      ja: {
+        title: "Web系ITルートの使い方",
+        subtitle: "自社プロダクト開発エンジニア志望の方向け",
+        bullets: [
+          "まずは TypeScript や Python などのプログラミング言語を学び、基礎的な文法力をしっかり身につける。",
+          "次に、VS Code や Jupyter Notebook などの開発エディタ、そして Terminal・Git・GitHub などの補助的な開発ツールを習得する。",
+          "最後に、フロントエンドとバックエンドを分離した実践的な開発を行い、開発経験を積み上げていく。",
+          "また、技術的な学習だけでなく、使用するプログラミング言語・開発フレームワーク・プロジェクト経験に応じた模擬面接対策も必要となる。",
+        ],
+        note: "メルカリ・リクルートなどの Web 系企業を目指す場合、このルートをメインに進めつつ、興味があれば ITコンサルルートのケース対策も補助的に行うと良いです。",
+      },
+    },
+    sier: {
+      zh: {
+        title: "SIer路线使用指南",
+        subtitle: "面向希望进入“系统集成（SIer）”的同学",
+        bullets: [
+          "先通过「日本SIer業界の現状」「System Engineerの紹介」了解行业与职种。",
+          "考取it passport与基本情报技术者的证书，了解业界情况与计算机技术。",
+          "学习 SIer 中使用最多的 Java语言，并且从实际案例来体验业务系统的开发。",
+          "此外，还需要通过一次和二次的模拟面试来练习志望动机与过往经历的表达。",
+        ],
+        note: "如果你喜欢稳定的大企业环境，但对超硬核开发兴趣一般，SIer路线会比 Web 系更适合。",
+      },
+      ja: {
+        title: "SIerルートの使い方",
+        subtitle: "安定した大企業・システムインテグレーター志望の方向け",
+        bullets: [
+          "まず「日本SIer業界の現状」「System Engineerの紹介」で、業界の構造と SE の役割を把握する。",
+          "ITパスポートや基本情報技術者試験の資格を取得し、業界知識やコンピュータ基礎技術を身につける",
+          "SIer で最も多く使用される Java 言語を学び、実際の事例を通して業務システム開発を体験する。",
+          "さらに、一次面接・二次面接を想定した模擬面接を行い、志望動機やこれまでの経験の伝え方を練習することも重要である。",
+        ],
+        note: "技術ガチ勢というより「日本語コミュニケーション＋基礎 IT」を活かして働きたい人に向いているルートです。",
+      },
+    },
+    consulting: {
+      zh: {
+        title: "ITコンサル路线使用指南",
+        subtitle: "面向希望做“IT咨询”的同学",
+        bullets: [
+          "先从「日本ITコンサル業界の現状」来了解日本的IT咨询的业务内容以及选考流程。",
+          "通过「ケーススタディの学習」「模擬面接：ケース面接」训练逻辑思考和日语表达，以应对企业的一次面试。",
+          "再通过「ITコンサルの企業分析法」来学习企业分析方法，以应对企业的二次面试。",
+          "另外，可以通过「AIコンサルの学習」「SAPコンサルの学習」来学习两个比较典型的IT咨询领域。",
+          "最后，想要通过ITコンサルタント成为プロジェクトマネージャ的同学可以考取プロジェクトマネージャ的证书。",
+        ],
+        note: "如果你喜欢“说服别人、做企划、画PPT”，但同时也想懂一点技术，这条路线会比较适合。",
+      },
+      ja: {
+        title: "ITコンサルルートの使い方",
+        subtitle: "IT×ビジネスの橋渡し役を目指す方向け",
+        bullets: [
+          "まずは「日本ITコンサル業界の現状」から、日本のITコンサルの業務内容や選考フローについて理解する。",
+          "「ケーススタディの学習」や「模擬面接：ケース面接」を通して、論理的思考力と日本語での表現力を鍛え、企業の一次面接に備える。",
+          "次に、「ITコンサルの企業分析法」を用いて企業分析のやり方を学び、二次面接への対策を行う。",
+          "また、「AIコンサルの学習」や「SAPコンサルの学習」を通じて、ITコンサルの代表的な専門領域について理解を深めることができる。",
+          "最後に、ITコンサルタントからプロジェクトマネージャを目指す場合は、プロジェクトマネージャ試験の取得も有効である。",
+        ],
+        note: "人と話すのが好きで、企画・提案・改善をやってみたい人に向いたルートです。",
+      },
+    },
+    others: {
+      zh: {
+        title: "その他（共通技能）路线使用指南",
+        subtitle: "面向“还在探索方向”或“想补强基础技能”的同学",
+        bullets: [
+          "数据库 / SQL / データ構造とアルゴリズム 等模块，对所有 IT 职种都有帮助。",
+          "インフラ・クラウド 模块适合考虑走基础设施工程师或 DevOps 方向的同学。",
+          "データ分析・AI 模块适合以后想做数据科学 / AI 工程相关岗位的人。",
+        ],
+        note: "不确定选 Web / SIer / ITコンサル 哪条路时，可以先在“その他”里打基础，再结合自己的兴趣决定主路线。",
+      },
+      ja: {
+        title: "その他（横断スキル）ルートの使い方",
+        subtitle: "進路を迷っている人・基礎を底上げしたい人向け",
+        bullets: [
+          "データベース・SQL・データ構造とアルゴリズムは、どの IT 職種でも役立つ土台になります。",
+          "インフラ・クラウドのモジュールは、インフラエンジニアや DevOps に興味がある人に向いています。",
+          "データ分析・AIのモジュールは、将来データサイエンスやAI関連職種を目指す場合に有効です。",
+        ],
+        note: "メインルート（Web / SIer / ITコンサル）を決める前に、このルートで“共通スキルの地盤固め”をしておくと安心です。",
+      },
+    },
+  }[laneKey][lang];
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="lane-guide-title"
+      className="fixed inset-0 z-[90] flex items-center justify-center"
+    >
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative mx-4 max-w-xl w-full rounded-2xl border bg-white dark:bg-zinc-900 dark:border-zinc-700 shadow-xl p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 id="lane-guide-title" className="text-lg font-semibold">
+              {content.title}
+            </h2>
+            <p className="mt-1 text-xs md:text-sm opacity-75">{content.subtitle}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleLang}
+              className="rounded-lg border bg-white/90 dark:bg-zinc-900/90 dark:border-zinc-700 px-3 py-1.5 text-xs md:text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              title="切换语言 / 言語切替"
+            >
+              {lang === "zh" ? "日本語へ" : "中文へ"}
+            </button>
+            <button
+              aria-label="close"
+              onClick={onClose}
+              className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              title="关闭 / 閉じる"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <ul className="mt-4 space-y-2 text-sm">
+          {content.bullets.map((b) => (
+            <li key={b} className="flex items-start gap-2">
+              <span className="mt-[6px] inline-block h-1.5 w-1.5 rounded-full bg-zinc-500" />
+              <span className="leading-snug">{b}</span>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-4 text-sm opacity-80 leading-relaxed">{content.note}</p>
+      </div>
+    </div>
+  );
+}
+
 /** ---------- Data model ---------- */
 type Step = {
   id: string;
@@ -189,7 +372,7 @@ type Step = {
 };
 
 type Track = {
-  key: "web" | "sier" | "consulting"| "others";
+  key: TrackKey;
   title: string;
   color: string;
   steps: Step[];
@@ -386,8 +569,6 @@ const tracks: Track[] = [
       { id: "sier-5a", label: "模擬面接：二次面接", href: "/paths/sier/sier-second-interview", summary: "SIer業界によくある二次面接を行う",col: 4,
         row: 0.85,
         chain: false, },
-      
-      
     ],
   },
   {
@@ -451,7 +632,6 @@ type Side =
   | "top-in" | "top-out" | "bottom-in" | "bottom-out"
   | "left-out" | "right-in";
 
-
 type ExtraEdge = {
   source: string;
   target: string;
@@ -460,11 +640,9 @@ type ExtraEdge = {
   sourceHandle?: Side;
   targetHandle?: Side;
 };
+
 const extraEdges: ExtraEdge[] = [
-  // 竖直分支：从 web-2 顶部 → web-2a 底部，用直线，带轻微动画
   { source: "web-2", target: "web-2a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
-  // （可选）补讲后再接回主线：
-  // { source: "web-2a", target: "web-3", sourceHandle: "right", targetHandle: "left", type: "smoothstep" },
   { source: "web-3", target: "web-3a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-3", target: "web-3b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-3b", target: "web-3c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
@@ -500,8 +678,6 @@ const extraEdges: ExtraEdge[] = [
   { source: "con-2", target: "con-2a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "con-3", target: "con-3a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "oth-4", target: "oth-4a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
-  
-
 ];
 
 /** ---------- Layout constants ---------- */
@@ -513,16 +689,32 @@ const START_X = 80;
 const START_Y = 80;
 
 /** 泳道标题用的小牌子节点（不带连线端点） */
-function LaneLabelNode({ data }: RFNodeProps<{ title: string }>) {
+function LaneLabelNode({
+  data,
+}: RFNodeProps<{ title: string; onHelpClick?: () => void; trackKey?: TrackKey }>) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    data.onHelpClick?.();
+  };
+
   return (
     <div
-      className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
+      className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold bg-white/90 dark:bg-zinc-900/90"
       style={{
         background: "var(--color-lane-bg)",
         borderColor: "var(--color-border)",
       }}
     >
-      {data.title}
+      {/* 问号按钮 */}
+      <button
+        onClick={handleClick}
+        className="flex h-4 w-4 items-center justify-center rounded-full border text-[10px] leading-none bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+        title="このルートの説明 / 路线介绍"
+      >
+        ?
+      </button>
+      <span>{data.title}</span>
     </div>
   );
 }
@@ -548,7 +740,6 @@ function StepNode({ data }: RFNodeProps<{ label: string; summary?: string; href?
       {/* 左右双向（新增） */}
       <Handle type="source" position={Position.Left}  id="left-out"  />
       <Handle type="target" position={Position.Right} id="right-in"  />
-
     </div>
   );
 }
@@ -556,7 +747,10 @@ function StepNode({ data }: RFNodeProps<{ label: string; summary?: string; href?
 const nodeTypes = { step: StepNode, lane: LaneLabelNode } as const;
 
 /** ---------- Build nodes & edges ---------- */
-function toNodesAndEdges(allTracks: Track[]): { nodes: RFNode[]; edges: RFEdge[] } {
+function toNodesAndEdges(
+  allTracks: Track[],
+  openLaneGuide?: (key: TrackKey) => void
+): { nodes: RFNode[]; edges: RFEdge[] } {
   const nodes: RFNode[] = [];
   const edges: RFEdge[] = [];
 
@@ -568,7 +762,11 @@ function toNodesAndEdges(allTracks: Track[]): { nodes: RFNode[]; edges: RFEdge[]
       id: `${track.key}-lane-label`,
       type: "lane",
       position: { x: START_X - 60, y: yBase - 40 },
-      data: { title: track.title },
+      data: {
+        title: track.title,
+        trackKey: track.key,
+        onHelpClick: openLaneGuide ? () => openLaneGuide(track.key) : undefined,
+      },
       draggable: false,
       selectable: false,
     });
@@ -626,14 +824,28 @@ function toNodesAndEdges(allTracks: Track[]): { nodes: RFNode[]; edges: RFEdge[]
 /** ---------- Component ---------- */
 export default function LearningPathsGraph() {
   const router = useRouter();
-  const { nodes: initialNodes, edges: initialEdges } = useMemo(() => toNodesAndEdges(tracks), []);
+
+  /** 路线用问号弹窗的 state */
+  const [activeLane, setActiveLane] = React.useState<TrackKey | null>(null);
+  const openLaneGuide = useCallback((key: TrackKey) => {
+    setActiveLane(key);
+  }, []);
+
+  const { nodes: initialNodes, edges: initialEdges } = useMemo(
+    () => toNodesAndEdges(tracks, openLaneGuide),
+    [openLaneGuide]
+  );
+
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
-  const onNodeClick = useCallback((_: React.MouseEvent, node: RFNode) => {
-    const href = (node.data as any)?.href;
-    if (href) router.push(href);
-  }, [router]);
+  const onNodeClick = useCallback(
+    (_: React.MouseEvent, node: RFNode) => {
+      const href = (node.data as any)?.href;
+      if (href) router.push(href);
+    },
+    [router]
+  );
 
   const fitViewOptions = { padding: 0.2, minZoom: 0.2, maxZoom: 1.75 } as const;
 
@@ -654,7 +866,7 @@ export default function LearningPathsGraph() {
     `}</style>
   );
 
-  /** ============== 使用指南显示控制（新增） ============== */
+  /** ============== 使用指南显示控制（总览版） ============== */
   const [showGuide, setShowGuide] = React.useState(false);
 
   React.useEffect(() => {
@@ -678,19 +890,25 @@ export default function LearningPathsGraph() {
     setShowGuide(false);
   }, []);
 
-
   return (
-    <div className="h-[calc(100vh-4rem)] w-full bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900 rounded-xl overflow-hidden">
+    <div className="h-[calc(100vh-4rem)] w-full bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900 rounded-xl overflow-hidden relative">
       {themeVars}
 
-      {/* （新增）一次性使用指南模态 */}
+      {/* 总览版使用指南模态 */}
       <GuideModal
         open={showGuide}
         onClose={handleGuideCloseOnce}
         onNeverShow={handleGuideNeverShow}
       />
 
-      {/* （新增）右上角“使用指南”按钮，用户可随时再看 */}
+      {/* 每条路线的问号弹窗 */}
+      <LaneGuideModal
+        open={activeLane !== null}
+        laneKey={activeLane}
+        onClose={() => setActiveLane(null)}
+      />
+
+      {/* 右上角“使用指南”按钮，用户可随时再看总览 */}
       <div className="absolute right-4 top-4 z-[60]">
         <button
           onClick={() => setShowGuide(true)}
@@ -720,4 +938,5 @@ export default function LearningPathsGraph() {
     </div>
   );
 }
+
 
