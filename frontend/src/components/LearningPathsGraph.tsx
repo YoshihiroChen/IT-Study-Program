@@ -401,7 +401,7 @@ const tracks: Track[] = [
         id: "web-2",
         label: "プログラミング言語学習（Typescript）",
         href: "/paths/web/tsbasics",
-        summary: "特徴、文、値、変数、関数、非同期処理、モジュール",
+        summary: "特徴、文、値、変数、関数など",
       },
       { id: "web-3", label: "プログラミング言語学習（Python）", href: "/paths/web/py-basics", summary: "文、データ構造、クラス" },
       { id: "web-4", label: "開発フローとツールの紹介", href: "/paths/web/deploy-flow", summary: "アジャイル開発、ウォーターフォール開発、VsCode、Github等" },
@@ -560,6 +560,9 @@ const tracks: Track[] = [
       { id: "sier-2a", label: "模擬面接：一次面接", href: "/paths/sier/first-interview", summary: "SIer業界によくある一次面接を行う",col: 1,
         row: 0.85,
         chain: false, },
+      { id: "sier-2b", label: "プログラミング言語学習（Javascript）", href: "/paths/sier/javascript", summary: "Javascriptの基礎的な知識を学ぶ",col: 1,
+        row: -0.97,
+        chain: false, },
       { id: "sier-3a", label: "コンピューターアーキテクチャ", href: "/paths/sier/computer-ach", summary: "コンピュータの構成を学ぶ",col: 2,
         row: 0.85,
         chain: false, },
@@ -643,6 +646,7 @@ type ExtraEdge = {
 
 const extraEdges: ExtraEdge[] = [
   { source: "web-2", target: "web-2a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  { source: "web-2", target: "sier-2b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-3", target: "web-3a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-3", target: "web-3b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-3b", target: "web-3c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
@@ -678,6 +682,7 @@ const extraEdges: ExtraEdge[] = [
   { source: "con-2", target: "con-2a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "con-3", target: "con-3a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "oth-4", target: "oth-4a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  { source: "sier-2", target: "sier-2b", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
 ];
 
 /** ---------- Layout constants ---------- */
