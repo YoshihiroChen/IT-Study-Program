@@ -61,6 +61,7 @@ export default function FirstInterviewPage() {
               ・課題の設定 → 行動 → 工夫 → 結果 → 学んだこと  
               という構造に沿って説明するのが基本です。  
               ・“何をしたか”ではなく“どのように考えたか”が評価されます。
+              ・ガクチカでは深く質問される可能性が高いです。
             </p>
           </div>
 
@@ -83,18 +84,6 @@ export default function FirstInterviewPage() {
             </p>
           </div>
 
-        </div>
-
-        {/* ===== Final Message ===== */}
-        <div className="bg-white mt-10 p-6 rounded-lg shadow-md text-gray-700 leading-relaxed">
-          <p className="mb-3">
-            本格的に練習したい場合は、実際の企業の質問傾向や  
-            あなたの ES（エントリーシート）を参考にした個別対策も可能です。
-          </p>
-          <p>
-            「模擬面接を受けたい」「回答のフィードバックが欲しい」など、  
-            必要があればお気軽に開発者へお問い合わせください。
-          </p>
         </div>
 
       </div>

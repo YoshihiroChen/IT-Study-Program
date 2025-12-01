@@ -40,17 +40,6 @@ export default function ItConsultingCaseInterviewPage() {
           </p>
         </div>
 
-        {/* ===== Section: Mock Interview Offer ===== */}
-        <h2 className="text-2xl font-semibold mb-4 text-gray-700">
-          模擬ケース面接を行いたい場合
-        </h2>
-        <div className="bg-white p-5 rounded-lg shadow-md mb-8 leading-relaxed">
-          <p>
-            「ITコンサル向けのケース面接を実際に練習したい」  
-            「ケーススタディの学習内容を使って模擬面接をしてほしい」  
-            といった場合は、必要に応じて開発者へお気軽にお問い合わせください。
-          </p>
-        </div>
 
       </div>
     </div>

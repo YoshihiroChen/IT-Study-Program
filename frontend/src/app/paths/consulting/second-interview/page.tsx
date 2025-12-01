@@ -127,22 +127,6 @@ export default function SecondInterviewPage() {
           </p>
         </div>
 
-        {/* ===== Final Message ===== */}
-        <div className="bg-white mt-10 p-6 rounded-lg shadow-md text-gray-700 leading-relaxed">
-          <p className="mb-3">
-            二次面接は「志望度の最終確認」と同時に、
-            「入社後にギャップなく働けそうか」を見られるフェーズです。
-          </p>
-          <p className="mb-3">
-            自分一人では業界や企業の整理が難しい場合や、
-            回答内容に不安がある場合は、実際の ES・志望企業リストをもとにした
-            個別の模擬面接も行うことができます。
-          </p>
-          <p>
-            「二次面接の練習をしたい」「企業・業界の整理から一緒にやってほしい」など、  
-            必要に応じて開発者までお気軽にお問い合わせください。
-          </p>
-        </div>
 
       </div>
     </div>
