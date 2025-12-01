@@ -225,7 +225,7 @@ function LaneGuideModal({
       },
       ja: {
         title: "Web系ITルートの使い方",
-        subtitle: "自社プロダクト開発エンジニア志望の方向け",
+        subtitle: "Web開発エンジニア志望の方向け",
         bullets: [
           "まずは TypeScript や Python などのプログラミング言語を学び、基礎的な文法力をしっかり身につける。",
           "次に、VS Code や Jupyter Notebook などの開発エディタ、そして Terminal・Git・GitHub などの補助的な開発ツールを習得する。",
@@ -242,7 +242,7 @@ function LaneGuideModal({
         bullets: [
           "先通过「日本SIer業界の現状」「System Engineerの紹介」了解行业与职种。",
           "考取it passport与基本情报技术者的证书，了解业界情况与计算机技术。",
-          "学习 SIer 中使用最多的 Java语言，并且从实际案例来体验业务系统的开发。",
+          "学习 SIer 中使用最多的 Java语言，实际进行IT技术的学习",
           "此外，还需要通过一次和二次的模拟面试来练习志望动机与过往经历的表达。",
         ],
         note: "如果你喜欢稳定的大企业环境，但对超硬核开发兴趣一般，SIer路线会比 Web 系更适合。",
@@ -253,7 +253,7 @@ function LaneGuideModal({
         bullets: [
           "まず「日本SIer業界の現状」「System Engineerの紹介」で、業界の構造と SE の役割を把握する。",
           "ITパスポートや基本情報技術者試験の資格を取得し、業界知識やコンピュータ基礎技術を身につける",
-          "SIer で最も多く使用される Java 言語を学び、実際の事例を通して業務システム開発を体験する。",
+          "SIer で最も多く使用される Java 言語を学び、実際のIT技術を学習する。",
           "さらに、一次面接・二次面接を想定した模擬面接を行い、志望動機やこれまでの経験の伝え方を練習することも重要である。",
         ],
         note: "技術ガチ勢というより「日本語コミュニケーション＋基礎 IT」を活かして働きたい人に向いているルートです。",
@@ -473,15 +473,6 @@ const tracks: Track[] = [
         chain: false,
       },
       {
-        id: "web-4d",
-        label: "AWSの使用ガイダンス",
-        href: "/paths/web/aws-guidance",
-        summary: "AWSを使ってクラウド開発環境を構築する",
-        col: 4,
-        row: -2,
-        chain: false,
-      },
-      {
         id: "web-4e",
         label: "ターミナルの使用ガイダンス",
         href: "/paths/web/terminal-guidance",
@@ -582,30 +573,18 @@ const tracks: Track[] = [
         row: 0.9,
         chain: false,
       },
-    ],
-  },
-  {
-    key: "others",
-    title: "その他",
-    color: "slate-500",
-    steps: [
-      { id: "oth-1", label: "データベースの学習", href: "/paths/others/database", summary: "開発におけるデータベースの学習" },
-      { id: "oth-2", label: "SQLの学習", href: "/paths/others/sql", summary: "データベースを操作するSQL言語を学習する" },
-      { id: "oth-3", label: "データ構造とアルゴリズム", href: "/paths/others/data-algorithm", summary: "Javaにおけるデータ構造とアルゴリズムを学習する" },
-      { id: "oth-4", label: "インフラの学習", href: "/paths/others/infra", summary: "インフラエンジニアに関する知識を学習する" },
-      { id: "oth-5", label: "データ分析の学習", href: "/paths/others/data-analysis", summary: "データ分析の基本知識を学ぶ" },
-      { id: "oth-6", label: "AIの学習", href: "/paths/others/ai-foundation", summary: "AIに関する基本知識を学ぶ" },
       {
-        id: "oth-4a",
-        label: "クラウドの学習",
-        href: "/paths/others/cloud",
-        summary: "オンプレミスに相対するクラウドの学習",
-        col: 3,
+        id: "con-3b",
+        label: "DXコンサルの学習",
+        href: "/paths/consulting/dx-consulting",
+        summary: "ITコンサルの一分野であるDXコンサルを学習する",
+        col: 2,
         row: -1,
         chain: false,
       },
     ],
   },
+  
 ];
 
 /** 额外连线（跨泳道 / 竖直分支等） */
@@ -646,7 +625,6 @@ const extraEdges: ExtraEdge[] = [
     animated: true,
   },
   { source: "web-4b", target: "web-4c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
-  { source: "web-4c", target: "web-4d", sourceHandle: "right-out", targetHandle: "left-in", type: "straight", animated: true },
   { source: "web-4", target: "web-4e", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-5", target: "web-5a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-5", target: "web-5b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
@@ -660,7 +638,7 @@ const extraEdges: ExtraEdge[] = [
   { source: "sier-5", target: "sier-5a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "con-2", target: "con-2a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "con-3", target: "con-3a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
-  { source: "oth-4", target: "oth-4a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  { source: "con-3", target: "con-3b", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "sier-2", target: "sier-2b", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
 ];
 

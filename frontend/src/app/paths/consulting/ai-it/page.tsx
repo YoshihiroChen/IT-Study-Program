@@ -507,29 +507,6 @@ const CURRICULUM: Chapter[] = [
   
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
 ];
 
 
