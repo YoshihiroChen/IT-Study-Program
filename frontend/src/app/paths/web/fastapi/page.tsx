@@ -664,7 +664,89 @@ const CURRICULUM: Chapter[] = [
       }
       
     ]
+  },
+  {
+    "key": "fastapi-practice",
+    "title": "FastAPIの実践",
+    "lessons": [
+      {
+        "id": "fastapi-minimal-app",
+        "title": "最小構成のFastAPIアプリケーション",
+        "summary": "FastAPIを使った最小構成のWebアプリケーションを作成し、FastAPIの基本構造と役割を理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "この節では、FastAPIを使った最もシンプルなアプリケーションを作成し、その構造と意味を一つずつ解説します。まずは、FastAPIで「動く最小構成」を理解することが目的です。"
+          },
+          {
+            "type": "p",
+            "text": "以下は、FastAPIで最小限のWebアプリケーションを構成するコード例です。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/\")\ndef read_root():\n    return {\"message\": \"Hello, FastAPI!\"}"
+          },
+          {
+            "type": "p",
+            "text": "このファイルだけで、FastAPIアプリケーションとして動作します。次に、それぞれの行が何をしているのかを詳しく見ていきましょう。"
+          },
+          {
+            "type": "p",
+            "text": "まず、`from fastapi import FastAPI` は、FastAPIフレームワークの中核となる `FastAPI` クラスを読み込んでいます。このクラスは、Webアプリケーション全体を管理するための中心的なオブジェクトです。"
+          },
+          {
+            "type": "p",
+            "text": "`FastAPI` クラスは、ルーティング・リクエスト処理・レスポンス生成など、Webアプリケーションとして必要な機能をすべてまとめて管理します。"
+          },
+          {
+            "type": "p",
+            "text": "次に、`app = FastAPI()` という行では、FastAPIクラスのインスタンスを生成しています。この `app` という変数が、アプリケーション本体になります。"
+          },
+          {
+            "type": "p",
+            "text": "この `app` オブジェクトは、後ほどルーティングの定義や設定の登録に使用され、FastAPIアプリ全体の入り口として機能します。"
+          },
+          {
+            "type": "p",
+            "text": "続いて、`@app.get(\"/\")` というデコレータが登場します。これは「HTTPのGETメソッドで、パス `/` にアクセスがあったときに、この関数を実行する」という意味です。"
+          },
+          {
+            "type": "p",
+            "text": "このように、FastAPIではデコレータを使ってURLと処理内容を結び付けます。これをルーティング（routing）と呼びます。"
+          },
+          {
+            "type": "p",
+            "text": "最後に定義されている `read_root` 関数は、実際にリクエストを受け取った際に実行される処理です。この関数が返す値が、そのままHTTPレスポンスとしてクライアントに返されます。"
+          },
+          {
+            "type": "p",
+            "text": "ここでは Python の辞書（dict）を返していますが、FastAPI はこれを自動的に JSON 形式へ変換して返します。"
+          },
+          {
+            "type": "p",
+            "text": "つまり、この最小構成のアプリでは、ブラウザで `http://localhost:8000/` にアクセスすると、次のようなレスポンスが返ってきます。"
+          },
+          {
+            "type": "code",
+            "filename": "response_example.json",
+            "lang": "json",
+            "code": "{\n  \"message\": \"Hello, FastAPI!\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "このように、FastAPIでは非常に少ないコードでAPIを構築することができ、HTTPリクエストとPython関数を直感的に対応づけることができます。"
+          },
+          {
+            "type": "p",
+            "text": "次の節では、FastAPIでリクエストパラメータやパスパラメータをどのように受け取るかを学びます。"
+          }
+        ]
+      }
+    ]
   }
+  
   
   
   
