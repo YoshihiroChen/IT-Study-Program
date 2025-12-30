@@ -42,207 +42,566 @@ type Chapter = {
 /** ---------- 示例课程大纲 ---------- */
 const CURRICULUM: Chapter[] = [
   {
-    "key": "fastapi-intro",
-    "title": "FastAPI入門：PythonでモダンなWeb APIを作る",
+    "key": "fastapi-core-components",
+    "title": "FastAPIの二大構成要素",
     "lessons": [
       {
-        "id": "overview",
-        "title": "FastAPIとは",
-        "summary": "FastAPIは、Pythonで高速かつ型安全なWeb APIを構築できる次世代フレームワークです。",
+        "id": "starlette",
+        "title": "Starlette：FastAPIの基盤となるASGIフレームワーク",
+        "summary": "FastAPIはStarletteを土台として動作し、HTTPリクエスト処理・ルーティング・ミドルウェアなど“Webアプリとして動くための機能”を担います。",
         "content": [
           {
             "type": "p",
-            "text": "FastAPIは、Pythonの型ヒントを活用して自動的にAPIドキュメントを生成するモダンなWebフレームワークです。FlaskやDjangoに比べて非同期処理に強く、開発速度と実行性能の両立を目指しています。"
+            "text": "FastAPIは「全部入りの単体フレームワーク」というよりも、複数の優れた部品を組み合わせて作られた“モダンなAPI開発のための統合レイヤー”です。その中で、Webアプリとして動くための基礎（HTTPサーバーとの接続方式、リクエスト受付、レスポンス返却、ルーティングなど）を提供しているのがStarletteです。"
+          },
+          {
+            "type": "p",
+            "text": "StarletteはASGI（Asynchronous Server Gateway Interface）に準拠したフレームワークです。ASGIはPythonのWebアプリが「同期だけでなく非同期（async/await）でも動ける」ようにするためのインターフェース規格であり、FastAPIはこのASGI世界で動作します。そのため実行にはUvicornなどのASGIサーバーを使います。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIのエンドポイント（@app.get など）で定義したルートは、内部ではStarletteのルーティング機構として登録されます。つまり、あなたがFastAPIで書いた「URLと関数の対応付け」は、最終的にStarletteが解釈し、実際にHTTPリクエストを関数へ届けます。"
           },
           {
             "type": "ul",
             "items": [
-              "高速（StarletteとPydanticによる高性能な処理）",
-              "型ヒントを利用した自動バリデーションと補完",
-              "Swagger UIによる自動ドキュメント生成",
-              "同期・非同期（async/await）の両方に対応",
-              "データモデル定義が容易（Pydanticベース）"
+              "ASGIベース：非同期処理に最適化された実行モデル",
+              "ルーティング：URLとハンドラ（関数）を結びつける",
+              "リクエスト/レスポンス：HTTPデータを扱う土台を提供",
+              "ミドルウェア：認証・ログ・CORS等の共通処理を挟み込める",
+              "WebSocket：HTTP以外の双方向通信もサポート（ASGIの強み）"
             ]
-          }
-        ]
-      },
-      {
-        "id": "install",
-        "title": "FastAPIのインストール",
-        "summary": "Python環境にFastAPIとUvicornをインストールします。",
-        "content": [
-          {
-            "type": "p",
-            "text": "FastAPI自体はアプリケーションのロジックを提供するフレームワークであり、実際のサーバー実行にはASGIサーバーであるUvicornを使います。"
-          },
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "pip install fastapi uvicorn"
           },
           {
             "type": "p",
-            "text": "インストール後、`uvicorn --version` と入力して動作確認できます。"
-          }
-        ]
-      },
-      {
-        "id": "hello-world",
-        "title": "最初のFastAPIアプリを作る",
-        "summary": "FastAPIの基本構造を理解するために、シンプルな“Hello World”アプリを作成します。",
-        "content": [
+            "text": "重要なのは、FastAPIは“Starletteの上で動きつつ”、開発者が書くコードをより簡潔にし、さらにPydanticと連携して「入力データの型安全性」「自動ドキュメント生成」などの体験を提供している点です。Starletteが担当するのは、あくまでWebアプリとしての基盤であり、データの厳密な検証やスキーマ生成は次のPydanticが大きく担います。"
+          },
           {
             "type": "code",
-            "filename": "main.py",
+            "filename": "example_starlette_base.py",
             "lang": "python",
-            "code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/\")\ndef read_root():\n    return {\"message\": \"Hello, FastAPI!\"}"
-          },
-          {
-            "type": "code",
-            "filename": "terminal",
-            "lang": "bash",
-            "code": "uvicorn main:app --reload"
+            "code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/\")\ndef read_root():\n    return {\"message\": \"Hello from Starlette base\"}"
           },
           {
             "type": "p",
-            "text": "実行後、ブラウザで `http://127.0.0.1:8000` にアクセスすると、JSON形式のメッセージが表示されます。"
-          },
-          {
-            "type": "ul",
-            "items": [
-              "URL `/` にGETリクエストが来ると `read_root()` が呼ばれる",
-              "戻り値は自動的にJSONに変換される",
-              "`--reload` はコード変更を自動的に反映させるオプション"
-            ]
+            "text": "この最小例でも、実際には「ASGIサーバー（例：Uvicorn）がHTTPリクエストを受け取る → ASGIとしてアプリへ渡す → Starletteが該当ルートを探索する → ハンドラ関数が実行される → 戻り値をStarletteがレスポンスへ整形して返す」という流れが裏側で動いています。"
           }
         ]
       },
       {
-        "id": "path-params",
-        "title": "パスパラメータとクエリパラメータ",
-        "summary": "APIで動的なURLや条件付き検索を実現する方法を学びます。",
+        "id": "pydantic",
+        "title": "Pydantic：外部入力を“信頼できるデータ”に変換する仕組み",
+        "summary": "Pydanticは型ヒントをもとに、入力データの検証（validation）と変換（parsing/coercion）を自動化し、FastAPIの型安全性と自動スキーマ生成を支えます。",
         "content": [
           {
+            "type": "p",
+            "text": "Pydanticの本質は、「外部から来る不確かなデータ（dict/JSON/フォームなど）」を、アプリ内部で安全に扱える“信頼できるPythonオブジェクト”へ変換することです。API開発では、ユーザーや外部システムから送られてくる入力は常に不正・欠損・型ズレの可能性があります。Pydanticはそれをモデル定義（型ヒント）に従って一括で検証し、必要なら型変換も行い、エラーなら理由付きで失敗させます。"
+          },
+          {
+            "type": "p",
+            "text": "以下はPydantic公式ドキュメントの代表例です。この短い例の中に、Pydanticの主要機能（必須/任意、デフォルト、型検証、ネスト構造、型変換、制約型、ダンプ）が凝縮されています。"
+          },
+          {
             "type": "code",
-            "filename": "main.py",
+            "filename": "pydantic_official_example.py",
             "lang": "python",
-            "code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/items/{item_id}\")\ndef read_item(item_id: int, q: str | None = None):\n    return {\"item_id\": item_id, \"query\": q}"
+            "code": "from datetime import datetime\n\nfrom pydantic import BaseModel, PositiveInt\n\n\nclass User(BaseModel):\n    id: int  \n    name: str = 'John Doe'  \n    signup_ts: datetime | None  \n    tastes: dict[str, PositiveInt]  \n\n\nexternal_data = {\n    'id': 123,\n    'signup_ts': '2019-06-01 12:22',  \n    'tastes': {\n        'wine': 9,\n        b'cheese': 7,  \n        'cabbage': '1',  \n    },\n}\n\nuser = User(**external_data)  \n\nprint(user.id)  \n#> 123\nprint(user.model_dump())  \n\"\"\"\n{\n    'id': 123,\n    'name': 'John Doe',\n    'signup_ts': datetime.datetime(2019, 6, 1, 12, 22),\n    'tastes': {'wine': 9, 'cheese': 7, 'cabbage': 1},\n}\n\"\"\""
           },
           {
             "type": "p",
-            "text": "`/items/3?q=apple` のようにアクセスすると、`item_id=3`, `q='apple'` が返されます。"
+            "text": "ここからは、この例でPydanticが実際に何をしているのかを「見える結果」と「裏側の処理」に分けて、フィールドごとに丁寧に分解します。"
+          },
+          {
+            "type": "p",
+            "text": "まず、class User(BaseModel) と書いた瞬間に、UserはただのPythonクラスではなくなります。Pydanticはクラス定義時に型ヒントとデフォルト値を読み取り、各フィールドに対する検証ルールを構築します。以降 User(**data) を呼ぶことは「コンストラクタ」ではなく、「入力データをモデルに従って検証・変換し、成功したらモデルインスタンスを返す処理」と考えるのが正確です。"
           },
           {
             "type": "ul",
             "items": [
-              "URLの一部を `{item_id}` のように変数で指定できる",
-              "クエリパラメータは `?key=value` 形式で指定する",
-              "型ヒントにより自動バリデーションが行われる"
+              "モデル定義（型ヒント）から検証ルールを生成する",
+              "外部入力（dictなど）を受け取り、フィールド単位で検証する",
+              "必要に応じて型変換（例：str→int、str→datetime、bytes→str）を行う",
+              "制約違反や変換不能ならValidationErrorとして失敗する",
+              "成功した場合のみ“型が揃った”安全なモデルを得る"
             ]
-          }
-        ]
-      },
-      {
-        "id": "request-body",
-        "title": "リクエストボディとPydanticモデル",
-        "summary": "POSTリクエストでデータを受け取る方法と、Pydanticでデータ型を定義する方法を解説します。",
-        "content": [
+          },
+          {
+            "type": "p",
+            "text": "次に、各フィールドが意味するところを確認します。"
+          },
+          {
+            "type": "p",
+            "text": "1) id: int は「必須フィールド」かつ「整数でなければならない」という宣言です。external_data に id が欠けていればエラーになりますし、id が 'abc' のような数値に変換できない値なら検証で弾かれます。逆に '123' のように整数へ変換可能な文字列なら、Pydanticが int へ変換して通すことがあります（設定や型により挙動は変わり得ますが、例が示す思想は“可能なら正しい型へ寄せる”です）。"
+          },
+          {
+            "type": "p",
+            "text": "2) name: str = 'John Doe' は「型は文字列」「外部入力に無ければデフォルトで 'John Doe' を採用」という意味です。この例の external_data には name が無いので、出力の model_dump() では name が自動補完されて 'John Doe' になります。ここで重要なのは、Pydanticが“欠損値をデフォルトで埋める”という、API設計上とても重要な役割を担っている点です。"
+          },
+          {
+            "type": "p",
+            "text": "3) signup_ts: datetime | None は「datetime でもよいし、None でもよい（任意）」という意味です。external_data では signup_ts が '2019-06-01 12:22' という文字列として渡されていますが、Pydanticはこれを datetime へパース（解析）して、datetime.datetime(2019, 6, 1, 12, 22) に変換します。もし変換できないフォーマットならエラーになり、APIとしては“入力が不正である”ことを明確に返せます。"
+          },
+          {
+            "type": "p",
+            "text": "4) tastes: dict[str, PositiveInt] は、この例の核心です。これは「キーは str、値は PositiveInt（正の整数）」というネスト構造を宣言しています。つまり tastes 全体が辞書であるだけでなく、辞書の中身まで“型と制約”を持ちます。これにより、単に tastes が dict かどうかを見るだけではなく、各エントリ（キー/値）を要素単位で検証・変換できます。"
+          },
+          {
+            "type": "p",
+            "text": "では external_data['tastes'] の中身を見てみましょう。"
+          },
           {
             "type": "code",
-            "filename": "main.py",
+            "filename": "tastes_input_snippet.py",
             "lang": "python",
-            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\nclass Item(BaseModel):\n    name: str\n    price: float\n    is_offer: bool | None = None\n\n@app.post(\"/items/\")\ndef create_item(item: Item):\n    return {\"item_name\": item.name, \"price\": item.price}"
+            "code": "tastes = {\n    'wine': 9,\n    b'cheese': 7,\n    'cabbage': '1',\n}"
+          },
+          {
+            "type": "p",
+            "text": "ここでPydanticは、tastes の「キー」と「値」をそれぞれ型に合わせて整形します。"
           },
           {
             "type": "ul",
             "items": [
-              "Pydanticモデルを使うと、型安全にデータを受け取れる",
-              "無効なデータが送られた場合は自動的にエラーが返る",
-              "データは自動的にPythonオブジェクトとして扱える"
+              "キー 'wine' はすでに str なのでそのまま採用される",
+              "キー b'cheese' は bytes だが、dict[str, ...] の定義に合わせて str へ変換され 'cheese' になる",
+              "値 '1' は本来 str だが、PositiveInt（intかつ正）として解釈され、int へ変換されて 1 になる",
+              "もし値が 0 や -1 なら PositiveInt の制約違反でエラーになる"
             ]
           },
           {
             "type": "p",
-            "text": "FastAPIは自動的にOpenAPI仕様に基づくリクエストスキーマを生成します。"
-          }
-        ]
-      },
-      {
-        "id": "docs",
-        "title": "自動ドキュメント（Swagger UIとReDoc）",
-        "summary": "FastAPIは自動的にAPIドキュメントを生成します。",
-        "content": [
+            "text": "この結果、model_dump() の tastes は {'wine': 9, 'cheese': 7, 'cabbage': 1} という、キーも値も“宣言した通り”に揃った辞書として出力されます。ここがPydanticの強みで、入力データが多少バラついていても、モデルの定義に従ってデータを正規化（normalize）できます。"
+          },
+          {
+            "type": "p",
+            "text": "次に user = User(**external_data) が何を意味するかを整理します。この1行は「辞書をそのままUserに詰める」ではなく、「Userモデル（型と制約の集合）を使って external_data を検証し、必要な型変換を行い、成功したらUserインスタンスを生成する」という処理です。途中で一つでも条件を満たさないフィールドがあれば、例外（ValidationError）として止まります。"
+          },
+          {
+            "type": "p",
+            "text": "最後に model_dump() についてです。Pydantic v2 では、モデルを辞書へ戻す際に model_dump() を使います。ここで返る値は「検証と変換が終わった後のデータ」であり、アプリ内部で扱う“正規化済みの真の値”と考えてよいです。FastAPIでは、Pydanticモデルをレスポンスモデルとして指定すると、同様の仕組みでレスポンスの形を保証できます。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、この短い例でPydanticがやっていることは次の一言に集約できます：外部入力（不確かなデータ）を、型ヒントに基づいて検証し、可能なら型を揃えて変換し、アプリ内部で信頼できる形に整える。これがFastAPIの「型安全」「自動バリデーション」「自動ドキュメント生成」を成立させている中心メカニズムです。"
+          },
           {
             "type": "ul",
             "items": [
-              "Swagger UI: `http://127.0.0.1:8000/docs`",
-              "ReDoc: `http://127.0.0.1:8000/redoc`"
+              "必須/任意（Optional）の判定と欠損検出",
+              "デフォルト値の自動補完",
+              "文字列→datetime、bytes→str、文字列→intなどの型変換",
+              "PositiveIntのような制約型によるルール付け",
+              "検証済みデータの取り出し（model_dump）",
+              "FastAPIの入力検証・OpenAPIスキーマ生成の基盤"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "http-basics",
+    "title": "HTTPの基礎知識",
+    "lessons": [
+      {
+        "id": "http-characteristics",
+        "title": "HTTPの基本的な特徴",
+        "summary": "HTTPはWeb通信の基盤となるプロトコルであり、通信方式・設計思想・制約を理解することがWebアプリケーション理解の出発点となります。",
+        "content": [
+          {
+            "type": "p",
+            "text": "HTTP（HyperText Transfer Protocol）は、WebブラウザとWebサーバーの間で情報をやり取りするための通信規約です。私たちが日常的に利用しているWebページの表示、フォーム送信、API通信などは、すべてHTTPという共通ルールの上で成り立っています。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIや他のWebフレームワークを理解するためには、HTTPがどのような性質を持つ通信方式なのかを把握しておくことが不可欠です。本節では、HTTPの最も基本的な特徴を4つに分けて説明します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "TCP/IP上で動作するプロトコルであること",
+              "リクエスト・レスポンス型の通信モデルであること",
+              "ステートレス（状態を保持しない）であること",
+              "基本的に短命な接続（短い通信）であること"
             ]
           },
           {
             "type": "p",
-            "text": "これらのドキュメントは自動生成され、リクエスト送信もGUI上で行えます。"
+            "text": "以下では、それぞれの特徴を順番に詳しく見ていきます。"
+          },
+          {
+            "type": "p",
+            "text": "① HTTPはTCP/IPの上で動作する\nHTTPは単独で存在する通信方式ではなく、インターネットの基盤であるTCP/IPプロトコル群の上に構築されています。具体的には、HTTPはトランスポート層にあるTCPを利用して通信を行います。TCPは「通信相手との接続確立」「データの順序保証」「再送制御」などを担当し、HTTPはその上で『どのような形式でデータをやり取りするか』を定義します。"
+          },
+          {
+            "type": "p",
+            "text": "そのため、HTTP自体は通信の信頼性を保証する仕組みを持たず、あくまでTCPの上で動作するアプリケーション層のプロトコルです。FastAPIを含む多くのWebフレームワークは、この構造を前提として設計されています。"
+          },
+          {
+            "type": "p",
+            "text": "② リクエスト・レスポンス型の通信モデル\nHTTP通信は必ず「クライアントがリクエストを送信し、それに対してサーバーがレスポンスを返す」という一方向の流れで構成されます。サーバー側から自発的に通信を開始することはできません。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、ブラウザでURLを開くと、ブラウザがHTTPリクエストを送信し、サーバーはHTMLやJSONなどのレスポンスを返します。この1往復がHTTP通信の最小単位です。FastAPIで定義するエンドポイント（@app.get など）は、この「リクエスト → レスポンス」の関係をコードとして表現したものです。"
+          },
+          {
+            "type": "p",
+            "text": "③ ステートレス（Stateless）であること\nHTTPの最も重要な特徴の一つが「ステートレス」である点です。これは、サーバーがクライアントごとの状態を原則として記憶しない、という設計思想を意味します。"
+          },
+          {
+            "type": "p",
+            "text": "たとえば、同じユーザーが連続してリクエストを送ったとしても、HTTPそのものは『前回のリクエストが誰から来たか』『ログインしているかどうか』といった情報を保持しません。すべてのリクエストは独立したものとして扱われます。"
+          },
+          {
+            "type": "p",
+            "text": "この性質はサーバーの構造を単純にし、スケーラビリティを高める一方で、「ログイン状態の保持」や「ユーザー識別」といった機能をそのままでは実現できないという制約も生みます。"
+          },
+          {
+            "type": "p",
+            "text": "そこで登場するのが Cookie や Session といった仕組みです。これらはHTTP自体の仕様ではなく、ステートレスなHTTPの上で「状態を擬似的に管理するための仕組み」として設計されています。"
+          },
+          {
+            "type": "p",
+            "text": "Cookieとは、サーバーがクライアント（ブラウザ）に保存させる小さなデータのことです。ブラウザは次回以降のリクエスト時に、そのCookieを自動的にサーバーへ送り返します。これにより、サーバー側は『同じクライアントからのアクセスである』と識別できます。"
+          },
+          {
+            "type": "p",
+            "text": "Sessionは、サーバー側でユーザーごとの状態を保持する仕組みです。一般的には、CookieにはセッションIDのみを保存し、実際のユーザー情報（ログイン状態や権限など）はサーバー側のメモリやデータベースに保存されます。これにより、HTTPが本来持たない「状態」をアプリケーションレベルで管理できます。"
+          },
+          {
+            "type": "p",
+            "text": "つまり、HTTPは本質的にステートレスである一方、CookieやSessionといった仕組みを組み合わせることで、ログイン機能やユーザーごとの継続的な体験を実現しています。FastAPIを含む多くのWebフレームワークは、この考え方を前提に設計されています。"
+          },
+          {
+            "type": "p",
+            "text": "④ 短い接続（短命な通信）であること\nHTTP通信は基本的に「1リクエスト＝1レスポンス」で完結します。通信が完了すると接続は終了し、次のリクエストでは新たな接続が作られます（HTTP/1.1以降ではKeep-Aliveなどの最適化はありますが、論理的には独立した通信です）。"
+          },
+          {
+            "type": "p",
+            "text": "この性質により、HTTPは大量のクライアントからの同時アクセスを効率よく処理できます。一方で、リアルタイム性が求められる場面ではWebSocketなど別の通信方式が利用されます。FastAPIがWebSocketをサポートしている理由も、ここにあります。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、HTTPは「シンプル・ステートレス・リクエスト駆動」という思想を持つプロトコルであり、この性質を理解することがWebアプリケーション設計の基礎となります。FastAPIはこのHTTPの性質を前提として、高速かつ安全なAPI構築を可能にしています。"
           }
         ]
       },
       {
-        "id": "async",
-        "title": "非同期処理（async/await）",
-        "summary": "FastAPIはPythonのasync/await構文に完全対応しています。",
+        "id": "http-request-format",
+        "title": "HTTPリクエストの形式",
+        "summary": "HTTPリクエストは単なる文字列の集合であり、リクエストライン・ヘッダー・空行・ボディという4つの要素から構成されます。",
         "content": [
+          {
+            "type": "p",
+            "text": "HTTPリクエストとは、クライアント（ブラウザやAPIクライアント）がサーバーに対して送信する「お願いのメッセージ」です。"
+          },
+          {
+            "type": "p",
+            "text": "このリクエストは、実はただのテキスト（文字列）で構成されています。見た目は単純ですが、Web通信の基本構造がすべて詰まっています。"
+          },
+          {
+            "type": "p",
+            "text": "HTTPリクエストは、大きく分けて次の4つの要素から構成されます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "リクエストライン（Request Line）",
+              "ヘッダー（Headers）",
+              "空行（空白行）",
+              "ボディ（Body）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "まずは、実際のHTTPリクエストの例をそのまま見てみましょう。"
+          },
           {
             "type": "code",
-            "filename": "main.py",
-            "lang": "python",
-            "code": "import asyncio\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/wait\")\nasync def wait_task():\n    await asyncio.sleep(2)\n    return {\"message\": \"2秒待ちました\"}"
+            "filename": "raw_http_request.txt",
+            "lang": "text",
+            "code": "POST /api/users HTTP/1.1\nHost: example.com\nContent-Type: application/json\nContent-Length: 47\nAuthorization: Bearer abcdef123456\n\n{\n  \"name\": \"Alice\",\n  \"age\": 20\n}"
           },
           {
             "type": "p",
-            "text": "非同期関数を使うと、複数リクエストを同時に効率的に処理できます。特にI/O処理（API呼び出しやDBアクセス）で性能差が大きくなります。"
-          }
-        ]
-      },
-      {
-        "id": "dependency",
-        "title": "依存性注入（Dependency Injection）",
-        "summary": "FastAPIの強力な機能である依存性注入を使って、共通処理や認証を整理します。",
-        "content": [
-          {
-            "type": "code",
-            "filename": "main.py",
-            "lang": "python",
-            "code": "from fastapi import Depends, FastAPI\n\napp = FastAPI()\n\ndef common_parameters(q: str | None = None):\n    return {\"q\": q}\n\n@app.get(\"/items/\")\ndef read_items(commons: dict = Depends(common_parameters)):\n    return commons"
+            "text": "これが1つのHTTPリクエストです。見た目は単なるテキストですが、行ごとに明確な意味があります。"
           },
           {
             "type": "p",
-            "text": "`Depends()` を使うと、共通のロジック（例：認証・DB接続・ロギングなど）を整理して再利用できます。"
-          }
-        ]
-      },
-      {
-        "id": "summary",
-        "title": "まとめ：FastAPIの魅力",
-        "summary": "FastAPIはPython開発者にとって強力かつ簡潔なAPIフレームワークです。",
-        "content": [
+            "text": "① リクエストライン（Request Line）\n\nPOST /api/users HTTP/1.1\n\nこの1行目をリクエストラインと呼びます。"
+          },
+          {
+            "type": "p",
+            "text": "リクエストラインは次の3つの要素で構成されます。"
+          },
           {
             "type": "ul",
             "items": [
-              "型ヒントに基づく高い開発効率と安全性",
-              "非同期処理に最適化された設計",
-              "自動生成されるドキュメント",
-              "Pydanticによる強力なデータバリデーション",
-              "依存性注入によりスケーラブルな設計が可能"
+              "HTTPメソッド（例：GET / POST / PUT / DELETE）",
+              "パス（例：/api/users）",
+              "HTTPバージョン（例：HTTP/1.1）"
             ]
           },
           {
             "type": "p",
-            "text": "FastAPIは、モダンなWeb API開発の標準になりつつあります。次のステップとして、データベース連携・認証・Dockerデプロイなどの実践的な内容に進みましょう。"
+            "text": "この行は、「HTTP/1.1 を使って /api/users に対して POST リクエストを送る」という意味になります。"
+          },
+          {
+            "type": "p",
+            "text": "② ヘッダー（Headers）\n\nリクエストラインの次には、ヘッダーが続きます。ヘッダーはリクエストに関する補足情報を表します。"
+          },
+          {
+            "type": "code",
+            "filename": "headers_example.txt",
+            "lang": "text",
+            "code": "Host: example.com\nContent-Type: application/json\nContent-Length: 47\nAuthorization: Bearer abcdef123456"
+          },
+          {
+            "type": "p",
+            "text": "ヘッダーには次のような情報が含まれます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Host：どのドメイン宛てのリクエストかを示す",
+              "Content-Type：ボディのデータ形式を示す",
+              "Content-Length：ボディのサイズ（バイト数）",
+              "Authorization：認証情報（トークンなど）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "ヘッダーは1行につき1つの情報を持ち、必要に応じて増減します。"
+          },
+          {
+            "type": "p",
+            "text": "③ 空行（重要）\n\nヘッダーの最後には必ず1行の空行が入ります。"
+          },
+          {
+            "type": "p",
+            "text": "この空行は「ここまでがヘッダーで、ここからがボディである」という区切りを示します。"
+          },
+          {
+            "type": "p",
+            "text": "この空行がないと、サーバーはどこからがボディなのかを正しく判断できません。"
+          },
+          {
+            "type": "p",
+            "text": "④ ボディ（Body）\n\nボディは、サーバーに送信したい実際のデータそのものです。"
+          },
+          {
+            "type": "code",
+            "filename": "body_example.json",
+            "lang": "json",
+            "code": "{\n  \"name\": \"Alice\",\n  \"age\": 20\n}"
+          },
+          {
+            "type": "p",
+            "text": "ボディは主に POST / PUT / PATCH リクエストで使用されます。JSON・フォームデータ・ファイルなど、用途に応じた形式が存在します。"
+          },
+          {
+            "type": "p",
+            "text": "一方で、GET リクエストには通常ボディは含まれません。HTTP仕様上、GET にボディを含めることは禁止されてはいませんが、多くのサーバー・フレームワーク・ブラウザがこれを想定しておらず、実運用では使われません。"
+          },
+          {
+            "type": "p",
+            "text": "そのため、GET リクエストでデータを送る場合は、URL のクエリパラメータ（?key=value の形式）を使用します。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPI でも同様に、GET リクエストではクエリパラメータを使い、POST や PUT ではリクエストボディを使う、という設計が推奨されています。"
+          },
+          {
+            "type": "p",
+            "text": "⑤ 全体のまとめ\n\nHTTPリクエストとは、「どこに」「何をしてほしいか」をリクエストラインで示し、「どのような情報か」をヘッダーで補足し、「実際のデータ」をボディで送る仕組みです。"
+          },
+          {
+            "type": "p",
+            "text": "特に GET リクエストはボディを持たず、状態を変更しない参照操作として設計されている点を理解することが、正しいAPI設計の第一歩となります。"
+          }
+        ]
+      },
+      {
+        "id": "http-response-format",
+        "title": "HTTPレスポンスの形式",
+        "summary": "HTTPレスポンスはサーバーからクライアントへ返されるメッセージであり、ステータスライン・ヘッダー・空行・ボディの4つの要素で構成されます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "HTTPレスポンスとは、クライアントからのリクエストに対してサーバーが返す「応答メッセージ」です。ブラウザが画面を表示できるのは、このレスポンスを受け取って内容を解釈しているからです。"
+          },
+          {
+            "type": "p",
+            "text": "HTTPレスポンスもリクエストと同様に、単なるテキストの集合で構成されています。構造は大きく4つの要素に分かれます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "ステータスライン（Status Line）",
+              "ヘッダー（Headers）",
+              "空行（空白行）",
+              "ボディ（Body）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "まずは、典型的なHTTPレスポンスの例を見てみましょう。"
+          },
+          {
+            "type": "code",
+            "filename": "raw_http_response.txt",
+            "lang": "text",
+            "code": "HTTP/1.1 200 OK\nContent-Type: application/json\nContent-Length: 56\n\n{\n  \"id\": 1,\n  \"name\": \"Alice\",\n  \"age\": 20\n}"
+          },
+          {
+            "type": "p",
+            "text": "これが1つのHTTPレスポンスです。ここから各構成要素を順番に見ていきます。"
+          },
+          {
+            "type": "p",
+            "text": "① ステータスライン（Status Line）\n\nHTTP/1.1 200 OK\n\nこの1行目をステータスラインと呼びます。"
+          },
+          {
+            "type": "p",
+            "text": "ステータスラインは次の3つの要素で構成されます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "HTTPバージョン（HTTP/1.1）",
+              "ステータスコード（200）",
+              "ステータスメッセージ（OK）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "ステータスコードは、リクエストの処理結果を数値で表します。200 は「正常に処理された」ことを意味します。"
+          },
+          {
+            "type": "p",
+            "text": "ステータスメッセージ（OK など）は人間向けの補足情報であり、プログラム上の処理では主にステータスコードが利用されます。"
+          },
+          {
+            "type": "p",
+            "text": "② ヘッダー（Headers）\n\nステータスラインの次に続くのがヘッダーです。レスポンスに関する補足情報が含まれます。"
+          },
+          {
+            "type": "code",
+            "filename": "response_headers.txt",
+            "lang": "text",
+            "code": "Content-Type: application/json\nContent-Length: 56"
+          },
+          {
+            "type": "p",
+            "text": "主なレスポンスヘッダーの意味は以下の通りです。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Content-Type：レスポンスボディのデータ形式",
+              "Content-Length：ボディのサイズ（バイト数）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "レスポンスヘッダーは、クライアントがレスポンスの内容を正しく解釈するための補助情報を提供します。"
+          },
+          {
+            "type": "p",
+            "text": "③ 空行（重要）\n\nヘッダーの後には必ず1行の空行が入ります。この空行が「ここまでがヘッダーで、ここからがボディである」という境界を示します。"
+          },
+          {
+            "type": "p",
+            "text": "④ ボディ（Body）\n\nボディは、サーバーがクライアントに返したい実際のデータ本体です。"
+          },
+          {
+            "type": "code",
+            "filename": "response_body.json",
+            "lang": "json",
+            "code": "{\n  \"id\": 1,\n  \"name\": \"Alice\",\n  \"age\": 20\n}"
+          },
+          {
+            "type": "p",
+            "text": "JSON形式のレスポンスでは、クライアント（ブラウザやアプリケーション）はこのデータを解析して画面表示や処理を行います。"
+          },
+          {
+            "type": "p",
+            "text": "HTTPレスポンスは、クライアントが送ったリクエストに対する「結果」を表すものであり、サーバーが何をしたかを明確に示します。"
+          },
+          {
+            "type": "p",
+            "text": "⑤ 全体のまとめ\n\nHTTPレスポンスは「処理結果を伝えるメッセージ」であり、ステータスラインで結果の概要を示し、ヘッダーで補足情報を伝え、ボディで実際のデータを返します。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、このレスポンス生成をフレームワークが自動的に行い、開発者は返したいデータをPythonオブジェクトとして返すだけで済むようになっています。"
+          }
+        ]
+      }      
+      
+    ]
+  },
+  {
+    "key": "application-patterns",
+    "title": "アプリケーションの運用・開発パターン（応用モード）",
+    "lessons": [
+      {
+        "id": "separated-vs-nonseparated",
+        "title": "分離式と非分離式",
+        "summary": "非分離式ではサーバーがデータ取得とHTML生成を一括で行い、完成したHTMLを返します。分離式ではフロントエンド（静的配信）とバックエンド（データ提供）が分かれ、ブラウザ上のJavaScriptがHTMLとデータを組み合わせて画面を構築します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "本節では、Webアプリケーションの代表的な開発方式である「非分離式」と「分離式」について、実際の実行フロー（ユーザーの操作から画面表示までの流れ）に沿って整理します。"
+          },
+          {
+            "type": "p",
+            "text": "■ 非分離式の実行フロー\n非分離式では、サーバーは1台（1つのアプリケーション）として動作します。ユーザーがブラウザからサーバーへリクエストを送ると、サーバーはそのリクエスト内容に基づいてデータベースから必要なデータを検索します。次に、そのデータをHTMLテンプレートに埋め込み（データをページに“镶嵌”するイメージ）、完成したHTMLページ全体をブラウザへ返します。ブラウザは受け取った完成済みのHTMLをそのまま表示するため、画面生成は基本的にサーバー側で完結します。"
+          },
+          {
+            "type": "p",
+            "text": "▼ 非分離式（モノリシック）実行フロー図"
+          },
+          {
+            "type": "code",
+            "filename": "monolithic_diagram.txt",
+            "lang": "text",
+            "code": "┌──────────────┐\n│   ブラウザ    │\n│（ユーザー）   │\n└──────┬───────┘\n       │ HTTPリクエスト\n       ▼\n┌────────────────────────────┐\n│        Webサーバー           │\n│  （アプリケーション本体）     │\n│                            │\n│  ・リクエスト受信             │\n│  ・DBから必要データ取得       │\n│  ・HTMLテンプレートへ埋め込み │\n│  ・完成HTMLを生成            │\n│                            │\n│  ┌──────────────┐         │\n│  │ データベース │         │\n│  └──────────────┘         │\n└──────────┬────────────────┘\n           │ 完成したHTML（ページ全体）\n           ▼\n┌──────────────┐\n│   ブラウザ    │\n│（完成画面表示）│\n└──────────────┘"
+          },
+          {
+            "type": "p",
+            "text": "■ 分離式の実行フロー\n分離式では、バックエンドサーバーとフロントエンドサーバーが分かれています。フロントエンドサーバーは基本的に静的なサーバーであり、HTML（およびCSS・JavaScriptなどの静的ファイル）を配信します。一方、バックエンドサーバーはデータを担当し、必要なデータをデータベースから取得して返す役割を持ちます。"
+          },
+          {
+            "type": "p",
+            "text": "ユーザーがブラウザ上のページから何らかの操作を行い、データが必要になるタイミングでリクエストが発生すると、バックエンドサーバーがデータベースからデータを取り出して返します。同時に、フロントエンド側が提供しているHTML（および画面の雛形）と、そのデータがブラウザ上で合流し、ブラウザ上で動作するJavaScriptが両者を組み合わせて画面を構築します。つまり、分離式では「画面の組み立て（表示の完成）」がブラウザ側のJavaScriptで行われる点が特徴です。"
+          },
+          {
+            "type": "p",
+            "text": "▼ 分離式（フロントエンド・バックエンド分離）実行フロー図"
+          },
+          {
+            "type": "code",
+            "filename": "separated_diagram.txt",
+            "lang": "text",
+            "code": "          （最初のアクセス）\n┌──────────────┐\n│   ブラウザ    │\n└──────┬───────┘\n       │ HTML / JS / CSS（静的ファイル）\n       ▼\n┌──────────────────────┐\n│  フロントエンドサーバー │\n│（静的ファイル配信）    │\n└─────────┬──────────┘\n          │ ブラウザでJavaScriptが実行される\n          ▼\n   ┌──────────────────┐\n   │   ブラウザ内JS    │\n   │（画面制御・通信） │\n   └─────────┬────────┘\n             │ データ取得のためのリクエスト\n             ▼\n┌──────────────────────┐\n│   バックエンドサーバー │\n│（データ担当：API等）   │\n│  ・DBからデータ取得    │\n│  ・データを返す         │\n└─────────┬──────────┘\n          │ データ（例：JSON）\n          ▼\n   ┌──────────────────┐\n   │   ブラウザ内JS    │\n   │ HTMLとデータを組合せ│\n   │ 画面を完成させる   │\n   └──────────────────┘"
+          },
+          {
+            "type": "p",
+            "text": "このように、非分離式は「サーバーがデータ取得からHTML生成までをまとめて行い、完成したHTMLを返す」方式であり、分離式は「フロントエンド（静的配信）とバックエンド（データ提供）が分かれ、ブラウザ上でHTMLとデータをJavaScriptが組み合わせて画面を作る」方式です。"
+          },
+          {
+            "type": "p",
+            "text": "分離式の構成では、バックエンドはデータ提供に特化し、フロントエンドは画面の雛形や表示ロジックを担当します。その結果、画面変更とデータ処理を別々に開発・運用しやすくなる一方、API通信や認証など、設計上考えるべきポイントが増えることもあります。"
           }
         ]
       }
     ]
   }
+  
+  
+  
   
   
   
