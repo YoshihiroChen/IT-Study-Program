@@ -743,7 +743,186 @@ const CURRICULUM: Chapter[] = [
             "text": "次の節では、FastAPIでリクエストパラメータやパスパラメータをどのように受け取るかを学びます。"
           }
         ]
+      },
+      {
+        "id": "fastapi-path-params",
+        "title": "パスパラメータ（Path Parameters）",
+        "summary": "URLの一部を変数として受け取り、リクエストごとに異なるデータを返す仕組みを学びます。FastAPIではパスパラメータを関数引数として受け取り、型注釈によって自動検証も行われます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "パスパラメータ（Path Parameters）とは、URLの一部を「変数」として扱い、アクセスされた値に応じて処理を変える仕組みです。たとえば、ユーザーIDや記事IDなど、対象リソースを識別する番号をURLに含めたい場合に使われます。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、次のようなURLを考えます。\n\n・/users/1\n・/users/2\n・/users/999\n\nこのとき、末尾の数字（1や2や999）をパスパラメータとして受け取り、ユーザー情報を返すAPIを作りたい、というのが典型的な用途です。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、URLパスの中で `{}` を使ってパスパラメータを定義します。そして、同じ名前の引数を関数に用意すると、その値が自動的に渡されます。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# 例：/users/1 のようにURL末尾の数字を user_id として受け取る\n@app.get(\"/users/{user_id}\")\ndef get_user(user_id: int):\n    return {\n        \"user_id\": user_id,\n        \"message\": f\"user_id={user_id} のユーザー情報を返します\"\n    }"
+          },
+          {
+            "type": "p",
+            "text": "この例では、`@app.get(\"/users/{user_id}\")` により、`/users/〇〇` という形式のURLへのGETアクセスを受け付けます。`{user_id}` の部分が変数になっており、ここに入った値が関数 `get_user` の引数 `user_id` に渡されます。"
+          },
+          {
+            "type": "p",
+            "text": "重要なのは、関数引数に `user_id: int` と型注釈を書いている点です。FastAPIはこの型注釈を使って、受け取った値を自動的に変換・検証します。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、次のURLにアクセスすると：\n\nGET /users/123\n\nFastAPIは `{user_id}` に入った文字列 \"123\" を int に変換し、関数には `user_id=123`（整数）として渡します。"
+          },
+          {
+            "type": "p",
+            "text": "レスポンスは次のようになります（例）。"
+          },
+          {
+            "type": "code",
+            "filename": "response_example_123.json",
+            "lang": "json",
+            "code": "{\n  \"user_id\": 123,\n  \"message\": \"user_id=123 のユーザー情報を返します\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "では、もし `/users/abc` のように数字ではない文字列を送ったらどうなるでしょうか。"
+          },
+          {
+            "type": "p",
+            "text": "この場合、`user_id: int` に変換できないため、FastAPIは自動的にエラー（バリデーションエラー）を返します。開発者が明示的にif文でチェックしなくても、型注釈にもとづいて入力検証が行われるのがFastAPIの大きな特徴です。"
+          },
+          {
+            "type": "p",
+            "text": "実際には、次のようなエラーが返されます（内容は環境によって多少異なりますが、基本構造は同じです）。"
+          },
+          {
+            "type": "code",
+            "filename": "error_example.json",
+            "lang": "json",
+            "code": "{\n  \"detail\": [\n    {\n      \"type\": \"int_parsing\",\n      \"loc\": [\"path\", \"user_id\"],\n      \"msg\": \"Input should be a valid integer\",\n      \"input\": \"abc\"\n    }\n  ]\n}"
+          },
+          {
+            "type": "p",
+            "text": "このエラーは、どこで（loc）、何が（msg）問題だったのかが構造化されて返るため、API利用者にとっても非常に分かりやすい形式になります。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、パスパラメータは「URLの一部を変数として受け取る仕組み」であり、FastAPIでは `{}` と関数引数を対応させることで自然に受け取れます。さらに型注釈によって自動変換と自動検証が行われるため、堅牢で読みやすいAPIを作りやすくなります。"
+          }
+        ]
+      },
+      {
+        "id": "fastapi-query-params",
+        "title": "クエリパラメータ（Query Parameters / リクエストパラメータ）",
+        "summary": "URLの末尾に `?key=value` 形式で付けるクエリパラメータを学びます。FastAPIでは関数引数として受け取り、型注釈により自動変換・自動検証が行われます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "クエリパラメータ（Query Parameters）とは、URLの末尾に `?key=value` の形で付ける追加情報です。日本語では「リクエストパラメータ」と呼ばれることもあります。主に「検索条件」「並び替え」「ページング」「フィルタ」など、同じリソースに対して条件を変えて取得したいときに使われます。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、ユーザー一覧を取得するAPIを考えると、次のような要求がよくあります。\n\n・アクティブなユーザーだけを取得したい\n・最大で何件返すかを指定したい\n・検索キーワードで絞り込みたい"
+          },
+          {
+            "type": "p",
+            "text": "このようなときに、URLパス自体（/users や /users/1）は変えずに、条件をクエリパラメータで渡します。"
+          },
+          {
+            "type": "p",
+            "text": "例：\n\n・GET /users?limit=10\n・GET /users?active=true\n・GET /users?keyword=alice&limit=5"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、関数引数として定義したパラメータが、パスに含まれていない場合は基本的にクエリパラメータとして扱われます。以下のコードでは、ユーザー一覧を取得する `/users` を作り、クエリパラメータで絞り込み条件を受け取る例を示します。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# 例：/users?limit=10&active=true&keyword=alice\n@app.get(\"/users\")\ndef list_users(limit: int = 10, active: bool = False, keyword: str | None = None):\n    return {\n        \"limit\": limit,\n        \"active\": active,\n        \"keyword\": keyword,\n        \"message\": \"指定された条件でユーザー一覧を返す想定です\"\n    }"
+          },
+          {
+            "type": "p",
+            "text": "この例では、`/users` というパスに対してGETリクエストを受け付けます。関数 `list_users` の引数がそのままクエリパラメータになります。"
+          },
+          {
+            "type": "p",
+            "text": "それぞれの引数の意味は次の通りです。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`limit: int = 10`：返す件数の上限。指定がない場合はデフォルトで10。",
+              "`active: bool = False`：アクティブユーザーのみ返すかどうか。指定がない場合はFalse。",
+              "`keyword: str | None = None`：検索キーワード。指定がない場合はNone（絞り込みなし）。"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "ここで重要なのは、引数に「デフォルト値」を設定している点です。デフォルト値があるパラメータは必須ではなく、指定がなければその値が使われます。"
+          },
+          {
+            "type": "p",
+            "text": "実際に次のようなアクセスをすると：\n\nGET /users\n\nクエリパラメータが何も指定されていないため、デフォルト値が使われます。"
+          },
+          {
+            "type": "p",
+            "text": "このときのレスポンス例は次のようになります。"
+          },
+          {
+            "type": "code",
+            "filename": "response_default.json",
+            "lang": "json",
+            "code": "{\n  \"limit\": 10,\n  \"active\": false,\n  \"keyword\": null,\n  \"message\": \"指定された条件でユーザー一覧を返す想定です\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "次に、条件を指定してアクセスしてみます。\n\nGET /users?limit=5&active=true&keyword=alice"
+          },
+          {
+            "type": "p",
+            "text": "この場合、FastAPIはクエリ文字列から値を読み取り、型注釈に従って自動的に変換します。つまり、`limit` は文字列 \"5\" ではなく整数 5 として、`active` は文字列 \"true\" ではなく真偽値 True として関数に渡されます。"
+          },
+          {
+            "type": "p",
+            "text": "レスポンス例は次の通りです。"
+          },
+          {
+            "type": "code",
+            "filename": "response_with_params.json",
+            "lang": "json",
+            "code": "{\n  \"limit\": 5,\n  \"active\": true,\n  \"keyword\": \"alice\",\n  \"message\": \"指定された条件でユーザー一覧を返す想定です\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "もし `limit=abc` のように数値ではない値が渡された場合、`limit: int` に変換できないため、FastAPIは自動的にバリデーションエラーを返します。開発者が手作業でチェックしなくても、型注釈に基づいて入力検証が行われる点がFastAPIの強みです。"
+          },
+          {
+            "type": "p",
+            "text": "パスパラメータとの使い分けを整理すると次の通りです。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "パスパラメータ：リソースを一意に特定する（例：/users/1 の `1`）",
+              "クエリパラメータ：同じリソースに条件を付ける（例：/users?limit=10）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "まとめると、クエリパラメータは「検索条件や絞り込み条件をURLで渡す仕組み」であり、FastAPIでは関数引数として自然に受け取れます。さらに型注釈により自動変換・自動検証が行われるため、安全で読みやすいAPI設計につながります。"
+          }
+        ]
       }
+      
+      
     ]
   }
   
