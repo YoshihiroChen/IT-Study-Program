@@ -1405,7 +1405,161 @@ const CURRICULUM: Chapter[] = [
             "text": "まとめると、フォームデータは「見た目はクエリパラメータに近いが、送信場所はリクエストボディ」であり、FastAPIでは `Form()` を使って明示的に受け取ります。HTMLフォームとFastAPIをつなぐ際の基本となる重要な仕組みです。"
           }
         ]
+      },
+      {
+        "id": "fastapi-file-upload",
+        "title": "ファイルアップロード（File Upload）",
+        "summary": "HTMLフォームなどから送信されるファイルデータを FastAPI で受け取る方法を学びます。`File()` を使ってファイルをバイト列として受け取る基本形を理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の小節では、HTML の form タグから送信される「フォームデータ（Form Data）」を `Form()` で受け取る方法を学びました。フォームでは、テキスト情報だけでなく、ファイル（画像・PDF・CSVなど）を一緒に送信することもできます。"
+          },
+          {
+            "type": "p",
+            "text": "このような「ファイルデータ」を FastAPI で受け取る場合に使うのが `File()` です。フォームデータと同様に、リクエストボディに含まれるデータですが、ファイル専用の型として明示的に指定します。"
+          },
+          {
+            "type": "p",
+            "text": "まず、FastAPI でファイルアップロードを扱うためには、`File` をインポートします。"
+          },
+          {
+            "type": "code",
+            "filename": "import_example.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, File"
+          },
+          {
+            "type": "p",
+            "text": "次に、エンドポイントの関数引数として `file: bytes = File()` のように書くことで、アップロードされたファイルを「バイト列（bytes）」として受け取ることができます。"
+          },
+          {
+            "type": "p",
+            "text": "以下は、最もシンプルなファイルアップロードの例です。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, File\n\napp = FastAPI()\n\n\n@app.post(\"/upload\")\ndef upload_file(file: bytes = File()):\n    return {\n        \"file_size\": len(file),\n        \"message\": \"ファイルを受け取りました\"\n    }"
+          },
+          {
+            "type": "p",
+            "text": "このコードでは、`file: bytes = File()` によって、アップロードされたファイル全体をバイト列としてメモリ上に読み込みます。`len(file)` を使えば、ファイルサイズ（バイト数）を確認できます。"
+          },
+          {
+            "type": "p",
+            "text": "このエンドポイントは、HTML 側から次のようなフォームで呼び出されることを想定しています。"
+          },
+          {
+            "type": "code",
+            "filename": "upload.html",
+            "lang": "html",
+            "code": "<form action=\"/upload\" method=\"post\" enctype=\"multipart/form-data\">\n  <input type=\"file\" name=\"file\" />\n  <button type=\"submit\">Upload</button>\n</form>"
+          },
+          {
+            "type": "p",
+            "text": "ここで重要なのは、`enctype=\"multipart/form-data\"` が指定されている点です。ファイルアップロードでは、この形式でなければブラウザはファイルを送信できません。"
+          },
+          {
+            "type": "p",
+            "text": "また、`name=\"file\"` の値と、FastAPI 側の引数名 `file` が一致している必要があります。これにより、FastAPI は正しくファイルデータを対応付けます。"
+          },
+          {
+            "type": "p",
+            "text": "なお、`file: bytes = File()` は「小さめのファイル」を扱う場合に向いています。ファイル全体を一度にメモリに読み込むため、大きなファイルには注意が必要です。"
+          },
+          {
+            "type": "p",
+            "text": "ここまでが、単一ファイルをアップロードする場合の基本的な使い方です。"
+          },
+          {
+            "type": "p",
+            "text": "次に、複数のファイルを同時にアップロードする方法を見ていきます。Webアプリケーションでは、画像をまとめて送信したり、複数の添付ファイルを一度にアップロードしたいケースがよくあります。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、`File()` を使った引数を「リスト型（list[bytes]）」にすることで、複数ファイルを受け取ることができます。"
+          },
+          {
+            "type": "code",
+            "filename": "main_multiple_files.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, File\nfrom typing import List\n\napp = FastAPI()\n\n\n@app.post(\"/upload-multiple\")\ndef upload_multiple_files(files: List[bytes] = File()):\n    return {\n        \"file_count\": len(files),\n        \"file_sizes\": [len(f) for f in files],\n        \"message\": \"複数のファイルを受け取りました\"\n    }"
+          },
+          {
+            "type": "p",
+            "text": "この例では、`files: List[bytes] = File()` と書くことで、「同じ名前のファイル項目が複数送られてくる」ことを想定しています。FastAPIはそれらを自動的にリストとしてまとめて渡します。"
+          },
+          {
+            "type": "p",
+            "text": "ここからは、より実務向けの方法である `UploadFile` を使ったファイルアップロードについて説明します。"
+          },
+          {
+            "type": "p",
+            "text": "`UploadFile` は、ファイルをメモリに一括で読み込まず、ストリームとして扱える仕組みです。そのため、大きなファイルや実運用環境では、`bytes` よりも `UploadFile` を使うことが推奨されます。"
+          },
+          {
+            "type": "p",
+            "text": "まず、`UploadFile` を使う場合は次のようにインポートします。"
+          },
+          {
+            "type": "code",
+            "filename": "import_uploadfile.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, File, UploadFile"
+          },
+          {
+            "type": "p",
+            "text": "次に、関数引数を `file: UploadFile = File()` の形で定義します。"
+          },
+          {
+            "type": "code",
+            "filename": "main_uploadfile.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, File, UploadFile\n\napp = FastAPI()\n\n\n@app.post(\"/upload-stream\")\ndef upload_file_stream(file: UploadFile = File()):\n    return {\n        \"filename\": file.filename,\n        \"content_type\": file.content_type,\n        \"message\": \"UploadFile としてファイルを受け取りました\"\n    }"
+          },
+          {
+            "type": "p",
+            "text": "`UploadFile` を使うと、次のような情報にアクセスできます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`file.filename`：アップロードされたファイル名",
+              "`file.content_type`：MIMEタイプ（例：image/png）",
+              "`file.file`：内部的なファイルオブジェクト（ストリーム）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "例えば、ファイル内容を読み取りたい場合は、次のようにします。"
+          },
+          {
+            "type": "code",
+            "filename": "read_uploadfile.py",
+            "lang": "python",
+            "code": "contents = file.file.read()"
+          },
+          {
+            "type": "p",
+            "text": "このように `UploadFile` は、ファイルサイズが大きくなる可能性がある場合や、本番環境での運用を想定する場合に非常に重要な選択肢です。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、FastAPI では次のように使い分けます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`bytes = File()`：小さなファイル・学習用・簡単な用途",
+              "`UploadFile = File()`：大きなファイル・実務・本番向け"
+            ]
+          }
+        ]
       }
+      
+      
       
       
       
