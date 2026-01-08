@@ -1143,7 +1143,190 @@ const CURRICULUM: Chapter[] = [
             "text": "まとめると、FastAPIにおけるリクエストボディ処理の基本は「BaseModelでデータ構造を定義し、それを関数引数として受け取る」ことです。これにより、型安全で保守性の高いAPIを簡潔に実装できます。"
           }
         ]
+      },
+      {
+        "id": "fastapi-request-body-custom-validation",
+        "title": "リクエストボディの追加バリデーション：BaseModelに自作検証関数を追加する",
+        "summary": "BaseModelは型チェックだけでなく、自分で書いた関数（バリデータ）で入力内容を追加検証できます。ここでは前の小節の UserCreate を拡張し、「name は英字のみ」などの独自ルールを適用する方法を学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の小節では、リクエストボディを `BaseModel` で受け取り、型注釈によって自動的に検証できることを学びました。ただし実務では、型が合っているだけでは不十分なことが多いです。例えば、`name` が文字列であっても「英字のみ」などの追加ルールを課したい場合があります。"
+          },
+          {
+            "type": "p",
+            "text": "このような「型以外の独自ルール」をチェックしたいときに使うのが、BaseModelにバリデーション関数（自作検証関数）を追加する方法です。Pydanticでは、フィールドごとに検証関数を紐付けることができます。"
+          },
+          {
+            "type": "p",
+            "text": "ここでは前の小節の例をそのまま拡張し、`UserCreate` に次のルールを追加します。\n\n・name：英字のみ許可（例：Alice はOK、Alice123 はNG）\n・age：0より大きく、100未満（0 < age < 100）\n\n※ age の範囲は Field でも表現できますが、ここでは「自作関数で検証する」例として扱います。"
+          },
+          {
+            "type": "p",
+            "text": "まず、`UserCreate` を定義している BaseModel を更新します。Pydantic v2 では `@field_validator` を使って、特定のフィールドに対する検証関数を定義できます。"
+          },
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from pydantic import BaseModel, field_validator\n\n\nclass UserCreate(BaseModel):\n    name: str\n    age: int\n    email: str\n\n    # name に対する独自バリデーション（英字のみ）\n    @field_validator(\"name\")\n    @classmethod\n    def validate_name(cls, v: str) -> str:\n        if not v.isalpha():\n            raise ValueError(\"name は英字のみ許可されます（例：Alice）\")\n        return v\n\n    # age に対する独自バリデーション（0 < age < 100）\n    @field_validator(\"age\")\n    @classmethod\n    def validate_age(cls, v: int) -> int:\n        if v <= 0:\n            raise ValueError(\"age は 0 より大きい値である必要があります\")\n        if v >= 100:\n            raise ValueError(\"age は 100 未満である必要があります\")\n        return v"
+          },
+          {
+            "type": "p",
+            "text": "ここでのポイントは次の通りです。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`@field_validator(\"name\")`：name フィールドが検証対象であることを指定する",
+              "検証関数は `@classmethod` として定義し、引数 `v` に入力値が入る",
+              "条件を満たさない場合は `ValueError` を投げる（FastAPIでは 422 エラーになる）",
+              "最後に `return v` を返す（問題ない値として採用する）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "次に、前の小節と同様に、この `UserCreate` をリクエストボディとして受け取るエンドポイントを用意します（ここは前の小節の形を維持します）。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import UserCreate\n\napp = FastAPI()\n\n\n@app.post(\"/users\")\ndef create_user(user: UserCreate):\n    return {\n        \"message\": \"ユーザーを作成しました\",\n        \"user\": user\n    }"
+          },
+          {
+            "type": "p",
+            "text": "このAPIに対して、例えば次のようなリクエストボディを送るとします。"
+          },
+          {
+            "type": "code",
+            "filename": "request_ok.json",
+            "lang": "json",
+            "code": "{\n  \"name\": \"Alice\",\n  \"age\": 25,\n  \"email\": \"alice@example.com\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "この場合、name は英字のみで、age も 0 < age < 100 を満たすため、正常に処理されます。"
+          },
+          {
+            "type": "p",
+            "text": "一方で、次のように name に数字が混ざっていると、`validate_name` が `ValueError` を投げるため、FastAPIは自動的にバリデーションエラー（422）を返します。"
+          },
+          {
+            "type": "code",
+            "filename": "request_ng_name.json",
+            "lang": "json",
+            "code": "{\n  \"name\": \"Alice123\",\n  \"age\": 25,\n  \"email\": \"alice@example.com\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "また age についても、次のように 0 や 100 以上を送ると `validate_age` がエラーを返し、同様に 422 になります。"
+          },
+          {
+            "type": "code",
+            "filename": "request_ng_age.json",
+            "lang": "json",
+            "code": "{\n  \"name\": \"Alice\",\n  \"age\": 0,\n  \"email\": \"alice@example.com\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "このように、BaseModelに自作の検証関数を追加すると「型は合っているが内容として不正」な入力を確実に弾けるようになります。フォーム入力の品質を守りたい場面や、APIの仕様を厳密にしたい場面で非常に重要なテクニックです。"
+          }
+        ]
+      },
+      {
+        "id": "fastapi-request-body-nested-model",
+        "title": "ネストした BaseModel による型検証（Nested Models）",
+        "summary": "BaseModel は他の BaseModel をフィールドとして持つことができます。これにより、JSONの入れ子構造をそのまま型として表現し、階層ごとに自動バリデーションを行えます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "これまでの例では、リクエストボディのフィールドはすべて `str` や `int` などの単純な型でした。しかし実際のAPIでは、データが入れ子構造（ネスト構造）になっていることがよくあります。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、「ユーザー情報の中に住所情報が含まれている」「注文データの中に複数の商品データが含まれている」といったケースです。このような構造を、FastAPI + Pydantic では BaseModel のネストで自然に表現できます。"
+          },
+          {
+            "type": "p",
+            "text": "ここでは次のようなJSONを受け取るAPIを例にします。ユーザーの中に `address` というオブジェクトが含まれています。"
+          },
+          {
+            "type": "code",
+            "filename": "request_example.json",
+            "lang": "json",
+            "code": "{\n  \"name\": \"Alice\",\n  \"age\": 25,\n  \"email\": \"alice@example.com\",\n  \"address\": {\n    \"country\": \"Japan\",\n    \"city\": \"Tokyo\",\n    \"zipcode\": \"100-0001\"\n  }\n}"
+          },
+          {
+            "type": "p",
+            "text": "まず、ネストされる側のデータ構造を BaseModel として定義します。ここでは住所情報を表す `Address` モデルを作ります。"
+          },
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from pydantic import BaseModel\n\n\nclass Address(BaseModel):\n    country: str\n    city: str\n    zipcode: str"
+          },
+          {
+            "type": "p",
+            "text": "この `Address` は単体でも「国・市区町村・郵便番号」を持つデータ構造として定義されています。次に、この Address を別の BaseModel のフィールドとして利用します。"
+          },
+          {
+            "type": "p",
+            "text": "前の小節で使った `UserCreate` を拡張し、`address` フィールドに `Address` 型を指定します。"
+          },
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from pydantic import BaseModel\n\n\nclass Address(BaseModel):\n    country: str\n    city: str\n    zipcode: str\n\n\nclass UserCreate(BaseModel):\n    name: str\n    age: int\n    email: str\n    address: Address"
+          },
+          {
+            "type": "p",
+            "text": "ここでの重要な点は、`address: Address` という1行です。これにより、「address には Address 型のオブジェクト（JSONオブジェクト）が必ず含まれている」というルールが定義されます。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIはリクエストを受け取ると、まず外側の `UserCreate` を検証し、その途中で `address` フィールドに対して自動的に `Address` の検証も行います。"
+          },
+          {
+            "type": "p",
+            "text": "次に、このモデルをリクエストボディとして受け取るエンドポイントを定義します。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import UserCreate\n\napp = FastAPI()\n\n\n@app.post(\"/users\")\ndef create_user(user: UserCreate):\n    return {\n        \"message\": \"ユーザーを受け取りました\",\n        \"user\": user\n    }"
+          },
+          {
+            "type": "p",
+            "text": "先ほどのJSONをこの `/users` に送信すると、FastAPIは次の処理を自動で行います。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "name・age・email が正しい型かを検証する",
+              "address がオブジェクトであることを確認する",
+              "address の中で country・city・zipcode がすべて存在し、型が正しいかを検証する"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "もし address の中で `zipcode` が欠けていたり、`address` が文字列になっていた場合は、内部の Address モデルの検証でエラーとなり、FastAPIは自動的に 422 エラーを返します。"
+          },
+          {
+            "type": "p",
+            "text": "このように、BaseModel をネストすると、JSONの階層構造そのものを型として表現でき、各階層で厳密な検証を行えます。データが複雑になるほど、この書き方の価値は大きくなります。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、ネストした BaseModel は「構造があるデータ」を安全に受け取るための基本テクニックです。FastAPIでは、モデルを分割して再利用できるため、可読性と保守性の高いAPI設計につながります。"
+          }
+        ]
       }
+      
+      
       
       
       
