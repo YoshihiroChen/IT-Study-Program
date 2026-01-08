@@ -1324,7 +1324,89 @@ const CURRICULUM: Chapter[] = [
             "text": "まとめると、ネストした BaseModel は「構造があるデータ」を安全に受け取るための基本テクニックです。FastAPIでは、モデルを分割して再利用できるため、可読性と保守性の高いAPI設計につながります。"
           }
         ]
+      },
+      {
+        "id": "fastapi-form-data",
+        "title": "フォームデータ（Form Data）の受け取り",
+        "summary": "HTMLの form タグなどから送信されるフォームデータ（application/x-www-form-urlencoded / multipart/form-data）を FastAPI で受け取る方法を学びます。JSONとの違いと、Form() の役割を理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "これまでの小節では、リクエストボディとして JSON データを受け取る方法を学んできました。しかし、Webアプリケーションでは今でも「HTMLの form から送信されるデータ」を扱う場面が多く存在します。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、ログイン画面やお問い合わせフォームなどでは、`<form>` タグを使ってデータを送信します。この場合、データは JSON ではなく「フォームデータ（Form Data）」として送られます。"
+          },
+          {
+            "type": "p",
+            "text": "フォームデータの特徴は次の通りです。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "キーと値のペアで送信される（見た目はクエリパラメータに近い）",
+              "HTTPリクエストのボディに含まれる",
+              "Content-Type は application/x-www-form-urlencoded または multipart/form-data"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、フォームデータを受け取るために `Form()` を使います。書き方はクエリパラメータと非常によく似ていますが、「これはフォームデータである」と明示するために `= Form()` を付ける点が重要です。"
+          },
+          {
+            "type": "p",
+            "text": "まずは、最もシンプルな例として、ユーザー名とパスワードをフォームから受け取るAPIを作ってみます。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n\n@app.post(\"/login\")\ndef login(username: str = Form(), password: str = Form()):\n    return {\n        \"username\": username,\n        \"message\": \"ログイン処理を行う想定です\"\n    }"
+          },
+          {
+            "type": "p",
+            "text": "このコードでは、`username: str = Form()` と `password: str = Form()` がフォームデータを受け取る部分です。クエリパラメータと似ていますが、`Form()` を指定することで「リクエストボディ内のフォームデータから値を取り出す」ことをFastAPIに伝えています。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、HTML側では次のようなフォームが送信されることを想定しています。"
+          },
+          {
+            "type": "code",
+            "filename": "login.html",
+            "lang": "html",
+            "code": "<form action=\"/login\" method=\"post\">\n  <input type=\"text\" name=\"username\" />\n  <input type=\"password\" name=\"password\" />\n  <button type=\"submit\">Login</button>\n</form>"
+          },
+          {
+            "type": "p",
+            "text": "このフォームが送信されると、FastAPIはフォームデータの中から `username` と `password` を取り出し、それぞれ関数引数に渡します。"
+          },
+          {
+            "type": "p",
+            "text": "ここで注意点として、フォームデータは JSON のように BaseModel では受け取れません。フォームの場合は、基本的に「フィールドごとに `Form()` を指定する」形になります。"
+          },
+          {
+            "type": "p",
+            "text": "また、フォームデータでも型注釈は有効です。例えば、数値を `int` として受け取れば、自動的に型変換とバリデーションが行われます。"
+          },
+          {
+            "type": "code",
+            "filename": "form_with_type.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, Form\n\napp = FastAPI()\n\n\n@app.post(\"/age\")\ndef submit_age(age: int = Form()):\n    return {\"age\": age}"
+          },
+          {
+            "type": "p",
+            "text": "この場合、フォームから送られた age が数値でなければ、FastAPIは自動的にバリデーションエラー（422）を返します。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、フォームデータは「見た目はクエリパラメータに近いが、送信場所はリクエストボディ」であり、FastAPIでは `Form()` を使って明示的に受け取ります。HTMLフォームとFastAPIをつなぐ際の基本となる重要な仕組みです。"
+          }
+        ]
       }
+      
       
       
       
