@@ -906,6 +906,46 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
+            "text": "ここで、クエリパラメータにおいて重要になるのが `None`、`Union[]`、`Optional[]` の使い方です。これらは「そのパラメータが省略可能である」ことを型として明示するために使われます。"
+          },
+          {
+            "type": "p",
+            "text": "`None` をデフォルト値として指定すると、そのクエリパラメータは必須ではなくなります。例えば `keyword: str | None = None` は、「文字列または None を受け取る」「指定がなければ None になる」という意味です。"
+          },
+          {
+            "type": "p",
+            "text": "Python 3.10 以降では、`str | None` のような書き方が可能ですが、これは内部的には `Union[str, None]` と同じ意味になります。"
+          },
+          {
+            "type": "p",
+            "text": "つまり、次の2つの書き方は意味的に等価です。"
+          },
+          {
+            "type": "code",
+            "filename": "type_union_example.py",
+            "lang": "python",
+            "code": "def example_a(keyword: str | None = None):\n    ...\n\nfrom typing import Union\n\ndef example_b(keyword: Union[str, None] = None):\n    ..."
+          },
+          {
+            "type": "p",
+            "text": "また、`Optional[str]` という書き方もよく使われます。`Optional[str]` は `Union[str, None]` の省略表現であり、「str または None」を意味します。"
+          },
+          {
+            "type": "p",
+            "text": "したがって、FastAPIのクエリパラメータでは、次の3つの書き方はすべて同じ意味になります。"
+          },
+          {
+            "type": "code",
+            "filename": "optional_types_example.py",
+            "lang": "python",
+            "code": "keyword: str | None = None\nkeyword: Union[str, None] = None\nkeyword: Optional[str] = None"
+          },
+          {
+            "type": "p",
+            "text": "これらを使うことで、「指定されてもよいし、されなくてもよいクエリパラメータ」を型レベルで明確に表現できます。FastAPIはこの型情報をもとに、必須・任意の判定やバリデーションを自動的に行います。"
+          },
+          {
+            "type": "p",
             "text": "パスパラメータとの使い分けを整理すると次の通りです。"
           },
           {
@@ -917,10 +957,195 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "まとめると、クエリパラメータは「検索条件や絞り込み条件をURLで渡す仕組み」であり、FastAPIでは関数引数として自然に受け取れます。さらに型注釈により自動変換・自動検証が行われるため、安全で読みやすいAPI設計につながります。"
+            "text": "まとめると、クエリパラメータは「検索条件や絞り込み条件をURLで渡す仕組み」であり、FastAPIでは関数引数として自然に受け取れます。さらに `None`・`Union`・`Optional` を使うことで、省略可能なパラメータを型として明確に表現でき、安全で読みやすいAPI設計につながります。"
+          }
+        ]
+      },
+      
+      {
+        "id": "fastapi-include-router",
+        "title": "include_router と prefix（ルーティング分割の基本）",
+        "summary": "FastAPIの include_router を使うと、ルーティング定義をファイル単位・機能単位で分割でき、コードの見通しと保守性が大きく向上します。prefix を使えば、まとめてURLの共通前置きを付けられます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "FastAPIでAPIが増えてくると、すべてのルーティングを main.py に書き続けるのは現実的ではありません。ファイルが肥大化し、どこに何があるか分かりにくくなり、変更の影響範囲も見えにくくなります。"
+          },
+          {
+            "type": "p",
+            "text": "そこで使うのが `include_router` です。`include_router` は、別ファイルに定義したルーティング（APIRouter）を、アプリ本体（FastAPIインスタンス）に「取り込む」ための仕組みです。"
+          },
+          {
+            "type": "p",
+            "text": "まず、理解しやすいように、以下のような“想定ディレクトリ構成”を作ります。"
+          },
+          {
+            "type": "code",
+            "filename": "project_structure.txt",
+            "lang": "text",
+            "code": "myapp/\n├── main.py\n└── routers/\n    ├── __init__.py\n    ├── users.py\n    └── items.py"
+          },
+          {
+            "type": "p",
+            "text": "ここでは、`routers/` ディレクトリに機能ごとのルーティングを分離します。例えば、ユーザー関連は users.py、商品（またはアイテム）関連は items.py というように分けます。"
+          },
+          {
+            "type": "p",
+            "text": "次に、routers/users.py で `APIRouter` を使ってルーティングを定義します。ポイントは、`app = FastAPI()` は作らず、代わりに `router = APIRouter()` を作ることです。"
+          },
+          {
+            "type": "code",
+            "filename": "routers/users.py",
+            "lang": "python",
+            "code": "from fastapi import APIRouter\n\nrouter = APIRouter()\n\n@router.get(\"/\")\ndef list_users():\n    return {\"message\": \"ユーザー一覧\"}\n\n@router.get(\"/{user_id}\")\ndef get_user(user_id: int):\n    return {\"message\": f\"user_id={user_id} のユーザー詳細\"}"
+          },
+          {
+            "type": "p",
+            "text": "このファイルの中では `@router.get(...)` のように router を使ってルーティングを定義します。つまり、ユーザー関連のエンドポイント定義は users.py に閉じ込められます。"
+          },
+          {
+            "type": "p",
+            "text": "同様に、routers/items.py も用意します。"
+          },
+          {
+            "type": "code",
+            "filename": "routers/items.py",
+            "lang": "python",
+            "code": "from fastapi import APIRouter\n\nrouter = APIRouter()\n\n@router.get(\"/\")\ndef list_items():\n    return {\"message\": \"アイテム一覧\"}\n\n@router.get(\"/{item_id}\")\ndef get_item(item_id: int):\n    return {\"message\": f\"item_id={item_id} のアイテム詳細\"}"
+          },
+          {
+            "type": "p",
+            "text": "ここまでで、users.py と items.py にルーティングを分割できました。しかし、このままでは FastAPI アプリ本体はこれらのルーティングを知らないので、実際には動きません。"
+          },
+          {
+            "type": "p",
+            "text": "そこで main.py で `include_router` を使い、分割したルーティングをアプリに取り込みます。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\n\nfrom routers import users, items\n\napp = FastAPI()\n\napp.include_router(users.router, prefix=\"/users\")\napp.include_router(items.router, prefix=\"/items\")"
+          },
+          {
+            "type": "p",
+            "text": "`app.include_router(users.router, prefix=\"/users\")` は、「users.py の router をアプリに取り込み、すべてのルートに /users を先頭に付ける」という意味です。"
+          },
+          {
+            "type": "p",
+            "text": "この設定により、users.py 内では `@router.get(\"/\")` と書いていても、実際のURLは次のようになります。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "users.py の `@router.get(\"/\")` → GET /users",
+              "users.py の `@router.get(\"/{user_id}\")` → GET /users/{user_id}"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "同様に items.py も、prefix=\"/items\" によって次のURLになります。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "items.py の `@router.get(\"/\")` → GET /items",
+              "items.py の `@router.get(\"/{item_id}\")` → GET /items/{item_id}"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "ここで `prefix` の役割が重要です。`prefix` を使うと、各ルーター内のパス定義をシンプルに保ったまま、URLの階層構造を綺麗に設計できます。"
+          },
+          {
+            "type": "p",
+            "text": "もし prefix を使わずに users.py 側で `/users` を毎回書くと、次のようになりがちです：\n\n@router.get(\"/users\")\n@router.get(\"/users/{user_id}\")\n\nこれでも動きますが、ルーティングが増えるほど重複が増え、管理が大変になります。prefix を使うことで「共通部分は main.py 側で一括管理」「各機能の詳細は routers 配下で管理」という分業が可能になります。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、include_router は「ルーティングを分割して取り込む仕組み」、prefix は「そのルーター群に共通するURLの先頭を一括で付ける仕組み」です。FastAPIで実務的な構成を作るうえで必須の基本テクニックになります。"
+          }
+        ]
+      },
+      {
+        "id": "fastapi-request-body",
+        "title": "リクエストボディ（Request Body）と BaseModel",
+        "summary": "FastAPIでPOSTやPUTリクエストのボディデータを受け取る方法を学びます。PydanticのBaseModelを使うことで、リクエストデータの構造定義・型変換・バリデーションを自動化できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "これまで見てきたパスパラメータやクエリパラメータは、主にURLからデータを受け取る方法でした。一方で、POSTやPUTリクエストでは、より多くのデータをHTTPリクエストの本文（リクエストボディ）に含めて送信するのが一般的です。"
+          },
+          {
+            "type": "p",
+            "text": "例えば「ユーザーを新規作成する」「記事を投稿する」「フォームの内容を送信する」といった処理では、JSON形式のデータをリクエストボディとして送ります。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、リクエストボディの受け取りに Pydantic の `BaseModel` を使います。これにより、リクエストデータの構造を明示的に定義でき、型チェックやバリデーションを自動で行うことができます。"
+          },
+          {
+            "type": "p",
+            "text": "まず、リクエストボディとして受け取りたいデータ構造を `BaseModel` を継承したクラスとして定義します。以下は、ユーザー作成APIの例です。"
+          },
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from pydantic import BaseModel\n\nclass UserCreate(BaseModel):\n    name: str\n    age: int\n    email: str"
+          },
+          {
+            "type": "p",
+            "text": "この `UserCreate` クラスは、「リクエストボディには name（文字列）、age（整数）、email（文字列）が含まれている必要がある」というルールを表しています。"
+          },
+          {
+            "type": "p",
+            "text": "次に、この BaseModel をFastAPIのエンドポイントで使います。関数引数としてBaseModel型を指定すると、FastAPIは自動的にリクエストボディをそのモデルとして解釈します。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import UserCreate\n\napp = FastAPI()\n\n@app.post(\"/users\")\ndef create_user(user: UserCreate):\n    return {\n        \"message\": \"ユーザーを作成しました\",\n        \"user\": user\n    }"
+          },
+          {
+            "type": "p",
+            "text": "ここで重要なのは、`user: UserCreate` という書き方です。この1行だけで、「このエンドポイントはJSON形式のリクエストボディを受け取り、それを UserCreate として扱う」という意味になります。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、次のようなHTTPリクエストを送るとします。"
+          },
+          {
+            "type": "code",
+            "filename": "request_example.json",
+            "lang": "json",
+            "code": "{\n  \"name\": \"Alice\",\n  \"age\": 25,\n  \"email\": \"alice@example.com\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIはこのJSONを読み取り、内部で `UserCreate` のインスタンスを生成します。その際、型の変換や必須項目のチェックが自動的に行われます。"
+          },
+          {
+            "type": "p",
+            "text": "もし `age` が文字列だったり、`email` が欠けていた場合は、エンドポイントの処理が実行される前に、FastAPIが自動的にバリデーションエラーを返します。"
+          },
+          {
+            "type": "p",
+            "text": "この仕組みにより、開発者は「正しいデータが渡ってくる前提」でビジネスロジックを書くことができ、if文だらけの入力チェックを書く必要がなくなります。"
+          },
+          {
+            "type": "p",
+            "text": "また、BaseModelを使うと、OpenAPI（Swagger）ドキュメントにもリクエストボディの構造が自動的に反映されます。そのため、API仕様書を別途手書きする必要もありません。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、FastAPIにおけるリクエストボディ処理の基本は「BaseModelでデータ構造を定義し、それを関数引数として受け取る」ことです。これにより、型安全で保守性の高いAPIを簡潔に実装できます。"
           }
         ]
       }
+      
+      
       
       
     ]
