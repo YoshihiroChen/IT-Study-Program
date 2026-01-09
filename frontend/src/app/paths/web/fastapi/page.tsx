@@ -1557,7 +1557,196 @@ const CURRICULUM: Chapter[] = [
             ]
           }
         ]
+      },
+      {
+        "id": "fastapi-request-object",
+        "title": "Request オブジェクト",
+        "summary": "FastAPI で HTTP リクエスト全体の情報にアクセスするための Request オブジェクトを学びます。URL・ヘッダー・クライアント情報に加え、Cookie の取得方法も理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "これまでの小節では、パスパラメータ、クエリパラメータ、リクエストボディ、フォームデータ、ファイルなど、「リクエストの一部」を関数引数として受け取る方法を学んできました。"
+          },
+          {
+            "type": "p",
+            "text": "しかし実際の開発では、「HTTPリクエスト全体の情報」にアクセスしたい場面も多くあります。例えば、どのURLにアクセスされたのか、どんなヘッダーが付いているのか、クライアントのIPアドレスは何か、といった情報です。"
+          },
+          {
+            "type": "p",
+            "text": "そのために FastAPI が提供しているのが `Request` オブジェクトです。`Request` を使うことで、HTTPリクエストの詳細情報をまとめて扱うことができます。"
+          },
+          {
+            "type": "p",
+            "text": "まず、`Request` を使うためにインポートします。"
+          },
+          {
+            "type": "code",
+            "filename": "import_request.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, Request"
+          },
+          {
+            "type": "p",
+            "text": "FastAPI では、エンドポイント関数の引数に `request: Request` を追加するだけで、現在のHTTPリクエストオブジェクトを受け取ることができます。"
+          },
+          {
+            "type": "code",
+            "filename": "main_basic.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, Request\n\napp = FastAPI()\n\n\n@app.get(\"/info\")\ndef read_request_info(request: Request):\n    return {\n        \"method\": request.method,\n        \"url\": str(request.url)\n    }"
+          },
+          {
+            "type": "p",
+            "text": "この例では、`request.method` で HTTP メソッド（GET / POST など）を、`request.url` でアクセスされたURLを取得しています。"
+          },
+          {
+            "type": "p",
+            "text": "次に、HTTPヘッダーを取得する例を見てみましょう。ヘッダーは `request.headers` から参照できます。"
+          },
+          {
+            "type": "code",
+            "filename": "request_headers.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, Request\n\napp = FastAPI()\n\n\n@app.get(\"/headers\")\ndef read_headers(request: Request):\n    return {\n        \"user_agent\": request.headers.get(\"user-agent\"),\n        \"accept\": request.headers.get(\"accept\")\n    }"
+          },
+          {
+            "type": "p",
+            "text": "`request.headers` は辞書のように扱うことができ、`get()` を使って安全に値を取得できます。ブラウザの種類判定やAPIクライアントの識別などでよく使われます。"
+          },
+          {
+            "type": "p",
+            "text": "また、クライアントのIPアドレスやポート番号などの接続情報は `request.client` から取得できます。"
+          },
+          {
+            "type": "code",
+            "filename": "request_client.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, Request\n\napp = FastAPI()\n\n\n@app.get(\"/client\")\ndef read_client_info(request: Request):\n    return {\n        \"client_host\": request.client.host if request.client else None,\n        \"client_port\": request.client.port if request.client else None\n    }"
+          },
+          {
+            "type": "p",
+            "text": "ここまでで、Request オブジェクトから URL・メソッド・ヘッダー・クライアント情報を取得できることが分かりました。"
+          },
+          {
+            "type": "p",
+            "text": "次に、Cookie の取得方法について説明します。Cookie は、ブラウザが自動的に送信する小さなデータで、ログイン状態の維持やユーザー識別によく使われます。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、Cookie も Request オブジェクトから直接取得できます。Cookie は `request.cookies` に辞書形式で格納されています。"
+          },
+          {
+            "type": "code",
+            "filename": "request_cookies.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI, Request\n\napp = FastAPI()\n\n\n@app.get(\"/cookies\")\ndef read_cookies(request: Request):\n    return {\n        \"session_id\": request.cookies.get(\"session_id\"),\n        \"all_cookies\": request.cookies\n    }"
+          },
+          {
+            "type": "p",
+            "text": "この例では、`request.cookies.get(\"session_id\")` によって、`session_id` という名前の Cookie を取得しています。存在しない場合は `None` になります。"
+          },
+          {
+            "type": "p",
+            "text": "Cookie はクエリパラメータやフォームとは異なり、クライアント（主にブラウザ）が自動的に送信する点が特徴です。そのため、認証・セッション管理・ユーザー追跡などでよく利用されます。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、`Request` オブジェクトは「HTTPリクエスト全体を表すオブジェクト」であり、次のような情報にアクセスできます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "HTTPメソッド（request.method）",
+              "URL情報（request.url）",
+              "ヘッダー（request.headers）",
+              "クライアント情報（request.client）",
+              "Cookie（request.cookies）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、これらを1つの Request オブジェクトからまとめて扱えるため、ログ出力・認証処理・アクセス制御などの実装が非常にシンプルになります。"
+          }
+        ]
+      },
+      {
+        "id": "http-dynamic-vs-static-requests",
+        "title": "動的リクエストと静的リクエストの比較",
+        "summary": "動的リクエスト（ルーティング→処理関数→DBなど）と、静的リクエスト（サーバー上の既存ファイルをそのまま返す）の違いを、処理フロー図で整理します。SSR（非分離）と分離式（API + フロント）も合わせて比較します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "ここまでの小節では、主に「動的リクエスト（Dynamic Request）」を扱ってきました。動的リクエストとは、クライアントからの要求がルーティングに入り、処理関数（エンドポイント）でロジックが実行され、必要に応じてデータベース（DB）などを参照し、結果を生成して返すタイプのリクエストです。"
+          },
+          {
+            "type": "p",
+            "text": "一方で「静的リクエスト（Static Request）」は、サーバー（あるいはCDN）上にすでに存在する“変化しないファイル”を、そのまま返すタイプのリクエストです。例えば、CSS・JavaScript・画像・ビルド済みのHTMLなどが代表例です。"
+          },
+          {
+            "type": "p",
+            "text": "まずは、動的リクエストの代表的な流れを「非分離式（SSR寄り）」と「分離式（API + フロント）」に分けて整理します。"
+          },
+      
+          {
+            "type": "p",
+            "text": "① 動的リクエスト：非分離式（サーバー側でHTMLを組み立てて返す）"
+          },
+          {
+            "type": "code",
+            "filename": "dynamic_ssr_flow.mmd",
+            "lang": "mermaid",
+            "code": "flowchart TD\n  A[Client / Browser] --> B[Server]\n  B --> C[Router / Routing]\n  C --> D[Endpoint / Logic Function]\n  D --> E[Database]\n  E --> D\n  D --> F[HTML生成（テンプレートにデータを埋め込む）]\n  F --> G[Response: HTML（+参照されるCSS/JS）]\n  G --> A"
+          },
+      
+          {
+            "type": "p",
+            "text": "② 動的リクエスト：分離式（フロントとAPIが分かれていて、ブラウザのJavaScriptが画面を組み立てる）"
+          },
+          {
+            "type": "code",
+            "filename": "dynamic_separated_flow.mmd",
+            "lang": "mermaid",
+            "code": "flowchart TD\n  A[Client / Browser] --> B[Front Server or CDN]\n  B --> C[Response: HTML/CSS/JS（静的）]\n  C --> A\n\n  A --> D[API Server]\n  D --> E[Router / Routing]\n  E --> F[Endpoint / Logic Function]\n  F --> G[Database]\n  G --> F\n  F --> H[Response: JSON]\n  H --> A\n\n  A --> I[Browser JavaScript]\n  I --> J[HTML/CSS/JS + JSON を使って画面を組み立てる]"
+          },
+      
+          {
+            "type": "p",
+            "text": "次に、静的リクエストの流れを整理します。静的リクエストでは、基本的に「ルーティング→処理関数→DB」という流れは発生せず、ファイルをそのまま返します。"
+          },
+      
+          {
+            "type": "p",
+            "text": "③ 静的リクエスト：サーバー上の既存ファイルをそのまま返す（例：/static/app.css, /static/app.js, /images/logo.png）"
+          },
+          {
+            "type": "code",
+            "filename": "static_flow.mmd",
+            "lang": "mermaid",
+            "code": "flowchart TD\n  A[Client / Browser] --> B[Static File Handler]\n  B --> C[File System / CDN Cache]\n  C --> D[Response: File 그대로返す（CSS/JS/画像/HTMLなど）]\n  D --> A"
+          },
+      
+          {
+            "type": "p",
+            "text": "ここまでの内容を、どこで何が起きるのかという観点で整理すると、次のように比較できます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "動的リクエスト：ルーティングに入り、処理関数が実行され、必要ならDBを参照し、結果を生成して返す。",
+              "静的リクエスト：すでに存在するファイルを、そのまま返す（通常DBには触れない）。",
+              "非分離式（動的）：サーバー側でHTMLを作って返す（テンプレートにDBのデータを埋め込む）。",
+              "分離式（動的）：APIはJSONを返し、画面の組み立てはブラウザのJavaScriptが担当する。"
+            ]
+          },
+      
+          {
+            "type": "p",
+            "text": "まとめると、動的リクエストは「リクエストごとに処理を走らせて結果を作る」もので、静的リクエストは「作り済みのものを配布する」ものです。FastAPIでAPIを作るときは動的リクエストが中心になりますが、実際のWebアプリではCSS/JS/画像などの静的配信も必ず登場するため、両方の処理フローをセットで理解しておくことが重要です。"
+          }
+        ]
       }
+      
+      
       
       
       
