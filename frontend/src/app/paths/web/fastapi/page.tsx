@@ -1744,7 +1744,233 @@ const CURRICULUM: Chapter[] = [
             "text": "まとめると、動的リクエストは「リクエストごとに処理を走らせて結果を作る」もので、静的リクエストは「作り済みのものを配布する」ものです。FastAPIでAPIを作るときは動的リクエストが中心になりますが、実際のWebアプリではCSS/JS/画像などの静的配信も必ず登場するため、両方の処理フローをセットで理解しておくことが重要です。"
           }
         ]
+      },
+      {
+        "id": "fastapi-static-files-mount",
+        "title": "静的ファイル配信：mount を使う（StaticFiles）",
+        "summary": "FastAPIで静的ファイル（CSS/JS/画像など）を配信する方法を学びます。`StaticFiles` と `app.mount()` を使って、`/static` のようなURLにディレクトリを紐付けます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の小節では、動的リクエストと静的リクエストの違いを整理しました。ここからは実際に「静的ファイルリクエスト（Static File Request）」を FastAPI で扱う方法を学びます。"
+          },
+          {
+            "type": "p",
+            "text": "静的ファイルとは、サーバー側ですでに用意されていて、基本的に内容が変化しないファイルのことです。例えば、CSS / JavaScript / 画像 / フォント / ビルド済みHTML などが該当します。静的ファイルリクエストでは、通常はデータベースやビジネスロジックに入らず、ファイルをそのまま返します。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIで静的ファイルを配信する基本は、`StaticFiles` と `mount`（`app.mount()`）です。`mount` は「あるURLパスに対して、別のアプリ（または静的ファイルハンドラ）をぶら下げる」ための仕組みです。"
+          },
+          {
+            "type": "p",
+            "text": "まずは必要なものをインポートします。静的ファイル配信には `fastapi.staticfiles.StaticFiles` を使います。"
+          },
+          {
+            "type": "code",
+            "filename": "imports.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom fastapi.staticfiles import StaticFiles"
+          },
+          {
+            "type": "p",
+            "text": "次に、プロジェクトのディレクトリ構成を例として示します。ここでは `static/` ディレクトリに静的ファイルを置く想定です。"
+          },
+          {
+            "type": "code",
+            "filename": "project_structure.txt",
+            "lang": "text",
+            "code": "your_project/\n├── main.py\n└── static/\n    ├── style.css\n    ├── app.js\n    └── images/\n        └── logo.png"
+          },
+          {
+            "type": "p",
+            "text": "それでは `app.mount()` を使って、URLの `/static` を `static/` ディレクトリに紐付けます。すると、例えば `static/style.css` は `/static/style.css` としてアクセスできるようになります。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom fastapi.staticfiles import StaticFiles\n\napp = FastAPI()\n\n# /static へのアクセスを、ローカルの static/ ディレクトリに紐付ける\napp.mount(\"/static\", StaticFiles(directory=\"static\"), name=\"static\")\n\n\n@app.get(\"/\")\ndef root():\n    return {\"message\": \"Hello, Static Files!\"}"
+          },
+          {
+            "type": "p",
+            "text": "この1行が静的ファイル配信の中心です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`app.mount(\"/static\", ...)`：URLの先頭が `/static` のリクエストを、静的ファイル配信に回す",
+              "`StaticFiles(directory=\"static\")`：実際に参照するフォルダを指定する（ここではプロジェクト直下の static/）",
+              "`name=\"static\"`：このマウント設定に名前を付ける（主に内部参照やURL生成に使う）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "例えば、次のようなリクエストをブラウザで開くと、サーバーはそのままファイルを返します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "GET /static/style.css  → static/style.css を返す",
+              "GET /static/app.js     → static/app.js を返す",
+              "GET /static/images/logo.png → static/images/logo.png を返す"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "ここで重要なのは、これらのリクエストは通常の `@app.get()` のルーティング処理には入らないという点です。`/static` 配下は `mount` によって静的ファイルハンドラに直接渡されるため、アプリのロジック関数やDBアクセスは発生しません。"
+          },
+          {
+            "type": "p",
+            "text": "次に、静的ファイルが本当に配信されていることを確認するために、簡単な `style.css` を用意してみます。"
+          },
+          {
+            "type": "code",
+            "filename": "static/style.css",
+            "lang": "css",
+            "code": "body {\n  font-family: sans-serif;\n}\n\nh1 {\n  font-size: 32px;\n}"
+          },
+          {
+            "type": "p",
+            "text": "この状態で `http://127.0.0.1:8000/static/style.css` にアクセスすると、CSSファイルの内容がそのまま表示されます（ブラウザによってはダウンロードやプレビューになります）。"
+          },
+          {
+            "type": "p",
+            "text": "まとめると、FastAPIで静的ファイル配信を行うには `StaticFiles` と `app.mount()` を使い、URLとディレクトリを対応付けます。動的APIとは違い、静的ファイル配信は「作り済みのファイルをそのまま返す」ため、Webアプリ全体の構成を理解するうえで重要な要素になります。"
+          }
+        ]
+      },
+      {
+        "id": "fastapi-rendering-where",
+        "title": "レンダリングはどこで行われるのか（SSR / 分離式 / 静的配信）",
+        "summary": "「レンダリング（rendering）」が処理フローのどの段階で発生するのかを整理します。非分離式（SSR）ではサーバー側、分離式ではブラウザ側（JavaScript）、静的ファイル配信ではサーバー側レンダリングは基本的に発生しません。",
+        "content": [
+          {
+            "type": "p",
+            "text": "ここまでで、動的リクエストと静的リクエストの処理フローを学びました。この小節では、そのフローの中で「レンダリング（rendering）」が“どこで”行われているのかを整理します。"
+          },
+          {
+            "type": "p",
+            "text": "まず、ここで言うレンダリングとは「ユーザーが画面として見られる形（HTML画面）を組み立てること」を指します。どの方式を採用しているかによって、レンダリングを担当する場所が変わります。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 1. 非分離式（SSR）ではレンダリングはサーバー側で行われる"
+          },
+          {
+            "type": "p",
+            "text": "非分離式（サーバーがHTMLを返すタイプ）では、リクエストはルーティングを通り、処理関数でロジックを実行し、必要ならデータベースからデータを取得します。その後、サーバーが「テンプレートにデータを埋め込んでHTMLを生成」し、そのHTMLをレスポンスとして返します。"
+          },
+          {
+            "type": "p",
+            "text": "つまり、非分離式ではレンダリングは次の場所（段階）で発生します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "DBからデータを取ってきた後",
+              "レスポンスを返す直前",
+              "サーバーがテンプレートを使ってHTMLを生成する段階"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "この「テンプレート + データ → HTML生成」の部分が、サーバーサイドレンダリング（SSR）におけるレンダリングです。"
+          },
+          {
+            "type": "code",
+            "filename": "ssr_rendering_flow.mmd",
+            "lang": "mermaid",
+            "code": "flowchart TD\n  A[Client / Browser] --> B[Server]\n  B --> C[Router / Routing]\n  C --> D[Endpoint / Logic Function]\n  D --> E[Database]\n  E --> D\n  D --> F[HTML生成（テンプレートにデータを埋め込む） ← レンダリング]\n  F --> G[Response: HTML]\n  G --> A"
+          },
+          {
+            "type": "p",
+            "text": "代表的な例としては、Rails（ERB）、Django（Template）、Laravel（Blade）などがあり、いずれもサーバーでHTMLを組み立てて返す仕組みを持っています。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 2. 分離式（フロント + API）ではレンダリングはブラウザ側（JavaScript）で行われる"
+          },
+          {
+            "type": "p",
+            "text": "分離式では、フロント側はHTML/CSS/JavaScript（多くは静的ファイル）を返し、バックエンド（FastAPIなど）はデータ（多くはJSON）を返します。"
+          },
+          {
+            "type": "p",
+            "text": "この方式では、サーバーは基本的に「画面（HTML）を完成させて返す」のではなく、「データ（JSON）を返す」だけです。では画面はどこで組み立てるのでしょうか。答えはブラウザです。"
+          },
+          {
+            "type": "p",
+            "text": "分離式では、レンダリングは次の場所（段階）で発生します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "ブラウザがHTML/CSS/JSを受け取った後",
+              "ブラウザがAPIからJSONを受け取った後",
+              "ブラウザ内のJavaScriptがDOMを更新して画面を組み立てる段階（ここがレンダリング）"
+            ]
+          },
+          {
+            "type": "code",
+            "filename": "separated_rendering_flow.mmd",
+            "lang": "mermaid",
+            "code": "flowchart TD\n  A[Client / Browser] --> B[Front Server or CDN]\n  B --> C[Response: HTML/CSS/JS（静的）]\n  C --> A\n\n  A --> D[API Server]\n  D --> E[Router / Routing]\n  E --> F[Endpoint / Logic Function]\n  F --> G[Database]\n  G --> F\n  F --> H[Response: JSON]\n  H --> A\n\n  A --> I[Browser JavaScript]\n  I --> J[HTML/CSS/JS + JSON を使って画面を組み立てる ← レンダリング]"
+          },
+          {
+            "type": "p",
+            "text": "React / Vue / Angular などのSPAフレームワークは、この「ブラウザ側レンダリング」を中心に動く設計になっています。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 3. 静的ファイル配信では、サーバー側のレンダリングは基本的に発生しない"
+          },
+          {
+            "type": "p",
+            "text": "静的ファイルリクエスト（CSS/JS/画像/ビルド済みHTMLなど）は、サーバー上にすでに存在するファイルをそのまま返すだけです。通常はルーティング→処理関数→DBという流れに入らず、サーバー側でテンプレート処理やデータ注入をしません。"
+          },
+          {
+            "type": "p",
+            "text": "つまり、静的ファイル配信の時点では「サーバー側のレンダリング」は行われません。"
+          },
+          {
+            "type": "code",
+            "filename": "static_no_rendering_flow.mmd",
+            "lang": "mermaid",
+            "code": "flowchart TD\n  A[Client / Browser] --> B[Static File Handler]\n  B --> C[File System / CDN Cache]\n  C --> D[Response: File（そのまま返す）]\n  D --> A"
+          },
+          {
+            "type": "p",
+            "text": "ただし、ブラウザは受け取ったHTMLを解析して画面に表示したり、JavaScriptを実行してDOMを更新したりします。その意味では「ブラウザ側の表示処理」はありますが、少なくともサーバー側のテンプレート生成＝レンダリングは基本的に発生しません。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 4. まとめ：レンダリングの場所は方式で決まる"
+          },
+          {
+            "type": "p",
+            "text": "最後に、レンダリングがどこで行われるかを整理します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "非分離式（SSR）：サーバー側でHTMLを生成する段階がレンダリング",
+              "分離式（フロント + API）：ブラウザのJavaScriptが画面を組み立てる段階がレンダリング",
+              "静的ファイル配信：サーバー側レンダリングは基本的に行われず、ファイルをそのまま返す"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "この整理ができると、「FastAPIはどこまで担当するのか」「フロントはどこで画面を作るのか」「静的ファイルは誰が配るのか」をはっきり切り分けられるようになります。次の小節では、FastAPIが静的ファイルを配信する方法（mount / StaticFiles）を実装として確認します。"
+          }
+        ]
       }
+      
+      
       
       
       
