@@ -500,6 +500,15 @@ const tracks: Track[] = [
         chain: false,
       },
       {
+        id: "web-5c",
+        label: "Cookie、Session、Tokenの学習",
+        href: "/paths/web/cookie",
+        summary: "Cookie、Session、Tokenを学習する",
+        col: 4,
+        row: -2,
+        chain: false,
+      },
+      {
         id: "web-6a",
         label: "Webアプリケーションの構成",
         href: "/paths/web/web-app",
