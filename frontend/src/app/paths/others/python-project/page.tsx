@@ -345,6 +345,50 @@ for key, value in person.items():
         ]
       },
       {
+        "id": "from-import-statement",
+        "title": "from ... import ... 文",
+        "summary": "モジュールの中から特定の機能だけを読み込むための構文です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "Python では、機能ごとにコードをまとめた **モジュール（module）** を利用できます。`from ... import ...` は、そのモジュールの中から **必要なものだけを指定して読み込む** ための構文です。"
+          },
+          {
+            "type": "p",
+            "text": "通常の `import モジュール名` と異なり、`from` を使うことで、モジュール名を省略して直接機能を呼び出せるようになります。"
+          },
+          {
+            "type": "code",
+            "filename": "from-import-basic.py",
+            "lang": "python",
+            "code": "# datetime モジュール全体を読み込む場合\nimport datetime\n\nnow = datetime.datetime.now()\nprint(now)"
+          },
+          {
+            "type": "p",
+            "text": "一方で、`from ... import ...` を使うと、モジュール名を付けずにその機能を直接使用できます。"
+          },
+          {
+            "type": "code",
+            "filename": "from-import-direct.py",
+            "lang": "python",
+            "code": "# datetime モジュールから datetime クラスだけを読み込む\nfrom datetime import datetime\n\nnow = datetime.now()\nprint(now)"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`import モジュール名`：モジュール全体を読み込む",
+              "`from モジュール名 import 機能名`：必要な機能だけを読み込む",
+              "`from` を使うとコードが短くなり、可読性が向上する"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "この教材で作成する就活Todoアプリでは、現在時刻を取得するために `from datetime import datetime` を使用します。これは、`datetime.now()` を簡潔に書くためです。"
+          }
+        ]
+      },
+      
+      {
         "id": "input-validation",
         "title": "入力チェックの考え方",
         "summary": "不正な入力を防ぐための基本的な考え方を学びます。",
