@@ -229,6 +229,58 @@ print(fruits)  # ['apple', 'mango', 'grape']`
         ],
       },
       {
+        "id": "for-loop-basic",
+        "title": "for 文による繰り返し処理",
+        "summary": "リストなどの要素を1つずつ取り出して処理するための基本構文です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`for` 文は、**複数のデータを順番に処理したいとき** に使う制御構文です。Python では、リストや文字列などの「繰り返し可能なオブジェクト（イテラブル）」から要素を1つずつ取り出して処理を行います。"
+          },
+          {
+            "type": "code",
+            "filename": "for-basic.py",
+            "lang": "python",
+            "code": "fruits = [\"apple\", \"banana\", \"orange\"]\n\nfor fruit in fruits:\n    print(fruit)"
+          },
+          {
+            "type": "p",
+            "text": "この例では、`fruits` というリストの中身を先頭から順番に取り出し、変数 `fruit` に代入して処理しています。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`for 変数 in リスト`：リストの要素を1つずつ取り出す",
+              "取り出された要素は、その都度 変数 に代入される",
+              "リストの要素数だけ処理が繰り返される"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "`for` 文は、インデックス（番号）と一緒に要素を扱いたい場合にも使えます。その場合は `enumerate()` を利用します。"
+          },
+          {
+            "type": "code",
+            "filename": "for-enumerate.py",
+            "lang": "python",
+            "code": "fruits = [\"apple\", \"banana\", \"orange\"]\n\nfor i, fruit in enumerate(fruits):\n    print(i, fruit)"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`enumerate(リスト)`：インデックスと要素を同時に取り出す",
+              "`i`：0 から始まる番号（インデックス）",
+              "`fruit`：リストの各要素"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "後の章で実装する就活Todoアプリでは、`for` 文を使って、登録された選考情報を1件ずつ表示したり、特定の条件に合うデータを探したりします。"
+          }
+        ]
+      },
+      
+      {
         "id": "dict",
         "title": "辞書型",
         "summary": "キーと値のペアでデータを管理する柔軟なデータ構造です。",
