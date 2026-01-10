@@ -624,6 +624,12 @@ for key, value in person.items():
           }
         ]
       },
+    ]
+  },
+  {
+    "key": "python-global-variables",
+    "title": "データ管理とグローバル変数",
+    "lessons": [
       {
         "id": "data-and-global-variables",
         "title": "データとグローバル変数の役割",
@@ -642,10 +648,10 @@ for key, value in person.items():
             ]
           }
         ]
-      },
-      
+      }
     ]
   },
+  
   {
     "key": "python-utility-functions-explanation",
     "title": "ユーティリティ関数の文法解説",
@@ -864,7 +870,163 @@ for key, value in person.items():
         ]
       }
     ]
+  },
+  {
+    "key": "python-todo-feature-functions",
+    "title": "機能関数の実装を読む（追加・一覧・更新）",
+    "lessons": [
+      {
+        "id": "add-todo-explanation",
+        "title": "add_todo() を読む：選考記録の追加",
+        "summary": "入力→辞書作成→リスト追加→ID更新までの流れを、1行ずつ確認します。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "add_todo.py",
+            "lang": "python",
+            "code": "def add_todo():\n    global NEXT_ID\n    company = input_nonempty(\"企業名：\")\n    role = input_nonempty(\"職種：\")\n    stage = input_nonempty(\"選考段階：\")\n    deadline = input_date_strict_or_empty(\"締切日（YYYY-MM-DD、未設定可）：\")\n    status = input_choice(\"状態\", [\"TODO\", \"DOING\", \"DONE\"])\n\n    todo = {\n        \"id\": NEXT_ID,\n        \"company\": company,\n        \"role\": role,\n        \"stage\": stage,\n        \"deadline\": deadline,\n        \"status\": status,\n        \"created_at\": now_str(),\n        \"updated_at\": now_str(),\n    }\n    todos.append(todo)\n    NEXT_ID += 1\n    print(\"追加しました。\")"
+          },
+          {
+            "type": "p",
+            "text": "この関数は「ユーザー入力を集める → 1件分の辞書（todo）を作る → リスト todos に追加する → 次のIDに進める」という役割を持ちます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`def add_todo():`：引数なしの関数を定義する（戻り値は省略＝通常 None）",
+              "`global NEXT_ID`：関数内で NEXT_ID を更新するために「グローバル変数を使う」と宣言する（これがないと NEXT_ID はローカル変数扱いになる）",
+              "`company = input_nonempty(\"企業名：\")`：空入力を許さない入力関数で企業名を受け取り、変数 company に代入する",
+              "`role = input_nonempty(\"職種：\")`：職種を同様に受け取る（代入の基本）",
+              "`stage = input_nonempty(\"選考段階：\")`：選考段階（ES/面接など）を受け取る",
+              "`deadline = input_date_strict_or_empty(...)`：空入力なら \"\"、入力ありなら YYYY-MM-DD を厳密検証して締切文字列を受け取る",
+              "`status = input_choice(\"状態\", [\"TODO\", \"DOING\", \"DONE\"])`：choices（リスト）の中からのみ状態を選ばせる",
+              "`todo = { ... }`：辞書（dict）リテラルを作成する。キーは文字列、値は入力結果や現在時刻など",
+              "`\"id\": NEXT_ID`：現在の NEXT_ID をこのレコードのIDとして保存する",
+              "`\"company\": company` など：入力結果（変数）を辞書の値として格納する",
+              "`\"created_at\": now_str()`：関数呼び出しで「現在時刻の文字列」を作り、作成日時として保存する",
+              "`\"updated_at\": now_str()`：更新日時も同じく現在時刻で初期化する",
+              "`todos.append(todo)`：リスト todos の末尾に、この辞書 todo を追加する",
+              "`NEXT_ID += 1`：複合代入演算子。`NEXT_ID = NEXT_ID + 1` と同じ意味で、次の追加に備えてIDを進める",
+              "`print(\"追加しました。\")`：処理完了メッセージを表示する"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "list-todos-explanation",
+        "title": "list_todos() を読む：締切順で一覧表示",
+        "summary": "sorted() と key 関数で並び替え、表示関数に渡す流れを理解します。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "list_todos.py",
+            "lang": "python",
+            "code": "def list_todos():\n    items = sorted(todos, key=sort_key_deadline)\n    pretty_print_list(items)"
+          },
+          {
+            "type": "p",
+            "text": "この関数は「データを締切順に並び替える → 見やすく表示する」だけに責務を絞っています。短い関数でも十分に価値があります。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`def list_todos():`：引数なし関数の定義",
+              "`items = sorted(todos, key=sort_key_deadline)`：組み込み関数 `sorted()` でリスト todos を並び替える",
+              "`sorted(リスト, key=関数)`：各要素に対して key 関数を適用し、その結果を基準に並び替える",
+              "`key=sort_key_deadline`：sort_key_deadline は「締切未設定を最後にする」ためのキー関数",
+              "`items = ...`：並び替え結果（新しいリスト）を items に代入する（todos 自体はそのまま）",
+              "`pretty_print_list(items)`：整形表示用の関数に items を渡して出力する（表示ロジックを分離している）"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "update-status-explanation",
+        "title": "update_status() を読む：状態を更新する",
+        "summary": "ID入力→存在確認→状態更新→更新日時変更という一連の処理を、分岐込みで理解します。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "update_status.py",
+            "lang": "python",
+            "code": "def update_status():\n    todo_id = input_id(\"状態を更新する ID を入力してください：\")\n    if todo_id is None:\n        return\n    t = find_by_id(todo_id)\n    if not t:\n        print(\"指定された ID は見つかりませんでした。\")\n        return\n    new_status = input_choice(\"新しい状態\", [\"TODO\", \"DOING\", \"DONE\"])\n    t[\"status\"] = new_status\n    t[\"updated_at\"] = now_str()\n    print(\"状態を更新しました。\")"
+          },
+          {
+            "type": "p",
+            "text": "この関数は「更新対象を特定（ID）→ 存在チェック → 状態を更新 → 更新日時を更新」という流れです。途中で失敗したら `return` で早めに終了する設計（ガード節）になっています。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`todo_id = input_id(...)`：ID入力を受け取り、数字でなければ None を返す入力関数を使う",
+              "`if todo_id is None:`：None かどうかを判定（`is` は同一性の比較）",
+              "`return`：ここで関数を終了し、以降の処理を行わない（不正入力への早期リターン）",
+              "`t = find_by_id(todo_id)`：todos の中から該当IDの辞書を検索し、見つかればその辞書、なければ None を受け取る",
+              "`if not t:`：t が None の場合は False 扱いになるため「見つからなかった」と判定できる",
+              "`print(...)`：見つからない場合のメッセージを表示する",
+              "`return`：見つからない場合はここで終了（以降の更新処理を防ぐ）",
+              "`new_status = input_choice(...)`：TODO/DOING/DONE のどれかを必ず選ばせる",
+              "`t[\"status\"] = new_status`：辞書 t のキー \"status\" の値を上書きする（更新処理）",
+              "`t[\"updated_at\"] = now_str()`：更新日時も現在時刻に更新する（データの整合性を保つ）",
+              "`print(\"状態を更新しました。\")`：更新完了メッセージ"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "python-main-loop",
+    "title": "メインループとアプリケーションの起動",
+    "lessons": [
+      {
+        "id": "run-app-explanation",
+        "title": "run_app() を読む：アプリ全体を動かすループ",
+        "summary": "while ループと条件分岐によって、アプリ全体の流れを制御する仕組みを理解します。",
+        "content": [
+          {
+            "type": "code",
+            "filename": "run_app.py",
+            "lang": "python",
+            "code": "def run_app():\n    print(\"=== 就活選考 Todo ===\")\n    while True:\n        print(\"\\n操作を選択してください：\")\n        print(\"1) 選考を新規追加\")\n        print(\"2) 一覧を表示\")\n        print(\"3) 状態を更新\")\n        print(\"0) 終了\")\n        choice = input(\"番号を入力：\").strip()\n        if choice == \"1\":\n            add_todo()\n        elif choice == \"2\":\n            list_todos()\n        elif choice == \"3\":\n            update_status()\n        elif choice == \"0\":\n            print(\"終了します。\")\n            break\n        else:\n            print(\"無効な入力です。\")\n\nrun_app()"
+          },
+          {
+            "type": "p",
+            "text": "この関数は、就活Todoアプリ全体を動かす **メインループ** です。メニューを表示し、ユーザーの入力に応じて各機能関数を呼び出します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`def run_app():`：アプリ全体を制御する関数を定義する",
+              "`print(\"=== 就活選考 Todo ===\")`：アプリ起動時にタイトルを表示する",
+              "`while True:`：終了条件が来るまで処理を繰り返す無限ループ",
+              "`print(\"\\n操作を選択してください：\")`：改行（\\n）を含めてメニュー見出しを表示する",
+              "`print(\"1) ...\")` ～ `print(\"0) 終了\")`：ユーザーに選択肢を提示する",
+              "`choice = input(\"番号を入力：\").strip()`：ユーザー入力を受け取り、前後の空白を削除して変数 choice に代入する",
+              "`if choice == \"1\":`：文字列として \"1\" が入力されたかを判定する",
+              "`add_todo()`：選考を新規追加する関数を呼び出す",
+              "`elif choice == \"2\":`：一覧表示が選ばれた場合の分岐",
+              "`list_todos()`：登録済みの選考を一覧表示する関数を呼び出す",
+              "`elif choice == \"3\":`：状態更新が選ばれた場合の分岐",
+              "`update_status()`：選考状態を更新する関数を呼び出す",
+              "`elif choice == \"0\":`：終了が選ばれた場合の分岐",
+              "`print(\"終了します。\")`：終了メッセージを表示する",
+              "`break`：while ループを抜けて、アプリを終了する",
+              "`else:`：どの選択肢にも当てはまらない入力の場合の処理",
+              "`print(\"無効な入力です。\")`：不正入力時のエラーメッセージ",
+              "`run_app()`：定義した関数を実行し、プログラムを開始する"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "このように、メインループでは「何をするか」を判断するだけに役割を限定し、実際の処理は他の関数に任せています。これにより、プログラム全体の構造が読みやすくなります。"
+          }
+        ]
+      }
+    ]
   }
+  
+  
   
   
   
