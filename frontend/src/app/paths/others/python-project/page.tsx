@@ -46,6 +46,35 @@ const CURRICULUM: Chapter[] = [
     "title": "基礎知識点の準備",
     "lessons": [
       {
+        "id": "variable-declaration",
+        "title": "変数の宣言（代入）",
+        "summary": "値を名前に紐づけて保存する基本操作を学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "プログラムでは、値をそのまま使うのではなく、**名前（変数）を付けて保存** します。Python では `=` を使って変数に値を代入します。これを「変数の宣言（代入）」と呼びます。"
+          },
+          {
+            "type": "code",
+            "filename": "variable-basic.py",
+            "lang": "python",
+            "code": "a = 12\nname = \"Alice\"\nis_valid = True\n\nprint(a)\nprint(name)\nprint(is_valid)"
+          },
+          {
+            "type": "p",
+            "text": "Python では、変数を使う前に型を宣言する必要はありません。**代入された値によって自動的に型が決まる** のが特徴です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`=` は「等しい」ではなく「代入」を意味する",
+              "変数は値に名前を付けるためのもの",
+              "同じ変数に別の値を代入することもできる"
+            ]
+          }
+        ]
+      },
+      {
         "id": "program-input-output",
         "title": "入力と出力（input / print）",
         "summary": "ユーザーとやり取りするための基本機能を学びます。",
@@ -198,6 +227,140 @@ const CURRICULUM: Chapter[] = [
       }
     ]
   },
+  {
+    "key": "python-program-design-from-features",
+    "title": "機能から考えるプログラム設計",
+    "lessons": [
+      {
+        "id": "what-is-program-design",
+        "title": "プログラム設計とは何か",
+        "summary": "コードを書く前に考えるべきことを整理します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "プログラム設計とは、**いきなりコードを書くことではありません**。まず「何を作りたいのか」「どんな機能が必要なのか」を言葉で整理することから始まります。"
+          },
+          {
+            "type": "p",
+            "text": "実務では、いきなり実装に入ると構造が崩れやすく、後から修正しづらくなります。そのため、**機能 → 構造 → 実装** の順で考えることが重要です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "プログラム設計はコードを書く前の準備段階",
+              "最初に「何ができる必要があるか」を整理する",
+              "設計ができてから実装に入ると失敗しにくい"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "list-required-features",
+        "title": "必要な機能を書き出す",
+        "summary": "アプリに必要な機能を洗い出します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "まずは、このプログラムで **ユーザーが何をしたいか** を考えます。ここでは「就活選考を管理する」という目的から、必要な機能を整理します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "選考情報を新しく追加できる",
+              "登録した選考情報を一覧で確認できる",
+              "選考の状態（TODO / DOING / DONE）を更新できる",
+              "プログラムを終了できる"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "この段階では、**どうやって実装するかは考えません**。できる・できないではなく、「やりたいこと」をそのまま書き出します。"
+          }
+        ]
+      },
+      {
+        "id": "design-data-structure",
+        "title": "データの形を設計する",
+        "summary": "機能を支えるデータ構造を考えます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "次に、これらの機能を実現するために **どんな情報を保存する必要があるか** を考えます。1 件の選考には複数の情報がまとまって存在します。"
+          },
+          {
+            "type": "code",
+            "filename": "todo-data-design.py",
+            "lang": "python",
+            "code": "todo = {\n    \"id\": 1,\n    \"company\": \"A社\",\n    \"role\": \"エンジニア\",\n    \"stage\": \"ES\",\n    \"deadline\": \"2026-01-20\",\n    \"status\": \"TODO\"\n}"
+          },
+          {
+            "type": "p",
+            "text": "さらに、選考は複数件存在するため、**これらをまとめて管理する入れ物** が必要になります。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "1 件の選考情報は dict で表す",
+              "複数の選考情報は list で管理する",
+              "ID を持たせることで特定の選考を操作できる"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "split-features-into-functions",
+        "title": "機能を関数に分解する",
+        "summary": "1 機能 1 関数の考え方を学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "次に、洗い出した機能を **それぞれ独立した関数** として考えます。これにより、プログラム全体の構造が分かりやすくなります。"
+          },
+          {
+            "type": "code",
+            "filename": "function-design.py",
+            "lang": "python",
+            "code": "def add_todo():\n    pass\n\ndef list_todos():\n    pass\n\ndef update_status():\n    pass"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "1 つの関数は 1 つの役割を持つ",
+              "処理の流れが追いやすくなる",
+              "後から修正・追加がしやすくなる"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "design-main-loop",
+        "title": "全体の流れ（メインループ）を考える",
+        "summary": "アプリ全体を動かす構造を設計します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "最後に、これらの機能を **どの順番で、どのように呼び出すか** を考えます。メニュー型アプリでは、ループ構造が中心になります。"
+          },
+          {
+            "type": "code",
+            "filename": "main-loop-design.py",
+            "lang": "python",
+            "code": "while True:\n    print(\"1) 追加\")\n    print(\"2) 一覧\")\n    print(\"3) 状態更新\")\n    print(\"0) 終了\")\n\n    choice = input(\"選択：\")\n\n    if choice == \"1\":\n        add_todo()\n    elif choice == \"2\":\n        list_todos()\n    elif choice == \"3\":\n        update_status()\n    elif choice == \"0\":\n        break"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "while ループがアプリの土台になる",
+              "ユーザー入力によって処理を切り替える",
+              "ここまででアプリ全体の設計が完成する"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  
+  
   
   
   
