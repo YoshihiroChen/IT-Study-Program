@@ -593,6 +593,15 @@ const tracks: Track[] = [
       },
     ],
   },
+  {
+    key: "others",
+    title: "その他",
+    color: "violet-500",
+    steps: [
+      { id: "oth-1", label: "pythonプロジェクト体験", href: "/paths/others/python-project", summary: "パイソンによりプロジェクト体験をする" },
+      
+    ],
+  },
   
 ];
 
