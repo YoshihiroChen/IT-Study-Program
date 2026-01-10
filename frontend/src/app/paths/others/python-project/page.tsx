@@ -42,6 +42,95 @@ type Chapter = {
 /** ---------- 示例课程大纲 ---------- */
 const CURRICULUM: Chapter[] = [
   {
+    "key": "python-project-overview",
+    "title": "作るプログラムの全体像",
+    "lessons": [
+      {
+        "id": "what-we-will-build",
+        "title": "この講座で作るもの",
+        "summary": "この講座で完成させるプログラムの概要を説明します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "この講座では、Python を使って **「就活の選考状況を管理する Todo プログラム」** を作成します。実際の就職活動を想定した、実用的なプログラムです。"
+          },
+          {
+            "type": "p",
+            "text": "完成したプログラムは、コマンドライン（ターミナルや Jupyter Notebook）上で動作し、ユーザーが入力した情報を元に選考状況を管理できます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Python の基礎文法を使って動作する",
+              "画面入力を通じて操作できる",
+              "実務に近い考え方で設計されている"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "program-features-overview",
+        "title": "プログラムでできること",
+        "summary": "完成後に使える機能を確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "このプログラムでは、就職活動における選考情報を **一覧で管理し、状態を更新** できます。具体的には、次のような操作が可能です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "企業名・職種・選考段階を入力して新しい選考を登録する",
+              "登録した選考情報を一覧で確認する",
+              "選考の状態（TODO / DOING / DONE）を変更する",
+              "操作を終了してプログラムを閉じる"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "how-to-use-program",
+        "title": "プログラムの操作イメージ",
+        "summary": "完成したプログラムの使い方をイメージします。",
+        "content": [
+          {
+            "type": "p",
+            "text": "プログラムを起動すると、画面にメニューが表示され、数字を入力して操作を選択します。ユーザーは表示された案内に従って情報を入力するだけで操作できます。"
+          },
+          {
+            "type": "code",
+            "filename": "menu-image.txt",
+            "lang": "text",
+            "code": "1) 新規選考を追加\n2) 選考一覧を表示\n3) 選考状態を更新\n0) 終了\n\n選択："
+          },
+          {
+            "type": "p",
+            "text": "このような **メニュー型のプログラム** は、Python 初学者でも作りやすく、アプリケーションの基本構造を理解するのに適しています。"
+          }
+        ]
+      },
+      {
+        "id": "learning-goal",
+        "title": "この講座で身につくこと",
+        "summary": "このプログラムを通して学ぶ目的を整理します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "この講座の目的は、単に Python の文法を覚えることではありません。**「やりたいことを、動くプログラムに落とし込む力」** を身につけることです。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Python の基本文法の使い方",
+              "機能からプログラム構造を考える力",
+              "実用的な小さなアプリを自分で作る経験"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "key": "python-basic-preparation",
     "title": "基礎知識点の準備",
     "lessons": [
@@ -358,7 +447,111 @@ const CURRICULUM: Chapter[] = [
         ]
       }
     ]
+  },
+  {
+    "key": "python-job-hunting-todo-implementation",
+    "title": "就活Todoアプリの実装",
+    "lessons": [
+      {
+        "id": "full-source-code",
+        "title": "完成版プログラムの全体コード",
+        "summary": "まずは完成した就活Todoアプリの全体像を確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "この章では、これまで設計してきた内容をもとに、**就活選考を管理する Todo アプリ** を実際に実装します。まずは、完成版のプログラム全体を確認しましょう。"
+          },
+          {
+            "type": "p",
+            "text": "この時点では、すべてを理解できなくても問題ありません。**後続の小節で、各部分を順番に詳しく解説** していきます。"
+          },
+          {
+            "type": "code",
+            "filename": "job_hunting_todo.py",
+            "lang": "python",
+            "code": "from datetime import datetime\nimport re\n\n# ----------------------------\n# データコンテナ：すべての記録はここに保存される\n# ----------------------------\ntodos = []\nNEXT_ID = 1\n\nDATE_RE = re.compile(r\"^\\d{4}-\\d{2}-\\d{2}$\")\n\n# ----------------------------\n# ユーティリティ関数\n# ----------------------------\ndef now_str() -> str:\n    return datetime.now().strftime(\"%Y-%m-%d %H:%M\")\n\ndef input_nonempty(prompt: str) -> str:\n    while True:\n        s = input(prompt).strip()\n        if s:\n            return s\n        print(\"入力は空にできません。もう一度入力してください。\")\n\ndef input_choice(prompt: str, choices: list[str]) -> str:\n    choices_str = \"/\".join(choices)\n    while True:\n        s = input(f\"{prompt} ({choices_str}): \").strip()\n        if s in choices:\n            return s\n        print(f\"次のいずれかを入力してください：{choices_str}\")\n\ndef input_date_strict_or_empty(prompt: str) -> str:\n    while True:\n        s = input(prompt).strip()\n        if s == \"\":\n            return \"\"\n        if not DATE_RE.match(s):\n            print(\"形式は YYYY-MM-DD にしてください（例：2026-01-02）。\")\n            continue\n        try:\n            datetime.strptime(s, \"%Y-%m-%d\")\n            return s\n        except ValueError:\n            print(\"存在しない日付です。もう一度入力してください。\")\n\ndef find_by_id(todo_id: int):\n    for t in todos:\n        if t[\"id\"] == todo_id:\n            return t\n    return None\n\ndef deadline_to_date_or_none(deadline: str):\n    if not deadline:\n        return None\n    return datetime.strptime(deadline, \"%Y-%m-%d\").date()\n\ndef sort_key_deadline(t):\n    d = deadline_to_date_or_none(t[\"deadline\"])\n    return (d is None, d)\n\ndef pretty_print_list(items: list[dict]) -> None:\n    if not items:\n        print(\"（記録はありません）\")\n        return\n    print(\"-\" * 80)\n    for t in items:\n        print(f\"[{t['id']}] {t['company']} / {t['role']} / {t['stage']}  DDL={t['deadline'] or '未設定'}  状態={t['status']}\")\n        print(f\"    更新日時: {t['updated_at']}\")\n    print(\"-\" * 80)\n\ndef input_id(prompt: str) -> int | None:\n    s = input_nonempty(prompt)\n    if not s.isdigit():\n        print(\"ID は数字で入力してください。\")\n        return None\n    return int(s)\n\n# ----------------------------\n# 機能：追加 / 一覧表示 / 状態更新\n# ----------------------------\ndef add_todo():\n    global NEXT_ID\n    company = input_nonempty(\"企業名：\")\n    role = input_nonempty(\"職種：\")\n    stage = input_nonempty(\"選考段階：\")\n    deadline = input_date_strict_or_empty(\"締切日（YYYY-MM-DD、未設定可）：\")\n    status = input_choice(\"状態\", [\"TODO\", \"DOING\", \"DONE\"])\n\n    todo = {\n        \"id\": NEXT_ID,\n        \"company\": company,\n        \"role\": role,\n        \"stage\": stage,\n        \"deadline\": deadline,\n        \"status\": status,\n        \"created_at\": now_str(),\n        \"updated_at\": now_str(),\n    }\n    todos.append(todo)\n    NEXT_ID += 1\n    print(\"追加しました。\")\n\ndef list_todos():\n    items = sorted(todos, key=sort_key_deadline)\n    pretty_print_list(items)\n\ndef update_status():\n    todo_id = input_id(\"状態を更新する ID を入力してください：\")\n    if todo_id is None:\n        return\n    t = find_by_id(todo_id)\n    if not t:\n        print(\"指定された ID は見つかりませんでした。\")\n        return\n    new_status = input_choice(\"新しい状態\", [\"TODO\", \"DOING\", \"DONE\"])\n    t[\"status\"] = new_status\n    t[\"updated_at\"] = now_str()\n    print(\"状態を更新しました。\")\n\n# ----------------------------\n# メインループ\n# ----------------------------\ndef run_app():\n    print(\"=== 就活選考 Todo ===\")\n    while True:\n        print(\"\\n操作を選択してください：\")\n        print(\"1) 選考を新規追加\")\n        print(\"2) 一覧を表示\")\n        print(\"3) 状態を更新\")\n        print(\"0) 終了\")\n        choice = input(\"番号を入力：\").strip()\n        if choice == \"1\":\n            add_todo()\n        elif choice == \"2\":\n            list_todos()\n        elif choice == \"3\":\n            update_status()\n        elif choice == \"0\":\n            print(\"終了します。\")\n            break\n        else:\n            print(\"無効な入力です。\")\n\nrun_app()"
+          }
+        ]
+      },
+      {
+        "id": "data-and-global-variables",
+        "title": "データとグローバル変数の役割",
+        "summary": "プログラム全体で使われるデータの管理方法を理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "このプログラムでは、選考情報を **グローバル変数** として管理しています。これにより、複数の関数から同じデータにアクセスできます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`todos`：すべての選考情報を保存するリスト",
+              "`NEXT_ID`：新しい選考に割り当てる一意な ID",
+              "グローバル変数は小規模アプリでは扱いやすい"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "utility-functions",
+        "title": "ユーティリティ関数の実装",
+        "summary": "入力チェックや補助処理を行う関数を確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "入力チェックや日付処理などの **共通処理** は、ユーティリティ関数としてまとめています。これにより、コードの重複を防げます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`input_nonempty()`：空入力を防ぐ",
+              "`input_choice()`：選択肢を制限する",
+              "`input_date_strict_or_empty()`：日付形式を検証する"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "feature-functions",
+        "title": "各機能を担当する関数",
+        "summary": "Todo アプリの主要機能を実装します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "就活 Todo アプリの各操作は、**1 機能 1 関数** の形で実装されています。これにより、処理の役割が明確になります。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`add_todo()`：選考情報を新しく追加する",
+              "`list_todos()`：登録済みの選考を一覧表示する",
+              "`update_status()`：選考の状態を変更する"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "main-loop-execution",
+        "title": "メインループとプログラムの実行",
+        "summary": "アプリ全体がどのように動くかを理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`run_app()` 関数は、アプリケーション全体を制御する **入口** です。メニュー表示とユーザー入力に応じた処理分岐を担当します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`while True` による常駐動作",
+              "ユーザー入力に応じた関数呼び出し",
+              "終了条件でループを抜ける"
+            ]
+          }
+        ]
+      }
+    ]
   }
+  
   
   
   
