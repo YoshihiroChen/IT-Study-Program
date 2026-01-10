@@ -601,19 +601,23 @@ for key, value in person.items():
       {
         "id": "now-str-function",
         "title": "現在時刻を文字列で取得する関数",
-        "summary": "datetime モジュールと関数定義の基本構文を学びます。",
+        "summary": "datetime の利用、関数定義、戻り値（return）を確認します。",
         "content": [
           {
-            "type": "p",
-            "text": "`now_str()` は、現在の日時を取得し、文字列として返す関数です。ここでは **関数定義・戻り値・外部モジュールの利用** が使われています。"
+            "type": "code",
+            "filename": "now_str.py",
+            "lang": "python",
+            "code": "def now_str() -> str:\n    return datetime.now().strftime(\"%Y-%m-%d %H:%M\")"
           },
           {
             "type": "ul",
             "items": [
-              "`def 関数名() -> str`：関数を定義し、戻り値が文字列であることを示す型ヒント",
-              "`datetime.now()`：現在の日時を取得する",
-              "`strftime()`：日時を指定フォーマットの文字列に変換する",
-              "`return`：関数の結果を呼び出し元へ返す"
+              "`def now_str()`：関数定義（名前は now_str）",
+              "`-> str`：戻り値が文字列（str）であることを示す型ヒント（実行時の動作は変えない）",
+              "`return`：関数の結果を呼び出し元に返して関数を終了する",
+              "`datetime.now()`：現在の日時（datetime型）を取得する",
+              "`.strftime(\"%Y-%m-%d %H:%M\")`：日時を指定フォーマットの文字列に変換する（例：2026-01-10 13:54）",
+              "`.`（ドット）：オブジェクトのメソッド呼び出し（now() / strftime() のように連結できる）"
             ]
           }
         ]
@@ -621,20 +625,24 @@ for key, value in person.items():
       {
         "id": "input-nonempty",
         "title": "空入力を防ぐ入力関数",
-        "summary": "while ループと条件分岐を使った入力検証を学びます。",
+        "summary": "while / if / input / strip を使った入力検証を学びます。",
         "content": [
           {
-            "type": "p",
-            "text": "`input_nonempty()` は、ユーザーが空文字を入力した場合に、再入力を促す関数です。**無限ループと if 文** を組み合わせています。"
+            "type": "code",
+            "filename": "input_nonempty.py",
+            "lang": "python",
+            "code": "def input_nonempty(prompt: str) -> str:\n    while True:\n        s = input(prompt).strip()\n        if s:\n            return s\n        print(\"入力は空にできません。もう一度入力してください。\")"
           },
           {
             "type": "ul",
             "items": [
-              "`while True`：条件を満たすまで繰り返す無限ループ",
-              "`input()`：ユーザーからの入力を受け取る",
-              "`.strip()`：前後の空白文字を削除する",
-              "`if s:`：文字列が空でないかを判定する",
-              "`return`：正しい入力が得られた時点で関数を終了する"
+              "`prompt: str`：引数 prompt は文字列型（型ヒント）",
+              "`while True`：無限ループ（正しい入力が来るまで繰り返す）",
+              "`input(prompt)`：ユーザー入力を受け取る（戻り値は必ず文字列）",
+              "`.strip()`：前後の空白（スペースや改行など）を削除する",
+              "`if s:`：空文字列 \"\" は False 扱い、空でなければ True 扱い（真偽値判定）",
+              "`return s`：正しい入力が得られた瞬間に関数を終了して返す",
+              "`print(...)`：再入力を促すメッセージを表示する"
             ]
           }
         ]
@@ -642,19 +650,23 @@ for key, value in person.items():
       {
         "id": "input-choice",
         "title": "選択肢を限定する入力関数",
-        "summary": "リストと in 演算子を使った入力制御を理解します。",
+        "summary": "list / join / f文字列 / in 演算子を理解します。",
         "content": [
           {
-            "type": "p",
-            "text": "`input_choice()` は、あらかじめ用意された選択肢の中からのみ入力を受け付ける関数です。"
+            "type": "code",
+            "filename": "input_choice.py",
+            "lang": "python",
+            "code": "def input_choice(prompt: str, choices: list[str]) -> str:\n    choices_str = \"/\".join(choices)\n    while True:\n        s = input(f\"{prompt} ({choices_str}): \").strip()\n        if s in choices:\n            return s\n        print(f\"次のいずれかを入力してください：{choices_str}\")"
           },
           {
             "type": "ul",
             "items": [
-              "`choices: list[str]`：文字列のリストを引数として受け取る",
-              "`\"/\".join(choices)`：リストの要素を `/` 区切りの文字列に変換する",
-              "`if s in choices`：入力値が選択肢に含まれているかを判定する",
-              "入力が不正な場合は再度ループに戻る"
+              "`choices: list[str]`：choices は「文字列のリスト」",
+              "`\"/\".join(choices)`：リストの要素を `/` 区切りで連結し、1つの文字列にする",
+              "`choices_str = ...`：変数への代入（宣言）",
+              "`input(f\"...\")`：f文字列で、変数を埋め込んだプロンプトを表示する",
+              "`if s in choices`：入力 s が choices の中に含まれるかを判定（in 演算子）",
+              "不正入力の場合は `print(...)` してループ継続、正しい場合は return で終了"
             ]
           }
         ]
@@ -662,19 +674,24 @@ for key, value in person.items():
       {
         "id": "input-date-strict",
         "title": "日付形式を厳密に検証する関数",
-        "summary": "正規表現と例外処理を用いた入力チェックを学びます。",
+        "summary": "正規表現（re）と例外処理（try/except）で入力を守ります。",
         "content": [
           {
-            "type": "p",
-            "text": "`input_date_strict_or_empty()` は、日付形式を厳密にチェックする関数です。ここでは **正規表現・try / except** が使われています。"
+            "type": "code",
+            "filename": "input_date_strict_or_empty.py",
+            "lang": "python",
+            "code": "def input_date_strict_or_empty(prompt: str) -> str:\n    while True:\n        s = input(prompt).strip()\n        if s == \"\":\n            return \"\"\n        if not DATE_RE.match(s):\n            print(\"形式は YYYY-MM-DD にしてください（例：2026-01-02）。\")\n            continue\n        try:\n            datetime.strptime(s, \"%Y-%m-%d\")\n            return s\n        except ValueError:\n            print(\"存在しない日付です。もう一度入力してください。\")"
           },
           {
             "type": "ul",
             "items": [
-              "`DATE_RE.match()`：正規表現で文字列の形式を検証する",
-              "`try / except`：エラーが起きる可能性のある処理を安全に実行する",
-              "`datetime.strptime()`：文字列を日付として解析する",
-              "`ValueError`：無効な日付の場合に発生する例外"
+              "`if s == \"\"`：空入力なら未設定として \"\" を返す",
+              "`if not ...`：条件の否定（not）",
+              "`DATE_RE.match(s)`：正規表現で「YYYY-MM-DD（ゼロ埋め必須）」の形か検証する",
+              "`continue`：その周の残り処理をスキップして次のループへ戻る",
+              "`try:`：例外が起きる可能性がある処理を試す",
+              "`datetime.strptime(s, \"%Y-%m-%d\")`：文字列を日付として解析（無効なら ValueError）",
+              "`except ValueError:`：解析に失敗した場合の処理（エラーメッセージ表示）"
             ]
           }
         ]
@@ -682,102 +699,121 @@ for key, value in person.items():
       {
         "id": "find-by-id",
         "title": "ID でデータを検索する関数",
-        "summary": "for ループと辞書アクセスの基本を確認します。",
+        "summary": "for ループと dict アクセスで「探す」処理を作ります。",
         "content": [
           {
-            "type": "p",
-            "text": "`find_by_id()` は、リスト内の辞書データを順番に調べ、指定された ID を持つ要素を探す関数です。"
+            "type": "code",
+            "filename": "find_by_id.py",
+            "lang": "python",
+            "code": "def find_by_id(todo_id: int):\n    for t in todos:\n        if t[\"id\"] == todo_id:\n            return t\n    return None"
           },
           {
             "type": "ul",
             "items": [
-              "`for t in todos`：リストの要素を1つずつ取り出す",
-              "`t[\"id\"]`：辞書から特定のキーの値を取得する",
-              "`return t`：見つかった時点で処理を終了する",
-              "`return None`：最後まで見つからなかった場合の戻り値"
+              "`todo_id: int`：引数 todo_id は整数（型ヒント）",
+              "`for t in todos`：リスト todos を先頭から順に取り出す",
+              "`t[\"id\"]`：辞書（dict）のキー \"id\" の値を取得する",
+              "`==`：等しいかどうかを比較する演算子",
+              "見つかったら `return t`、最後まで見つからなければ `return None`"
             ]
           }
         ]
       },
       {
         "id": "deadline-to-date",
-        "title": "文字列を日付オブジェクトに変換する関数",
-        "summary": "None の扱いと型変換を理解します。",
+        "title": "締切文字列を日付に変換する関数",
+        "summary": "空（未設定）を None として扱い、安全に型変換します。",
         "content": [
           {
-            "type": "p",
-            "text": "`deadline_to_date_or_none()` は、締切日が未設定の場合と設定されている場合を分けて処理する関数です。"
+            "type": "code",
+            "filename": "deadline_to_date_or_none.py",
+            "lang": "python",
+            "code": "def deadline_to_date_or_none(deadline: str):\n    if not deadline:\n        return None\n    return datetime.strptime(deadline, \"%Y-%m-%d\").date()"
           },
           {
             "type": "ul",
             "items": [
-              "`if not deadline`：空文字を False として判定する",
+              "`if not deadline`：空文字 \"\" は False 扱い → 未設定なら None を返す",
               "`None`：値が存在しないことを表す特別な値",
-              "`.date()`：datetime から日付部分だけを取り出す"
+              "`datetime.strptime(deadline, \"%Y-%m-%d\")`：文字列を datetime に変換する",
+              "`.date()`：datetime から日付部分だけを取り出す（date型）"
             ]
           }
         ]
       },
       {
         "id": "sort-key-deadline",
-        "title": "ソート用キー関数",
-        "summary": "sorted() とタプル比較の仕組みを学びます。",
+        "title": "締切順ソートのためのキー関数",
+        "summary": "タプルの比較を利用して、未設定の締切を最後に回します。",
         "content": [
           {
-            "type": "p",
-            "text": "`sort_key_deadline()` は、締切日順に並び替えるためのキー関数です。Python では **タプルの比較** が自動的に行われます。"
+            "type": "code",
+            "filename": "sort_key_deadline.py",
+            "lang": "python",
+            "code": "def sort_key_deadline(t):\n    d = deadline_to_date_or_none(t[\"deadline\"])\n    return (d is None, d)"
           },
           {
             "type": "ul",
             "items": [
-              "`(d is None, d)`：None を最後に回すための工夫",
-              "タプルは左から順に比較される",
-              "`sorted(..., key=関数)`：並び替えの基準を指定する"
+              "`t[\"deadline\"]`：辞書から締切文字列を取り出す",
+              "`d = ...`：変数 d に変換結果（date または None）を代入する",
+              "`d is None`：None かどうかを判定（is は同一性の比較）",
+              "`return (d is None, d)`：2要素のタプルを返す",
+              "タプルは左から順に比較されるため、`(False, 日付)` が先、`(True, None)` が後になる → 未設定は最後に並ぶ"
             ]
           }
         ]
       },
       {
         "id": "pretty-print-list",
-        "title": "一覧表示用の関数",
-        "summary": "for 文と f文字列による整形出力を確認します。",
+        "title": "一覧を見やすく表示する関数",
+        "summary": "f文字列と文字列演算で整形して表示します。",
         "content": [
           {
-            "type": "p",
-            "text": "`pretty_print_list()` は、Todo の一覧を見やすく表示するための関数です。"
+            "type": "code",
+            "filename": "pretty_print_list.py",
+            "lang": "python",
+            "code": "def pretty_print_list(items: list[dict]) -> None:\n    if not items:\n        print(\"（記録はありません）\")\n        return\n    print(\"-\" * 80)\n    for t in items:\n        print(f\"[{t['id']}] {t['company']} / {t['role']} / {t['stage']}  DDL={t['deadline'] or '未設定'}  状態={t['status']}\")\n        print(f\"    更新日時: {t['updated_at']}\")\n    print(\"-\" * 80)"
           },
           {
             "type": "ul",
             "items": [
-              "`if not items`：空リストかどうかを判定する",
-              "`print(\"-\" * 80)`：文字列の繰り返し",
-              "`f\"...{変数}...\"`：f文字列による埋め込み表示"
+              "`items: list[dict]`：辞書のリストを受け取る（型ヒント）",
+              "`-> None`：この関数は値を返さない（表示だけする）",
+              "`if not items`：空リストなら True → 記録なし表示して return",
+              "`\"-\" * 80`：文字列を 80 回繰り返して横線を作る",
+              "`for t in items`：一覧の各要素（辞書）を順番に表示する",
+              "`f\"...\"`：f文字列で辞書の値を埋め込んで表示する",
+              "`t['deadline'] or '未設定'`：deadline が空なら '未設定' を使う（or によるフォールバック）"
             ]
           }
         ]
       },
       {
         "id": "input-id",
-        "title": "ID を数値として受け取る関数",
-        "summary": "文字列と数値の違いを理解します。",
+        "title": "ID を整数として受け取る関数",
+        "summary": "isdigit と int 変換で「数値として安全に扱う」方法を学びます。",
         "content": [
           {
-            "type": "p",
-            "text": "`input_id()` は、ユーザー入力を数値として安全に扱うための関数です。"
+            "type": "code",
+            "filename": "input_id.py",
+            "lang": "python",
+            "code": "def input_id(prompt: str) -> int | None:\n    s = input_nonempty(prompt)\n    if not s.isdigit():\n        print(\"ID は数字で入力してください。\")\n        return None\n    return int(s)"
           },
           {
             "type": "ul",
             "items": [
-              "入力値は最初は必ず文字列になる",
-              "`.isdigit()`：文字列が数字だけで構成されているかを判定",
-              "`int(s)`：文字列を整数に変換する",
-              "不正な入力時は `None` を返す設計"
+              "`-> int | None`：戻り値は「int か None」のどちらか（Union 型の表現）",
+              "`s.isdigit()`：文字列が数字だけで構成されているかを判定する",
+              "`if not ...`：数字でなければエラー表示し None を返す",
+              "`int(s)`：文字列を整数に変換する（数字以外だと例外になるため事前チェックが重要）"
             ]
           }
         ]
       }
     ]
   }
+  
   
   
   
