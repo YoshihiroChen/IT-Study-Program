@@ -88,46 +88,6 @@ const CURRICULUM: Chapter[] = [
           }
         ]
       },
-      {
-        "id": "how-to-use-program",
-        "title": "プログラムの操作イメージ",
-        "summary": "完成したプログラムの使い方をイメージします。",
-        "content": [
-          {
-            "type": "p",
-            "text": "プログラムを起動すると、画面にメニューが表示され、数字を入力して操作を選択します。ユーザーは表示された案内に従って情報を入力するだけで操作できます。"
-          },
-          {
-            "type": "code",
-            "filename": "menu-image.txt",
-            "lang": "text",
-            "code": "1) 新規選考を追加\n2) 選考一覧を表示\n3) 選考状態を更新\n0) 終了\n\n選択："
-          },
-          {
-            "type": "p",
-            "text": "このような **メニュー型のプログラム** は、Python 初学者でも作りやすく、アプリケーションの基本構造を理解するのに適しています。"
-          }
-        ]
-      },
-      {
-        "id": "learning-goal",
-        "title": "この講座で身につくこと",
-        "summary": "このプログラムを通して学ぶ目的を整理します。",
-        "content": [
-          {
-            "type": "p",
-            "text": "この講座の目的は、単に Python の文法を覚えることではありません。**「やりたいことを、動くプログラムに落とし込む力」** を身につけることです。"
-          },
-          {
-            "type": "ul",
-            "items": [
-              "Python の基本文法の使い方",
-              "機能からプログラム構造を考える力",
-              "実用的な小さなアプリを自分で作る経験"
-            ]
-          }
-        ]
-      }
     ]
   },
   {
@@ -230,8 +190,6 @@ print(type(is_active))  # <class 'bool'>`
             "text": "Python ではすべてがオブジェクトとして扱われますが、これらのプリミティブ型は最も基本的なデータ構造として、複雑な型の基盤になります。"
           }
         ],
-        "level": "basic",
-        "estMin": 7
       },
       {
         "id": "list",
@@ -269,8 +227,6 @@ print(fruits)  # ['apple', 'mango', 'grape']`
             ]
           }
         ],
-        "level": "basic",
-        "estMin": 7
       },
       {
         "id": "dict",
@@ -312,8 +268,6 @@ for key, value in person.items():
             ]
           }
         ],
-        "level": "basic",
-        "estMin": 8
       },
       {
         "id": "if-conditional",
