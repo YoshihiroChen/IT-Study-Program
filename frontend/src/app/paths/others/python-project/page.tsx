@@ -591,65 +591,194 @@ for key, value in person.items():
           }
         ]
       },
+      
+    ]
+  },
+  {
+    "key": "python-utility-functions-explanation",
+    "title": "ユーティリティ関数の文法解説",
+    "lessons": [
       {
-        "id": "utility-functions",
-        "title": "ユーティリティ関数の実装",
-        "summary": "入力チェックや補助処理を行う関数を確認します。",
+        "id": "now-str-function",
+        "title": "現在時刻を文字列で取得する関数",
+        "summary": "datetime モジュールと関数定義の基本構文を学びます。",
         "content": [
           {
             "type": "p",
-            "text": "入力チェックや日付処理などの **共通処理** は、ユーティリティ関数としてまとめています。これにより、コードの重複を防げます。"
+            "text": "`now_str()` は、現在の日時を取得し、文字列として返す関数です。ここでは **関数定義・戻り値・外部モジュールの利用** が使われています。"
           },
           {
             "type": "ul",
             "items": [
-              "`input_nonempty()`：空入力を防ぐ",
-              "`input_choice()`：選択肢を制限する",
-              "`input_date_strict_or_empty()`：日付形式を検証する"
+              "`def 関数名() -> str`：関数を定義し、戻り値が文字列であることを示す型ヒント",
+              "`datetime.now()`：現在の日時を取得する",
+              "`strftime()`：日時を指定フォーマットの文字列に変換する",
+              "`return`：関数の結果を呼び出し元へ返す"
             ]
           }
         ]
       },
       {
-        "id": "feature-functions",
-        "title": "各機能を担当する関数",
-        "summary": "Todo アプリの主要機能を実装します。",
+        "id": "input-nonempty",
+        "title": "空入力を防ぐ入力関数",
+        "summary": "while ループと条件分岐を使った入力検証を学びます。",
         "content": [
           {
             "type": "p",
-            "text": "就活 Todo アプリの各操作は、**1 機能 1 関数** の形で実装されています。これにより、処理の役割が明確になります。"
+            "text": "`input_nonempty()` は、ユーザーが空文字を入力した場合に、再入力を促す関数です。**無限ループと if 文** を組み合わせています。"
           },
           {
             "type": "ul",
             "items": [
-              "`add_todo()`：選考情報を新しく追加する",
-              "`list_todos()`：登録済みの選考を一覧表示する",
-              "`update_status()`：選考の状態を変更する"
+              "`while True`：条件を満たすまで繰り返す無限ループ",
+              "`input()`：ユーザーからの入力を受け取る",
+              "`.strip()`：前後の空白文字を削除する",
+              "`if s:`：文字列が空でないかを判定する",
+              "`return`：正しい入力が得られた時点で関数を終了する"
             ]
           }
         ]
       },
       {
-        "id": "main-loop-execution",
-        "title": "メインループとプログラムの実行",
-        "summary": "アプリ全体がどのように動くかを理解します。",
+        "id": "input-choice",
+        "title": "選択肢を限定する入力関数",
+        "summary": "リストと in 演算子を使った入力制御を理解します。",
         "content": [
           {
             "type": "p",
-            "text": "`run_app()` 関数は、アプリケーション全体を制御する **入口** です。メニュー表示とユーザー入力に応じた処理分岐を担当します。"
+            "text": "`input_choice()` は、あらかじめ用意された選択肢の中からのみ入力を受け付ける関数です。"
           },
           {
             "type": "ul",
             "items": [
-              "`while True` による常駐動作",
-              "ユーザー入力に応じた関数呼び出し",
-              "終了条件でループを抜ける"
+              "`choices: list[str]`：文字列のリストを引数として受け取る",
+              "`\"/\".join(choices)`：リストの要素を `/` 区切りの文字列に変換する",
+              "`if s in choices`：入力値が選択肢に含まれているかを判定する",
+              "入力が不正な場合は再度ループに戻る"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "input-date-strict",
+        "title": "日付形式を厳密に検証する関数",
+        "summary": "正規表現と例外処理を用いた入力チェックを学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`input_date_strict_or_empty()` は、日付形式を厳密にチェックする関数です。ここでは **正規表現・try / except** が使われています。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`DATE_RE.match()`：正規表現で文字列の形式を検証する",
+              "`try / except`：エラーが起きる可能性のある処理を安全に実行する",
+              "`datetime.strptime()`：文字列を日付として解析する",
+              "`ValueError`：無効な日付の場合に発生する例外"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "find-by-id",
+        "title": "ID でデータを検索する関数",
+        "summary": "for ループと辞書アクセスの基本を確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`find_by_id()` は、リスト内の辞書データを順番に調べ、指定された ID を持つ要素を探す関数です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`for t in todos`：リストの要素を1つずつ取り出す",
+              "`t[\"id\"]`：辞書から特定のキーの値を取得する",
+              "`return t`：見つかった時点で処理を終了する",
+              "`return None`：最後まで見つからなかった場合の戻り値"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "deadline-to-date",
+        "title": "文字列を日付オブジェクトに変換する関数",
+        "summary": "None の扱いと型変換を理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`deadline_to_date_or_none()` は、締切日が未設定の場合と設定されている場合を分けて処理する関数です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`if not deadline`：空文字を False として判定する",
+              "`None`：値が存在しないことを表す特別な値",
+              "`.date()`：datetime から日付部分だけを取り出す"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "sort-key-deadline",
+        "title": "ソート用キー関数",
+        "summary": "sorted() とタプル比較の仕組みを学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`sort_key_deadline()` は、締切日順に並び替えるためのキー関数です。Python では **タプルの比較** が自動的に行われます。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`(d is None, d)`：None を最後に回すための工夫",
+              "タプルは左から順に比較される",
+              "`sorted(..., key=関数)`：並び替えの基準を指定する"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "pretty-print-list",
+        "title": "一覧表示用の関数",
+        "summary": "for 文と f文字列による整形出力を確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`pretty_print_list()` は、Todo の一覧を見やすく表示するための関数です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`if not items`：空リストかどうかを判定する",
+              "`print(\"-\" * 80)`：文字列の繰り返し",
+              "`f\"...{変数}...\"`：f文字列による埋め込み表示"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "input-id",
+        "title": "ID を数値として受け取る関数",
+        "summary": "文字列と数値の違いを理解します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "`input_id()` は、ユーザー入力を数値として安全に扱うための関数です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "入力値は最初は必ず文字列になる",
+              "`.isdigit()`：文字列が数字だけで構成されているかを判定",
+              "`int(s)`：文字列を整数に変換する",
+              "不正な入力時は `None` を返す設計"
             ]
           }
         ]
       }
     ]
   }
+  
   
   
   
