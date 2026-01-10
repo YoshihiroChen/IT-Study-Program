@@ -636,6 +636,7 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-4b", target: "web-4c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-4", target: "web-4e", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-5", target: "web-5a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
+  { source: "web-5a", target: "web-5c", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-5", target: "web-5b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-6", target: "web-6a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-6", target: "web-6b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
