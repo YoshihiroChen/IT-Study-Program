@@ -189,30 +189,131 @@ const CURRICULUM: Chapter[] = [
         ]
       },
       {
-        "id": "data-types-and-structures",
-        "title": "データ型とデータ構造",
-        "summary": "情報をどの形で管理するかを学びます。",
+        "id": "primitive-types",
+        "title": "プリミティブ型",
+        "summary": "Python の基本的なデータ型には、数値型・文字列型・ブール型などがあります。",
         "content": [
           {
             "type": "p",
-            "text": "プログラムでは情報を保存・管理する必要があります。就活 Todo アプリでは、**1 件の選考情報をまとめて扱い、複数件を一覧として管理** します。"
+            "text": "Python のプリミティブ型（基本型）は、プログラムの基礎を構成する最も単純なデータ型です。代表的なものには数値型（int, float）、文字列型（str）、ブール型（bool）などがあります。"
           },
           {
             "type": "code",
-            "filename": "data-structure-basic.py",
+            "filename": "primitive-types.py",
             "lang": "python",
-            "code": "todo = {\n    \"company\": \"A社\",\n    \"role\": \"エンジニア\",\n    \"status\": \"TODO\"\n}\n\ntodos = [todo]"
+            "code": `# 数値型
+x = 42        # int（整数）
+y = 3.14      # float（浮動小数点数）
+  
+# 文字列型
+name = "Python"
+  
+# ブール型
+is_active = True
+  
+print(type(x))       # <class 'int'>
+print(type(y))       # <class 'float'>
+print(type(name))    # <class 'str'>
+print(type(is_active))  # <class 'bool'>`
           },
           {
             "type": "ul",
             "items": [
-              "`str`：会社名・職種・状態などの文字情報",
-              "`int`：ID などの数値",
-              "`dict`：1 件の選考情報をまとめる",
-              "`list`：複数の選考情報を管理する"
+              "`int`：整数を表す",
+              "`float`：小数を表す",
+              "`str`：文字列を表す",
+              "`bool`：True / False の論理値を表す"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "Python ではすべてがオブジェクトとして扱われますが、これらのプリミティブ型は最も基本的なデータ構造として、複雑な型の基盤になります。"
+          }
+        ],
+        "level": "basic",
+        "estMin": 7
+      },
+      {
+        "id": "list",
+        "title": "リスト",
+        "summary": "複数の要素を順序付きで格納できる可変長のデータ構造です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "リスト（list）は、複数の値を順序付きで格納できるデータ構造です。**ミュータブル（可変）** なため、要素の追加・削除・変更が可能です。"
+          },
+          {
+            "type": "code",
+            "filename": "list-basic.py",
+            "lang": "python",
+            "code": `fruits = ["apple", "banana", "orange"]
+print(fruits[0])  # "apple"
+  
+# 要素の追加
+fruits.append("grape")
+  
+# 要素の変更
+fruits[1] = "mango"
+  
+# 要素の削除
+del fruits[2]
+  
+print(fruits)  # ['apple', 'mango', 'grape']`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "インデックスでアクセス可能（0 始まり）",
+              "append(), insert(), remove() などで操作可能",
+              "ミュータブル（可変）なので後から変更できる"
             ]
           }
-        ]
+        ],
+        "level": "basic",
+        "estMin": 7
+      },
+      {
+        "id": "dict",
+        "title": "辞書型",
+        "summary": "キーと値のペアでデータを管理する柔軟なデータ構造です。",
+        "content": [
+          {
+            "type": "p",
+            "text": "辞書型（dict）は、**キーと値のペア** でデータを格納するデータ構造です。キーはユニークでなければならず、値はどんな型でも格納できます。"
+          },
+          {
+            "type": "code",
+            "filename": "dict-basic.py",
+            "lang": "python",
+            "code": `person = {
+  "name": "Alice",
+  "age": 25,
+  "city": "Tokyo"
+}
+  
+print(person["name"])  # Alice
+  
+# 要素の追加・更新
+person["age"] = 26
+  
+# 要素の削除
+del person["city"]
+  
+# キーと値の取得
+for key, value in person.items():
+    print(key, value)`
+          },
+          {
+            "type": "ul",
+            "items": [
+              "キーで値にアクセスする（順序付き・ユニーク）",
+              "ミュータブルなので追加・削除・更新が可能",
+              "JSON などデータ交換形式とも相性がよい"
+            ]
+          }
+        ],
+        "level": "basic",
+        "estMin": 8
       },
       {
         "id": "if-conditional",

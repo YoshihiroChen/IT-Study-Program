@@ -595,7 +595,7 @@ const tracks: Track[] = [
   },
   {
     key: "others",
-    title: "その他",
+    title: "体験プログラム",
     color: "violet-500",
     steps: [
       { id: "oth-1", label: "pythonプロジェクト体験", href: "/paths/others/python-project", summary: "パイソンによりプロジェクト体験をする" },
