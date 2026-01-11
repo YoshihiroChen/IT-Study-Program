@@ -1968,7 +1968,179 @@ const CURRICULUM: Chapter[] = [
             "text": "この整理ができると、「FastAPIはどこまで担当するのか」「フロントはどこで画面を作るのか」「静的ファイルは誰が配るのか」をはっきり切り分けられるようになります。次の小節では、FastAPIが静的ファイルを配信する方法（mount / StaticFiles）を実装として確認します。"
           }
         ]
+      },
+      {
+        "id": "fastapi-response-model",
+        "title": "レスポンスモデル：response_model と response_model_exclude_unset",
+        "summary": "FastAPIでは「返すJSONの形」を `response_model` で固定できます。さらに `response_model_exclude_unset=True` を使うと、レスポンスから「未設定（unset）」のフィールドを自動的に省略できます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "これまでの小節では、`BaseModel` を使ってリクエストボディ（入力）を型安全に受け取る方法を学びました。次に重要なのが、レスポンス（出力）の形をコントロールすることです。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPIでは、エンドポイントが返すデータの形を `response_model` で指定できます。これを使うと「このAPIは必ずこの形で返す」という契約（API仕様）をコードで明示できます。"
+          },
+          {
+            "type": "p",
+            "text": "また、レスポンスに含めたくない情報（例：パスワード、内部フラグなど）を自動的に除外したり、型変換やバリデーションをレスポンス側にも適用できます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 1. response_model とは何か"
+          },
+          {
+            "type": "p",
+            "text": "`response_model` は「レスポンスの出力形式（スキーマ）を指定する」ためのパラメータです。`@app.get()` や `@app.post()` のデコレータに付けます。"
+          },
+          {
+            "type": "p",
+            "text": "まずは、ユーザー作成APIを例にして整理します。前の小節で使った `UserCreate` は入力用（リクエスト用）でした。ここでは出力用（レスポンス用）に `UserOut` を用意します。"
+          },
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from pydantic import BaseModel\n\n\nclass UserCreate(BaseModel):\n    name: str\n    age: int\n    email: str\n\n\nclass UserOut(BaseModel):\n    id: int\n    name: str\n    age: int\n    email: str"
+          },
+          {
+            "type": "p",
+            "text": "ポイントは「入力用」と「出力用」を分けている点です。入力では id を受け取らない（サーバー側で採番する）ことが多いので、`UserCreate` には id を入れません。一方で、レスポンスでは作成したユーザーの id を返したいので `UserOut` には id を含めます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "次に、`response_model=UserOut` を指定したエンドポイントを書きます。"
+          },
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import UserCreate, UserOut\n\napp = FastAPI()\n\n\n@app.post(\"/users\", response_model=UserOut)\ndef create_user(user: UserCreate):\n    # 本来はDBに保存して id を採番しますが、ここでは例として固定値を返します\n    created = {\n        \"id\": 1,\n        \"name\": user.name,\n        \"age\": user.age,\n        \"email\": user.email,\n    }\n    return created"
+          },
+          {
+            "type": "p",
+            "text": "このように `response_model=UserOut` を指定すると、FastAPIは「このエンドポイントは UserOut の形で返す」というルールを適用します。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、もし開発者がうっかり余計な情報を返してしまっても、`response_model` によってレスポンスがフィルタされます（つまり、UserOut に存在しないキーはレスポンスに出ません）。"
+          },
+          {
+            "type": "code",
+            "filename": "response_model_filter_example.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import UserCreate, UserOut\n\napp = FastAPI()\n\n\n@app.post(\"/users\", response_model=UserOut)\ndef create_user(user: UserCreate):\n    # 余計な情報（internal_flag）を返してしまっても…\n    created = {\n        \"id\": 1,\n        \"name\": user.name,\n        \"age\": user.age,\n        \"email\": user.email,\n        \"internal_flag\": True,  # 本来クライアントに返したくない\n    }\n    return created"
+          },
+          {
+            "type": "p",
+            "text": "この場合でも、レスポンスに含まれるのは `UserOut` に定義されたフィールドだけです。`internal_flag` はクライアントに返りません。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 2. response_model_exclude_unset とは何か"
+          },
+          {
+            "type": "p",
+            "text": "次に `response_model_exclude_unset=True` を説明します。これは「レスポンスをJSONに変換するとき、未設定（unset）のフィールドを省略する」ためのオプションです。"
+          },
+          {
+            "type": "p",
+            "text": "ここで重要なのは、`unset` の意味です。`unset` は「値が None である」ではなく、「そもそも値が与えられていない（設定されていない）」という状態です。"
+          },
+      
+          {
+            "type": "p",
+            "text": "この挙動を分かりやすくするために、レスポンスモデルに「任意項目（Optional）」を含めた例を作ります。"
+          },
+          {
+            "type": "code",
+            "filename": "models_optional.py",
+            "lang": "python",
+            "code": "from pydantic import BaseModel\n\n\nclass UserOutOptional(BaseModel):\n    id: int\n    name: str\n    age: int | None = None\n    email: str | None = None"
+          },
+          {
+            "type": "p",
+            "text": "このモデルは、`age` と `email` を省略可能にしています。ここで、同じデータを返すとしても、`exclude_unset` の有無によって「レスポンスJSONの見た目」が変わります。"
+          },
+      
+          {
+            "type": "p",
+            "text": "### 2-1. response_model_exclude_unset を使わない場合"
+          },
+          {
+            "type": "code",
+            "filename": "main_no_exclude_unset.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models_optional import UserOutOptional\n\napp = FastAPI()\n\n\n@app.get(\"/users/{user_id}\", response_model=UserOutOptional)\ndef get_user(user_id: int):\n    # age と email を返さない（＝値を与えない）ケースを作る\n    return {\n        \"id\": user_id,\n        \"name\": \"Alice\"\n    }"
+          },
+          {
+            "type": "p",
+            "text": "このとき、クライアントが受け取るJSONは、`age` と `email` が `null` として含まれやすい形になります（モデル側にデフォルトがあるため）。"
+          },
+          {
+            "type": "code",
+            "filename": "response_no_exclude_unset.json",
+            "lang": "json",
+            "code": "{\n  \"id\": 1,\n  \"name\": \"Alice\",\n  \"age\": null,\n  \"email\": null\n}"
+          },
+      
+          {
+            "type": "p",
+            "text": "### 2-2. response_model_exclude_unset=True を使う場合"
+          },
+          {
+            "type": "p",
+            "text": "次に、同じ処理でも `response_model_exclude_unset=True` を付けます。"
+          },
+          {
+            "type": "code",
+            "filename": "main_exclude_unset.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models_optional import UserOutOptional\n\napp = FastAPI()\n\n\n@app.get(\n    \"/users/{user_id}\",\n    response_model=UserOutOptional,\n    response_model_exclude_unset=True,\n)\ndef get_user(user_id: int):\n    # age と email を返さない（＝値を与えない）ケースを作る\n    return {\n        \"id\": user_id,\n        \"name\": \"Alice\"\n    }"
+          },
+          {
+            "type": "p",
+            "text": "この場合、未設定（unset）のフィールドはレスポンスから省略されます。つまり、`age` と `email` が「出力されない」JSONになります。"
+          },
+          {
+            "type": "code",
+            "filename": "response_exclude_unset.json",
+            "lang": "json",
+            "code": "{\n  \"id\": 1,\n  \"name\": \"Alice\"\n}"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 3. いつ response_model_exclude_unset が役に立つのか"
+          },
+          {
+            "type": "p",
+            "text": "`response_model_exclude_unset=True` は、特に「部分的なデータだけ返したい」場面で役立ちます。例えば、更新API（PATCHのような部分更新）で、更新された項目だけを返したい場合です。"
+          },
+          {
+            "type": "p",
+            "text": "このとき、未設定項目を `null` として返してしまうと、クライアント側が「このフィールドは null に更新されたのか？」と誤解する可能性があります。`exclude_unset` を使えば「そもそも返していない」ことが明確になります。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 4. まとめ"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`response_model`：レスポンスの形（出力スキーマ）を固定し、余計なフィールドを自動的に除外できる",
+              "`response_model_exclude_unset=True`：未設定（unset）のフィールドをレスポンスJSONから省略できる",
+              "分離式のAPIでは「レスポンスの形」はフロント実装に直結するため、`response_model` で仕様を明示することが重要"
+            ]
+          }
+        ]
       }
+      
       
       
       
