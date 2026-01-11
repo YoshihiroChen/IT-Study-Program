@@ -618,7 +618,8 @@ const tracks: Track[] = [
 type Side =
   | "left" | "right" | "top" | "bottom"| "left-in" | "right-out"
   | "top-in" | "top-out" | "bottom-in" | "bottom-out"
-  | "left-out" | "right-in";
+  | "left-out" | "right-in"
+  | "right-out" | "left-in";
 
 type ExtraEdge = {
   source: string;
@@ -658,7 +659,7 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-5", target: "web-5b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-6", target: "web-6a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-6", target: "web-6b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
-  { source: "web-5c", target: "web-6c", sourceHandle: "right-in", targetHandle: "left-out", type: "straight", animated: true },
+  { source: "web-5c", target: "web-6c", sourceHandle: "right-out", targetHandle: "left-in", type: "straight", animated: true },
   { source: "web-7", target: "web-7a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-7", target: "web-7b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "sier-4", target: "sier-4a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
@@ -731,6 +732,9 @@ function StepNode({ data }: RFNodeProps<{ label: string; summary?: string; href?
       {/* 左右双向（新增） */}
       <Handle type="source" position={Position.Left}  id="left-out"  />
       <Handle type="target" position={Position.Right} id="right-in"  />
+      {/* 左右双向（新增） */}
+      <Handle type="source" position={Position.Right}  id="right-out"  />
+      <Handle type="target" position={Position.Left} id="left-in"  />
     </div>
   );
 }
