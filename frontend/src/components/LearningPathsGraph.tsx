@@ -526,6 +526,15 @@ const tracks: Track[] = [
         row: 0.9,
         chain: false,
       },
+      {
+        id: "web-6c",
+        label: "httpsの学習",
+        href: "/paths/web/https",
+        summary: "httpsという安全な通信プロトコルを学習する",
+        col: 5,
+        row: -2,
+        chain: false,
+      },
     ],
   },
   {
@@ -649,6 +658,7 @@ const extraEdges: ExtraEdge[] = [
   { source: "web-5", target: "web-5b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "web-6", target: "web-6a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-6", target: "web-6b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
+  { source: "web-5c", target: "web-6c", sourceHandle: "right-in", targetHandle: "left-out", type: "straight", animated: true },
   { source: "web-7", target: "web-7a", sourceHandle: "top", targetHandle: "bottom", type: "straight", animated: true },
   { source: "web-7", target: "web-7b", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
   { source: "sier-4", target: "sier-4a", sourceHandle: "bottom-out", targetHandle: "top-in", type: "straight", animated: true },
