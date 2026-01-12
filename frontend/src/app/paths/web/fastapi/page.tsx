@@ -2139,7 +2139,262 @@ const CURRICULUM: Chapter[] = [
             ]
           }
         ]
-      }
+      },
+      {
+        "id": "fastapi-tortoise-orm",
+        "title": "ORM 入門：Tortoise ORM とモデル設計",
+        "summary": "FastAPIでよく使われる非同期ORMの一つが Tortoise ORM です。この小節では、ORMとは何かを整理した上で、Tortoise ORM によるモデル定義と、1対多・多対1・多対多のリレーションを学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "ここからは、FastAPI と一緒によく使われる ORM（Object Relational Mapping）について学びます。APIが本格的になると、必ず「データベース」と「モデル設計」が必要になるからです。"
+          },
+          {
+            "type": "p",
+            "text": "まずは ORM とは何かを整理し、その後で非同期対応ORMである **Tortoise ORM** を使った具体的なモデル定義を見ていきます。"
+          },
+          {
+            "type": "p",
+            "text": "## 1. ORM とは何か"
+          },
+          {
+            "type": "p",
+            "text": "ORM（Object Relational Mapping）とは、「データベースのテーブル」を「プログラム上のオブジェクト（クラス）」として扱うための仕組みです。"
+          },
+          {
+            "type": "p",
+            "text": "ORMを使わない場合、SQLを文字列として直接書く必要がありますが、ORMを使うと Python のクラスや属性としてデータを操作できます。"
+          },
+          {
+            "type": "p",
+            "text": "## 2. なぜ FastAPI で Tortoise ORM を使うのか"
+          },
+          {
+            "type": "p",
+            "text": "FastAPI は非同期（async / await）を前提としたフレームワークです。そのため、ORMも非同期対応しているものが相性良く使われます。"
+          },
+          {
+            "type": "p",
+            "text": "Tortoise ORM は、Django ORM に近い書き心地を持ちながら、非同期に対応している ORM です。学習コストが低く、FastAPIとの組み合わせとしてよく採用されます。"
+          },
+          {
+            "type": "p",
+            "text": "## 3. Tortoise ORM の基本モデル定義"
+          },
+          {
+            "type": "p",
+            "text": "Tortoise ORM では、データベースのテーブルを `Model` クラスとして定義します。以下は最も基本的なユーザーモデルの例です。"
+          },
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n    email = fields.CharField(max_length=255, unique=True)\n\n    def __str__(self):\n        return self.name"
+          },
+          {
+            "type": "p",
+            "text": "このクラス1つが、データベース上の1テーブルに対応します。`fields.IntField(pk=True)` は主キー（Primary Key）を意味します。"
+          },
+      
+          {
+            "type": "p",
+            "text": "### 3-1. コード文法の解説（models.py）"
+          },
+          {
+            "type": "p",
+            "text": "ここでは、先ほどの `models.py` を「Python文法」と「Tortoise ORMの意味」の両方から、行ごとに分解して理解します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`from tortoise import models, fields`：`tortoise` パッケージから `models`（Model基底クラス群）と `fields`（カラム定義）をインポートします。",
+              "`class User(models.Model):`：Pythonのクラス定義です。`User` クラスは `models.Model` を継承（inherit）することで「DBテーブルに対応するモデル」になります。",
+              "`id = fields.IntField(pk=True)`：クラス属性（class attribute）として `id` を定義しています。ORMはこれを「整数カラム」として解釈します。`pk=True` は primary key（主キー）指定です。",
+              "`name = fields.CharField(max_length=100)`：文字列カラムです。`max_length` はDB上の最大長（例：VARCHAR(100)）に対応します。",
+              "`email = fields.CharField(max_length=255, unique=True)`：`unique=True` は「重複禁止」制約です。同じメールアドレスが複数登録されないようにします。",
+              "`def __str__(self):`：Pythonの特殊メソッド（dunder method）です。オブジェクトを文字列化するときの表示を定義します。",
+              "`return self.name`：`self` はインスタンス自身を指します。`self.name` はそのユーザーの `name` 値を返します。"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "補足：Tortoise ORM では、モデルクラス内に `fields.XxxField(...)` をクラス属性として並べるだけで、DBのテーブル定義（スキーマ）として扱われます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 4. 多対1（Many-to-One）の関係"
+          },
+          {
+            "type": "p",
+            "text": "多対1の関係とは、「多くのデータが1つのデータに属する」関係です。例えば「投稿（Post）は1人のユーザーに属する」という関係です。"
+          },
+          {
+            "type": "code",
+            "filename": "models_many_to_one.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n\n\nclass Post(models.Model):\n    id = fields.IntField(pk=True)\n    title = fields.CharField(max_length=200)\n    content = fields.TextField()\n\n    user = fields.ForeignKeyField(\n        \"models.User\",\n        related_name=\"posts\",\n        on_delete=fields.CASCADE,\n    )"
+          },
+          {
+            "type": "p",
+            "text": "`ForeignKeyField` を使うことで「多対1」の関係を表現できます。ここでは Post が User に属しています。"
+          },
+      
+          {
+            "type": "p",
+            "text": "### 4-1. コード文法の解説（models_many_to_one.py）"
+          },
+          {
+            "type": "p",
+            "text": "この例は「User（親）と Post（子）」の関係を作っています。`Post.user` が外部キー（Foreign Key）で、Post側に親（User）を指す矢印がある構造です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`class User(models.Model):` と `class Post(models.Model):`：それぞれが別テーブル（users, posts）に対応するモデルです。",
+              "`content = fields.TextField()`：長文向けのテキストカラムです。`CharField` と違い、通常は `max_length` を指定しません。",
+              "`user = fields.ForeignKeyField(...)`：外部キーを表すフィールドです。ここが「多対1」を作る中心です。",
+              "`\"models.User\"`：関連先モデルの指定です。文字列で指定しているのは、読み込み順序の問題を避けるためです（循環参照対策）。",
+              "`related_name=\"posts\"`：逆方向アクセス名です。User側から `user.posts` と attaching できるようになります。",
+              "`on_delete=fields.CASCADE`：親（User）が削除されたとき、子（Post）も連鎖削除する設定です。CASCADEは「親が消えたら子も消える」を意味します。",
+              "`fields.ForeignKeyField(` の括弧が複数行になっている：Pythonでは `(...)` の中では改行が許可されるため、読みやすく複数行にできます。"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "補足：`Post` が多数存在しても、それぞれの `Post.user` は必ず1人の `User` を指すため「多（Post）対 1（User）」になります。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 5. 1対多（One-to-Many）の関係"
+          },
+          {
+            "type": "p",
+            "text": "1対多は、多対1の裏側の関係です。上の例では「1人のユーザーは複数の投稿を持つ」という関係になります。"
+          },
+          {
+            "type": "p",
+            "text": "`related_name=\"posts\"` を指定しているため、User 側からは `user.posts` として投稿一覧にアクセスできます。"
+          },
+          {
+            "type": "code",
+            "filename": "one_to_many_usage.py",
+            "lang": "python",
+            "code": "# user が取得済みの場合\nposts = await user.posts.all()"
+          },
+          {
+            "type": "p",
+            "text": "このように、1対多の関係は追加の定義を書かなくても、自動的に利用できます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "### 5-1. コード文法の解説（one_to_many_usage.py）"
+          },
+          {
+            "type": "p",
+            "text": "この1行には、非同期ORMならではの文法と、リレーションアクセスの文法が両方入っています。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`user.posts`：`related_name=\"posts\"` によって作られた「逆方向リレーション」です。Userの投稿一覧にアクセスするための入り口になります。",
+              "`.all()`：クエリを組み立てます。「このユーザーに紐づく投稿を全部」という意味のQuerySetに相当します。",
+              "`await`：非同期処理の結果を待ちます。DBアクセスはI/Oなので、Tortoise ORMでは `await` が必要です。",
+              "`posts = ...`：取得結果（投稿のリストに相当）が `posts` 変数に代入されます。"
+            ]
+          },
+      
+          {
+            "type": "p",
+            "text": "## 6. 多対多（Many-to-Many）の関係"
+          },
+          {
+            "type": "p",
+            "text": "多対多とは、「1つのデータが複数のデータに属し、逆もまた同様」という関係です。例えば「投稿とタグ」の関係が代表例です。"
+          },
+          {
+            "type": "code",
+            "filename": "models_many_to_many.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass Tag(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=50)\n\n\nclass Post(models.Model):\n    id = fields.IntField(pk=True)\n    title = fields.CharField(max_length=200)\n\n    tags = fields.ManyToManyField(\n        \"models.Tag\",\n        related_name=\"posts\"\n    )"
+          },
+          {
+            "type": "p",
+            "text": "Tortoise ORM では `ManyToManyField` を使うことで、中間テーブルを意識せずに多対多の関係を表現できます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "### 6-1. コード文法の解説（models_many_to_many.py）"
+          },
+          {
+            "type": "p",
+            "text": "この例では「Post は複数の Tag を持てる」「Tag は複数の Post に付けられる」という相互関係を作っています。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`tags = fields.ManyToManyField(...)`：多対多リレーションを定義します。ORMが自動的に「中間テーブル（結合テーブル）」を作成・管理します。",
+              "`\"models.Tag\"`：関連先モデル指定です。ここでは Post 側に `tags` を置き、Tag と結びつけています。",
+              "`related_name=\"posts\"`：逆方向アクセス名です。Tag側から `tag.posts` として「このタグが付いた投稿一覧」を辿れるようになります。",
+              "多対多は「片側にだけ書けばOK」：この例では Post に `tags` を書くだけで、Tag側にも逆アクセスが自動で生えます。"
+            ]
+          },
+      
+          {
+            "type": "p",
+            "text": "## 7. 関係設計の考え方"
+          },
+          {
+            "type": "p",
+            "text": "ORMの本質は「テーブル定義」ではなく、「現実世界の関係をどうモデル化するか」です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "所有関係がある → 多対1 / 1対多",
+              "対等な関係がある → 多対多",
+              "データの主語を意識してモデルを分ける",
+              "APIのレスポンス構造を意識して設計する"
+            ]
+          },
+      
+          {
+            "type": "p",
+            "text": "## 8. まとめ"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "ORMはデータベースをオブジェクトとして扱う仕組み",
+              "Tortoise ORM は FastAPI と相性の良い非同期 ORM",
+              "ForeignKeyField で多対1 / 1対多を表現する",
+              "ManyToManyField で多対多を表現できる",
+              "モデル設計はAPI設計とセットで考えることが重要"
+            ]
+          },
+      
+          {
+            "type": "p",
+            "text": "### 追加補足：この小節で出てきたPython文法まとめ"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`import`：外部ライブラリやモジュールを読み込む文法",
+              "`class X(Y):`：クラス定義。`Y` を継承するときは括弧に親クラスを書く",
+              "`def method(self):`：インスタンスメソッド。`self` はインスタンス自身",
+              "`\"文字列\"`：Pythonの文字列リテラル。ORMではモデル参照を文字列で書くことがある",
+              "`await`：非同期処理の完了を待つ。DBアクセスはI/Oなので非同期ORMでは頻出",
+              "`(...)`：括弧内では改行が許可されるため、引数が多いときに複数行に分けられる"
+            ]
+          }
+        ]
+      },
+      
+      
       
       
       
