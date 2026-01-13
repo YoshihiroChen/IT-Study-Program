@@ -2375,24 +2375,194 @@ const CURRICULUM: Chapter[] = [
               "モデル設計はAPI設計とセットで考えることが重要"
             ]
           },
+        ]
+      },
+      {
+        "id": "fastapi-tortoise-migration",
+        "title": "ORM のマイグレーション：register_tortoise と Aerich",
+        "summary": "ORMでは、モデル定義をデータベース構造に反映するために「マイグレーション（migration）」を行います。この小節では、まず register_tortoise による FastAPI と DB の接続を整理し、その後に Aerich を使ったマイグレーション操作の流れを学びます。",
+        "content": [
+          {
+            "type": "p",
+            "text": "これまでの小節では、Tortoise ORM を使ってモデルやリレーションを定義しました。しかし、**モデルを書いただけではデータベースは自動では変わりません**。"
+          },
+          {
+            "type": "p",
+            "text": "ここで必要になるのが「マイグレーション（migration）」です。この小節では、マイグレーションとは何かを整理し、FastAPI × Tortoise ORM での基本的な運用方法を説明します。"
+          },
       
           {
             "type": "p",
-            "text": "### 追加補足：この小節で出てきたPython文法まとめ"
+            "text": "## 1. マイグレーションとは何か"
+          },
+          {
+            "type": "p",
+            "text": "マイグレーション（migration）とは、「モデル（コード）の変更内容を、データベースの構造変更として安全に反映する仕組み」です。"
+          },
+          {
+            "type": "p",
+            "text": "例えば次のような変更は、すべてマイグレーションが必要になります。"
           },
           {
             "type": "ul",
             "items": [
-              "`import`：外部ライブラリやモジュールを読み込む文法",
-              "`class X(Y):`：クラス定義。`Y` を継承するときは括弧に親クラスを書く",
-              "`def method(self):`：インスタンスメソッド。`self` はインスタンス自身",
-              "`\"文字列\"`：Pythonの文字列リテラル。ORMではモデル参照を文字列で書くことがある",
-              "`await`：非同期処理の完了を待つ。DBアクセスはI/Oなので非同期ORMでは頻出",
-              "`(...)`：括弧内では改行が許可されるため、引数が多いときに複数行に分けられる"
+              "新しいテーブル（モデル）を追加する",
+              "カラムを追加・削除・変更する",
+              "外部キーや多対多関係を追加する",
+              "制約（unique など）を変更する"
             ]
+          },
+          {
+            "type": "p",
+            "text": "ORM を使う理由の一つは、「SQLを直接書かずに、モデル変更を履歴として管理できる」点にあります。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 2. register_tortoise の役割"
+          },
+          {
+            "type": "p",
+            "text": "マイグレーションの前に、まず FastAPI アプリとデータベースを正しく接続する必要があります。そのために使われるのが `register_tortoise` です。"
+          },
+          {
+            "type": "p",
+            "text": "`register_tortoise` は、「FastAPI に Tortoise ORM の設定を登録し、DB 接続を初期化する」ための関数です。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom tortoise.contrib.fastapi import register_tortoise\n\napp = FastAPI()\n\nregister_tortoise(\n    app,\n    config={\n        \"connections\": {\n            \"default\": {\n                \"engine\": \"tortoise.backends.sqlite\",\n                \"credentials\": {\n                    \"file_path\": \"db.sqlite3\"\n                }\n            }\n        },\n        \"apps\": {\n            \"models\": {\n                \"models\": [\"models\"],\n                \"default_connection\": \"default\"\n            }\n        }\n    }\n)"
+          },
+      
+          {
+            "type": "p",
+            "text": "この設定によって、FastAPI 起動時に Tortoise ORM が初期化され、データベースとの接続が確立されます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "### 2-1. engine パラメータとは何か（重要）"
+          },
+          {
+            "type": "p",
+            "text": "ここで指定している `engine` は、「どのデータベースバックエンド（非同期ドライバ）を使って接続するか」を明示的に指定するパラメータです。"
+          },
+          {
+            "type": "p",
+            "text": "上記の設定は、内部的には次のような初期化に対応しています。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "conceptual_structure.py",
+            "lang": "python",
+            "code": "Tortoise.init(\n    config={\n        \"connections\": {\n            \"default\": {\n                \"engine\": \"tortoise.backends.sqlite\",\n                \"credentials\": {\n                    \"file_path\": \"db.sqlite3\"\n                }\n            }\n        },\n        \"apps\": {\n            \"models\": {\n                \"models\": [\"models\"],\n                \"default_connection\": \"default\"\n            }\n        }\n    }\n)"
+          },
+      
+          {
+            "type": "p",
+            "text": "`engine` によって、ORM は「どのDBに、どの非同期ドライバで接続するか」を判断します。代表的な例は以下の通りです。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`tortoise.backends.sqlite`：SQLite（内部で aiosqlite を使用）",
+              "`tortoise.backends.asyncpg`：PostgreSQL（asyncpg）",
+              "`tortoise.backends.mysql`：MySQL（aiomysql）"
+            ]
+          },
+          {
+            "type": "p",
+            "text": "一方で、`credentials` は「その engine に渡す具体的な接続情報（ファイルパス、ホスト名、ユーザー名など）」を表します。"
+          },
+          {
+            "type": "p",
+            "text": "つまり、`engine` と `credentials` を組み合わせることで、FastAPI とデータベースが初めて正しく接続されます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 3. Aerich とは何か"
+          },
+          {
+            "type": "p",
+            "text": "Tortoise ORM には、公式に推奨されているマイグレーションツールとして **Aerich** があります。"
+          },
+          {
+            "type": "p",
+            "text": "Aerich は、モデルの差分を検出し、それを「マイグレーションファイル」として管理・適用するツールです。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 4. Aerich の初期化"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "aerich init -t tortoise_config"
+          },
+          {
+            "type": "p",
+            "text": "Tortoise ORM の設定を参照するための設定ファイルを作成します。"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "aerich init -db"
+          },
+          {
+            "type": "p",
+            "text": "マイグレーション管理用のテーブル（aerich テーブル）を作成します。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 5. マイグレーションの作成と適用"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "aerich migrate --name add_user_table"
+          },
+          {
+            "type": "p",
+            "text": "モデルの差分を検出し、マイグレーションファイルを作成します。"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "aerich upgrade"
+          },
+          {
+            "type": "p",
+            "text": "マイグレーションをデータベースに適用します。"
+          },
+      
+          {
+            "type": "p",
+            "text": "## 6. マイグレーションの巻き戻し"
+          },
+          {
+            "type": "code",
+            "filename": "terminal",
+            "lang": "bash",
+            "code": "aerich downgrade"
+          },
+          {
+            "type": "p",
+            "text": "直前のマイグレーションを1つ分取り消します。"
           }
         ]
-      },
+      }
+      
       
       
       
