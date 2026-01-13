@@ -1133,7 +1133,7 @@ export default function TsBasicsPage() {
 
           <BookOpen className="w-5 h-5 opacity-80 ml-2" />
           <h1 className="text-lg font-semibold tracking-wide">
-            Githubの使用ガイダンス
+            Pythonプロジェクト体験
           </h1>
 
           <button
