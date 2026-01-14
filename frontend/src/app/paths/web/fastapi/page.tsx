@@ -2565,7 +2565,7 @@ const CURRICULUM: Chapter[] = [
       {
         "id": "api-and-restful",
         "title": "API と RESTful 規約",
-        "summary": "API は「データを操作するための入口」です。RESTful 規約は、その API を一貫したルールで設計するための考え方です。この小節では、API の基本的な役割と、RESTful 規約が何を整理しているのかを具体例とともに学びます。",
+        "summary": "API は「データを操作するための入口」です。RESTful 規約は、その API を一貫したルールで設計するための考え方です。この小節では、API の基本的な役割と、RESTful 規約が CRUD をどう整理するのかを具体例とともに学びます。",
         "content": [
           {
             "type": "p",
@@ -2608,28 +2608,258 @@ const CURRICULUM: Chapter[] = [
           },
           {
             "type": "p",
-            "text": "例えば、ユーザーというデータを扱う場合、RESTful ではまず「ユーザーというリソースが存在する」と考えます。そして、そのリソースに対して操作を行います。"
+            "text": "このとき RESTful は、データ操作を **CRUD**（Create / Read / Update / Delete）として整理し、それを HTTP メソッドと URL の組み合わせに落とし込みます。"
           },
           {
             "type": "p",
-            "text": "このとき、URL は「操作」ではなく「リソース」を表し、操作の種類は HTTP メソッドで表現します。"
+            "text": "CRUD は、ほとんどの業務アプリで必ず出てくる基本操作です。RESTful の設計では「どのリソースに対して」「CRUD のどの操作をするか」を一貫したルールで表現します。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "Create：データを新規作成する（例：ユーザー登録）",
+              "Read：データを取得する（例：ユーザー一覧・詳細取得）",
+              "Update：データを更新する（例：ユーザー情報変更）",
+              "Delete：データを削除する（例：ユーザー削除）"
+            ]
+          },
+      
+          {
+            "type": "p",
+            "text": "例えば、ユーザーというリソースを扱う場合、RESTful ではまず「ユーザーというリソースが存在する」と考えます。そして、そのリソースに対する CRUD を次のように設計します。"
+          },
+          {
+            "type": "p",
+            "text": "URL は「操作」ではなく「リソース」を表し、操作の種類は HTTP メソッドで表現します。"
           },
           {
             "type": "code",
-            "filename": "restful_example.txt",
+            "filename": "restful_crud_example.txt",
             "lang": "text",
-            "code": "GET    /users        → ユーザー一覧を取得\nPOST   /users        → ユーザーを新規作成\nGET    /users/1      → ID=1 のユーザーを取得\nPUT    /users/1      → ID=1 のユーザーを更新\nDELETE /users/1      → ID=1 のユーザーを削除"
+            "code": "Create（作成）\nPOST   /users        → ユーザーを新規作成\n\nRead（取得）\nGET    /users        → ユーザー一覧を取得\nGET    /users/1      → ID=1 のユーザーを取得\n\nUpdate（更新）\nPUT    /users/1      → ID=1 のユーザーを更新\n\nDelete（削除）\nDELETE /users/1      → ID=1 のユーザーを削除"
           },
           {
             "type": "p",
-            "text": "ここで重要なのは、URL に「getUser」や「deleteUser」のような動詞が出てこない点です。RESTful では、URL は常に「何のデータか」を表し、「何をするか」は HTTP メソッドに任せます。"
+            "text": "ここで重要なのは、URL に「createUser」や「deleteUser」のような動詞が出てこない点です。RESTful では、URL は常に「何のデータか（リソース）」を表し、「何をするか（CRUDの操作）」は HTTP メソッドに任せます。"
           },
           {
             "type": "p",
             "text": "このルールに従うことで、API 全体の構造が自然に揃い、初めて見た API でも挙動を推測しやすくなります。FastAPI は、このような RESTful な API を書きやすい構造を最初から備えています。"
           }
         ]
+      },
+      {
+        "id": "fastapi-tortoise-query-all-endpoint",
+        "title": "ORM クエリ実践：API パス関数で全件取得する",
+        "summary": "この小節では、FastAPI のパス関数（エンドポイント）の中で Tortoise ORM を使い、データを全件取得する方法を学びます。`Model.all()` が返す値の性質（リストであること）も合わせて確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の小節では、Tortoise ORM を使って「全件取得」が `await Model.all()` で行えることを見ました。ここではそれを FastAPI の実際の API パス関数の中で使います。"
+          },
+          {
+            "type": "p",
+            "text": "重要なポイントは、ORM のクエリは「API の中で呼ばれる」という点です。クライアントは URL にアクセスし、その内部で ORM がデータベースを検索します。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n    email = fields.CharField(max_length=255, unique=True)"
+          },
+      
+          {
+            "type": "p",
+            "text": "次に、ユーザー一覧を取得する API を定義します。この API は「ユーザーというリソースの一覧」を返す役割を持ちます。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import User\n\napp = FastAPI()\n\n\n@app.get(\"/users\")\nasync def get_users():\n    users = await User.all()\n    return users"
+          },
+      
+          {
+            "type": "p",
+            "text": "このように、FastAPI のパス関数の中で `await User.all()` を呼ぶことで、データベースに保存されているユーザーをすべて取得できます。"
+          },
+          {
+            "type": "p",
+            "text": "ここで注意すべき点は、`User.all()` の戻り値です。`await User.all()` の結果は「単一のユーザー」ではなく、「ユーザーの一覧」です。"
+          },
+      
+          {
+            "type": "p",
+            "text": "つまり、`users` には次のようなイメージのデータが入っています。"
+          },
+          {
+            "type": "code",
+            "filename": "users_result_image.txt",
+            "lang": "text",
+            "code": "[User(id=1, name=\"Alice\", email=\"a@example.com\"),\n User(id=2, name=\"Bob\", email=\"b@example.com\"),\n User(id=3, name=\"Carol\", email=\"c@example.com\")]"
+          },
+      
+          {
+            "type": "p",
+            "text": "`users` はリスト（配列）なので、1件ずつ処理したい場合は `for` でループできます。また、FastAPI はこのリストを自動的に JSON 配列として返します。"
+          },
+      
+          {
+            "type": "p",
+            "text": "この API にクライアントがアクセスすると、レスポンスは次のような JSON になります。"
+          },
+          {
+            "type": "code",
+            "filename": "users_response.json",
+            "lang": "json",
+            "code": "[\n  {\"id\": 1, \"name\": \"Alice\", \"email\": \"a@example.com\"},\n  {\"id\": 2, \"name\": \"Bob\", \"email\": \"b@example.com\"},\n  {\"id\": 3, \"name\": \"Carol\", \"email\": \"c@example.com\"}\n]"
+          },
+        ]
+      },
+      {
+        "id": "fastapi-tortoise-query-by-id",
+        "title": "ORM クエリ実践：パスパラメータで特定IDのデータを取得する",
+        "summary": "この小節では、FastAPI のパスパラメータ（path parameter）を使って、ID を指定した 1 件のデータを取得する方法を学びます。全件取得との違いや、取得結果が「1 件 or None」になる点を確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の小節では、`/users` エンドポイントでユーザーを全件取得しました。次によく使われるのが、「特定の ID を指定して 1 件だけ取得する」API です。"
+          },
+          {
+            "type": "p",
+            "text": "RESTful な設計では、このような取得は URL の一部に ID を含めて表現します。FastAPI では、これを「パスパラメータ」と呼びます。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n    email = fields.CharField(max_length=255, unique=True)"
+          },
+      
+          {
+            "type": "p",
+            "text": "次に、ID を指定してユーザーを 1 件取得する API を定義します。URL に `{user_id}` が含まれている点に注目してください。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import User\n\napp = FastAPI()\n\n\n@app.get(\"/users/{user_id}\")\nasync def get_user(user_id: int):\n    user = await User.get(id=user_id)\n    return user"
+          },
+      
+          {
+            "type": "p",
+            "text": "`{user_id}` はパスパラメータです。クライアントが `/users/3` にアクセスすると、`user_id` には `3` が渡されます。型注釈を `int` にしているため、自動的に整数として扱われます。"
+          },
+          {
+            "type": "p",
+            "text": "ここで使っている `User.get(id=user_id)` は、「条件に一致するデータを 1 件取得する」ための ORM クエリです。"
+          },
+      
+          {
+            "type": "p",
+            "text": "全件取得で使った `User.all()` との大きな違いは、戻り値の性質です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "`await User.all()` → 複数件（リスト）",
+              "`await User.get(...)` → 単一のモデルインスタンス"
+            ]
+          },
+      
+          {
+            "type": "p",
+            "text": "つまり、この API が返すのは「配列」ではなく、「1 人分のユーザーデータ」です。レスポンスのイメージは次のようになります。"
+          },
+          {
+            "type": "code",
+            "filename": "user_response.json",
+            "lang": "json",
+            "code": "{\n  \"id\": 3,\n  \"name\": \"Alice\",\n  \"email\": \"alice@example.com\"\n}"
+          },
+        ]
+      },
+      {
+        "id": "fastapi-tortoise-one-to-many-query",
+        "title": "ORM クエリ実践：1対多（User → Posts）の取得",
+        "summary": "この小節では、Tortoise ORM の 1対多リレーションを使って「あるユーザーに紐づく投稿一覧」を取得する方法を学びます。`related_name` による逆方向アクセス（`user.posts`）を API パス関数の中で使います。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の小節では、パスパラメータ（`/users/{user_id}`）を使って特定のユーザーを 1 件取得しました。次によく必要になるのが、「そのユーザーに紐づく投稿一覧（1対多）」を取得する API です。"
+          },
+          {
+            "type": "p",
+            "text": "ここでは User（1）→ Post（多）の関係を前提にし、`/users/{user_id}/posts` というエンドポイントで「特定ユーザーの投稿一覧」を返す例を作ります。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n\n\nclass Post(models.Model):\n    id = fields.IntField(pk=True)\n    title = fields.CharField(max_length=200)\n    content = fields.TextField()\n\n    user = fields.ForeignKeyField(\n        \"models.User\",\n        related_name=\"posts\",\n        on_delete=fields.CASCADE,\n    )"
+          },
+      
+          {
+            "type": "p",
+            "text": "このモデル定義では、`Post.user` が外部キーで、`related_name=\"posts\"` により User 側から `user.posts` という逆方向アクセスが使えるようになります。"
+          },
+      
+          {
+            "type": "p",
+            "text": "まずは「ユーザーの投稿一覧を返す」API を書きます。流れはシンプルで、(1) user を取得 → (2) user.posts から投稿一覧を取得 → (3) そのまま返す、です。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import User\n\napp = FastAPI()\n\n\n@app.get(\"/users/{user_id}/posts\")\nasync def get_user_posts(user_id: int):\n    user = await User.get(id=user_id)\n    posts = await user.posts.all()\n    return posts"
+          },
+      
+          {
+            "type": "p",
+            "text": "ここでのポイントは、`user.posts.all()` が「この user に紐づく Post を全部取得する」という意味になることです。`posts` の中身は 1 件ではなく、投稿のリスト（複数件）です。"
+          },
+      
+          {
+            "type": "p",
+            "text": "レスポンスは JSON 配列になります。イメージは次のようになります。"
+          },
+          {
+            "type": "code",
+            "filename": "user_posts_response.json",
+            "lang": "json",
+            "code": "[\n  {\"id\": 10, \"title\": \"Hello\", \"content\": \"...\"},\n  {\"id\": 11, \"title\": \"FastAPI\", \"content\": \"...\"}\n]"
+          },
+      
+          {
+            "type": "p",
+            "text": "別の書き方として、Post 側（多の側）からも同じ結果を取得できます。こちらは「posts テーブルから user_id で絞る」発想です。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main_alternative.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom models import Post\n\napp = FastAPI()\n\n\n@app.get(\"/users/{user_id}/posts\")\nasync def get_user_posts(user_id: int):\n    posts = await Post.filter(user_id=user_id).all()\n    return posts"
+          },
+      
+          {
+            "type": "p",
+            "text": "どちらも「特定ユーザーの投稿一覧」を返しますが、考え方が少し違います。`user.posts` は「User からたどる」書き方で、`Post.filter(user_id=...)` は「Post から条件で絞る」書き方です。"
+          }
+        ]
       }
+      
+      
+      
+      
       
       
       
