@@ -2855,7 +2855,248 @@ const CURRICULUM: Chapter[] = [
             "text": "どちらも「特定ユーザーの投稿一覧」を返しますが、考え方が少し違います。`user.posts` は「User からたどる」書き方で、`Post.filter(user_id=...)` は「Post から条件で絞る」書き方です。"
           }
         ]
+      },
+      {
+        "id": "fastapi-async-await-importance",
+        "title": "async / await の重要性",
+        "summary": "FastAPI と Tortoise ORM では、async / await を前提とした非同期処理が基本になります。この小節では、なぜ非同期が必要なのか、そして「なぜ await を付け忘れると動かないのか」を実感レベルで整理します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "ここまでの小節では、FastAPI のパス関数の中で Tortoise ORM を使い、データを取得してきました。その中で、必ず出てきたのが `async` と `await` です。"
+          },
+          {
+            "type": "p",
+            "text": "FastAPI と Tortoise ORM を組み合わせる場合、**基本的にすべて非同期（async / await）で書く必要があります**。これは「好み」ではなく、「設計上の前提」です。"
+          },
+      
+          {
+            "type": "p",
+            "text": "まず、FastAPI 自体が「非同期 Web フレームワーク」です。リクエストを受け取って処理する仕組みが、最初から async / await を前提に作られています。"
+          },
+          {
+            "type": "p",
+            "text": "そのため、FastAPI のパス関数は次のように `async def` で書くのが基本形になります。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "async_path_function.py",
+            "lang": "python",
+            "code": "@app.get(\"/users\")\nasync def get_users():\n    users = await User.all()\n    return users"
+          },
+      
+          {
+            "type": "p",
+            "text": "ここで重要なのは、「なぜ async が必要か」です。理由は、API の内部ではデータベースアクセスなどの **I/O 処理** が発生するからです。"
+          },
+          {
+            "type": "p",
+            "text": "データベースアクセスは「すぐに結果が返ってくる処理」ではありません。結果が返ってくるまでの間、プログラムは待たされます。この待ち時間を効率よく扱うために非同期処理が使われます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "Tortoise ORM は、この I/O 待ちを前提として設計された **非同期 ORM** です。そのため、ORM のクエリはすべて非同期になります。"
+          },
+          {
+            "type": "p",
+            "text": "例えば、`User.all()` や `User.get()` は「すぐに結果を返す関数」ではなく、「将来結果が返ってくる処理」を表します。その結果を実際に受け取るために `await` が必要になります。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "await_example.py",
+            "lang": "python",
+            "code": "users = await User.all()"
+          },
+      
+          {
+            "type": "p",
+            "text": "もし `await` を付け忘れると、`users` には「データ」ではなく「未実行の非同期処理（コルーチン）」が入ってしまいます。これは FastAPI のレスポンスとしては扱えません。"
+          },
+      
+          {
+            "type": "p",
+            "text": "同様に、`await` を使うためには、その関数自体が `async def` で定義されている必要があります。そのため、FastAPI + Tortoise ORM の組み合わせでは、パス関数はほぼ必ず `async def` になります。"
+          },
+      
+          {
+            "type": "p",
+            "text": "まとめると、FastAPI と Tortoise ORM において async / await は「高速化のためのテクニック」ではなく、「正しく動かすための前提条件」です。"
+          },
+          {
+            "type": "ul",
+            "items": [
+              "FastAPI は非同期フレームワーク",
+              "Tortoise ORM は非同期 ORM",
+              "DB アクセスは I/O 処理なので await が必要",
+              "await を使うには async def が必須",
+              "async / await は省略できない基本構文"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fastapi-tortoise-create",
+        "title": "ORM 実践：データを追加（Create）する",
+        "summary": "この小節では、Tortoise ORM を使ってデータを新規追加（Create）する方法を学びます。FastAPI のパス関数の中で、モデルをインスタンス化して保存する流れ（受け取る → 作る → 保存する → 返す）を確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の小節では、Tortoise ORM を使ってデータを取得（Read）する方法を学びました。次は CRUD の C（Create）にあたる「データを追加する」操作です。"
+          },
+          {
+            "type": "p",
+            "text": "追加（Create）の場合は、取得（Read）と違って「モデルを自分で作る（インスタンス化する）」必要があります。作ったモデルをデータベースに保存すると、新しい行（レコード）が追加されます。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n    email = fields.CharField(max_length=255, unique=True)"
+          },
+      
+          {
+            "type": "p",
+            "text": "まずは「ユーザーを追加する」API を作ります。RESTful では、新規作成は `POST /users` の形になるのが基本です。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\nfrom models import User\n\napp = FastAPI()\n\n\nclass UserCreate(BaseModel):\n    name: str\n    email: str\n\n\n@app.post(\"/users\")\nasync def create_user(payload: UserCreate):\n    user = await User.create(\n        name=payload.name,\n        email=payload.email,\n    )\n    return user"
+          },
+      
+          {
+            "type": "p",
+            "text": "このエンドポイントは、リクエストボディで受け取った `name` と `email` を使って、ユーザーを 1 件追加します。"
+          },
+          {
+            "type": "p",
+            "text": "ここでは `User.create(...)` を使っています。これは「作成 + 保存」を 1 行で行う便利な書き方です。戻り値は、追加されたユーザー（単一のモデルインスタンス）になります。"
+          },
+      
+          {
+            "type": "p",
+            "text": "リクエストとレスポンスのイメージは次のようになります。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "create_user_request.json",
+            "lang": "json",
+            "code": "{\n  \"name\": \"Alice\",\n  \"email\": \"alice@example.com\"\n}"
+          },
+          {
+            "type": "code",
+            "filename": "create_user_response.json",
+            "lang": "json",
+            "code": "{\n  \"id\": 1,\n  \"name\": \"Alice\",\n  \"email\": \"alice@example.com\"\n}"
+          },
+      
+          {
+            "type": "p",
+            "text": "もう一つの書き方として、「モデルをインスタンス化してから保存する」方法もあります。動きは同じですが、処理の分解が分かりやすい書き方です。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main_create_alternative.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\nfrom models import User\n\napp = FastAPI()\n\n\nclass UserCreate(BaseModel):\n    name: str\n    email: str\n\n\n@app.post(\"/users\")\nasync def create_user(payload: UserCreate):\n    user = User(\n        name=payload.name,\n        email=payload.email,\n    )\n    await user.save()\n    return user"
+          },
+      
+          {
+            "type": "p",
+            "text": "この方法では、まず `User(...)` でモデルを作り（インスタンス化）、次に `await user.save()` でデータベースに保存しています。"
+          },
+        ]
+      },
+      {
+        "id": "fastapi-tortoise-one-to-many-create",
+        "title": "ORM 実践：1対多（User → Posts）にデータを追加する",
+        "summary": "この小節では、1対多リレーション（User → Post）を前提に、特定ユーザーに紐づく投稿（Post）を新規追加する方法を学びます。パスパラメータで user_id を受け取り、そのユーザーの「子データ」を作成する流れを確認します。",
+        "content": [
+          {
+            "type": "p",
+            "text": "前の小節では、ユーザーを新規追加（Create）する方法を学びました。次によく必要になるのが、「特定ユーザーに紐づく投稿（1対多の子データ）を追加する」操作です。"
+          },
+          {
+            "type": "p",
+            "text": "前に作った 1対多の取得では `/users/{user_id}/posts` で投稿一覧を返しました。今回は同じ考え方で、`POST /users/{user_id}/posts` を作り、指定ユーザーの投稿を追加します。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n\n\nclass Post(models.Model):\n    id = fields.IntField(pk=True)\n    title = fields.CharField(max_length=200)\n    content = fields.TextField()\n\n    user = fields.ForeignKeyField(\n        \"models.User\",\n        related_name=\"posts\",\n        on_delete=fields.CASCADE,\n    )"
+          },
+      
+          {
+            "type": "p",
+            "text": "投稿を追加するには、まずリクエストボディで受け取る入力（title / content）を定義します。次に、パスパラメータの `user_id` を使って「親ユーザー」を特定し、そのユーザーに紐づく Post を作成します。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\nfrom models import User, Post\n\napp = FastAPI()\n\n\nclass PostCreate(BaseModel):\n    title: str\n    content: str\n\n\n@app.post(\"/users/{user_id}/posts\")\nasync def create_post_for_user(user_id: int, payload: PostCreate):\n    user = await User.get(id=user_id)\n\n    post = await Post.create(\n        title=payload.title,\n        content=payload.content,\n        user=user,\n    )\n\n    return post"
+          },
+      
+          {
+            "type": "p",
+            "text": "このエンドポイントでは、`user_id` で親（User）を指定し、その親に属する子（Post）を 1 件追加します。`Post.create(..., user=user)` と書くことで、外部キー（user_id）が自動的にセットされます。"
+          },
+      
+          {
+            "type": "p",
+            "text": "リクエストとレスポンスのイメージは次のようになります。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "create_post_request.json",
+            "lang": "json",
+            "code": "{\n  \"title\": \"My first post\",\n  \"content\": \"Hello Tortoise ORM\"\n}"
+          },
+          {
+            "type": "code",
+            "filename": "create_post_response.json",
+            "lang": "json",
+            "code": "{\n  \"id\": 10,\n  \"title\": \"My first post\",\n  \"content\": \"Hello Tortoise ORM\",\n  \"user_id\": 3\n}"
+          },
+      
+          {
+            "type": "p",
+            "text": "もう一つの書き方として、外部キーを「ユーザーオブジェクト」ではなく、「ID」で指定することもできます。結果は同じで、より短く書けるケースがあります。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main_create_post_by_id.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\nfrom models import Post\n\napp = FastAPI()\n\n\nclass PostCreate(BaseModel):\n    title: str\n    content: str\n\n\n@app.post(\"/users/{user_id}/posts\")\nasync def create_post_for_user(user_id: int, payload: PostCreate):\n    post = await Post.create(\n        title=payload.title,\n        content=payload.content,\n        user_id=user_id,\n    )\n    return post"
+          },
+      
+          {
+            "type": "p",
+            "text": "この書き方では、先に `User.get(...)` でユーザーを取得せずに、そのまま `user_id` を外部キーとしてセットしています。データベース上では同じ意味ですが、指定した `user_id` が存在しない場合の扱い（エラーになるかどうか）は DB の制約や設定に依存します。"
+          },
+      
+          {
+            "type": "p",
+            "text": "この小節のポイントは、「1対多の追加は、子モデル（Post）を作るときに親（User）を指定する」ということです。次の小節では、存在しない user_id を指定したときにどう扱うべきか（404やエラー処理）を整理していきます。"
+          }
+        ]
       }
+      
+      
+      
       
       
       
