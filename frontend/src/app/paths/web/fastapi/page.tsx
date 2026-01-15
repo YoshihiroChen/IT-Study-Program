@@ -2921,20 +2921,6 @@ const CURRICULUM: Chapter[] = [
             "text": "同様に、`await` を使うためには、その関数自体が `async def` で定義されている必要があります。そのため、FastAPI + Tortoise ORM の組み合わせでは、パス関数はほぼ必ず `async def` になります。"
           },
       
-          {
-            "type": "p",
-            "text": "まとめると、FastAPI と Tortoise ORM において async / await は「高速化のためのテクニック」ではなく、「正しく動かすための前提条件」です。"
-          },
-          {
-            "type": "ul",
-            "items": [
-              "FastAPI は非同期フレームワーク",
-              "Tortoise ORM は非同期 ORM",
-              "DB アクセスは I/O 処理なので await が必要",
-              "await を使うには async def が必須",
-              "async / await は省略できない基本構文"
-            ]
-          }
         ]
       },
       {
@@ -3090,7 +3076,7 @@ const CURRICULUM: Chapter[] = [
       
           {
             "type": "p",
-            "text": "この小節のポイントは、「1対多の追加は、子モデル（Post）を作るときに親（User）を指定する」ということです。次の小節では、存在しない user_id を指定したときにどう扱うべきか（404やエラー処理）を整理していきます。"
+            "text": "この小節のポイントは、「1対多の追加は、子モデル（Post）を作るときに親（User）を指定する」ということです。"
           }
         ]
       }
