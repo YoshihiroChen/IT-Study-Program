@@ -2925,7 +2925,7 @@ const CURRICULUM: Chapter[] = [
       },
       {
         "id": "fastapi-tortoise-create",
-        "title": "ORM 実践：データを追加（Create）する",
+        "title": "ORM クエリ実践：データを追加（Create）する",
         "summary": "この小節では、Tortoise ORM を使ってデータを新規追加（Create）する方法を学びます。FastAPI のパス関数の中で、モデルをインスタンス化して保存する流れ（受け取る → 作る → 保存する → 返す）を確認します。",
         "content": [
           {
@@ -3003,7 +3003,7 @@ const CURRICULUM: Chapter[] = [
       },
       {
         "id": "fastapi-tortoise-one-to-many-create",
-        "title": "ORM 実践：1対多（User → Posts）にデータを追加する",
+        "title": "ORM クエリ実践：1対多（User → Posts）にデータを追加する",
         "summary": "この小節では、1対多リレーション（User → Post）を前提に、特定ユーザーに紐づく投稿（Post）を新規追加する方法を学びます。パスパラメータで user_id を受け取り、そのユーザーの「子データ」を作成する流れを確認します。",
         "content": [
           {
@@ -3079,7 +3079,163 @@ const CURRICULUM: Chapter[] = [
             "text": "この小節のポイントは、「1対多の追加は、子モデル（Post）を作るときに親（User）を指定する」ということです。"
           }
         ]
+      },
+      {
+        "id": "fastapi-tortoise-update",
+        "title": "ORM クエリ実践：データを編集（Update）する",
+        "summary": "この小節では、Tortoise ORM を使ってデータを更新（Update）する方法を学びます。まずは 1件（User）の更新を行い、次に 1対多（User → Post）の子データ（Post）を更新する API を作ります。",
+        "content": [
+          {
+            "type": "p",
+            "text": "ここまでで、取得（Read）と追加（Create）を実装しました。次は CRUD の U（Update）にあたる「編集（更新）」です。"
+          },
+          {
+            "type": "p",
+            "text": "更新の基本はシンプルで、「対象データを特定する → 値を変更する → 保存する」です。API ではパスパラメータ（id）を使って対象を特定します。"
+          },
+      
+          {
+            "type": "p",
+            "text": "まずはユーザー（User）を 1 件更新する API を作ります。RESTful では、特定リソースの更新は `PUT /users/{user_id}` の形にするのが基本です。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n    email = fields.CharField(max_length=255, unique=True)\n\n\nclass Post(models.Model):\n    id = fields.IntField(pk=True)\n    title = fields.CharField(max_length=200)\n    content = fields.TextField()\n\n    user = fields.ForeignKeyField(\n        \"models.User\",\n        related_name=\"posts\",\n        on_delete=fields.CASCADE,\n    )"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main_update_user.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\nfrom models import User, Post\n\napp = FastAPI()\n\n\nclass UserUpdate(BaseModel):\n    name: str\n    email: str\n\n\n@app.put(\"/users/{user_id}\")\nasync def update_user(user_id: int, payload: UserUpdate):\n    user = await User.get(id=user_id)\n\n    user.name = payload.name\n    user.email = payload.email\n\n    await user.save()\n    return user"
+          },
+      
+          {
+            "type": "p",
+            "text": "この API は、指定された user_id のユーザーを取得し、`name` と `email` を上書きして保存します。更新後のユーザーをそのまま返す形です。"
+          },
+      
+          {
+            "type": "p",
+            "text": "次に、1対多（User → Posts）の「子データ」を更新してみます。典型例は「特定ユーザーの特定投稿を編集する」です。"
+          },
+          {
+            "type": "p",
+            "text": "URL は `/users/{user_id}/posts/{post_id}` のように、親（User）と子（Post）の両方の ID をパスに含めると分かりやすくなります。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main_update_post.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\nfrom models import User, Post\n\napp = FastAPI()\n\n\nclass PostUpdate(BaseModel):\n    title: str\n    content: str\n\n\n@app.put(\"/users/{user_id}/posts/{post_id}\")\nasync def update_user_post(user_id: int, post_id: int, payload: PostUpdate):\n    # 「このユーザーの投稿」であることを条件にして取得する\n    post = await Post.get(id=post_id, user_id=user_id)\n\n    post.title = payload.title\n    post.content = payload.content\n\n    await post.save()\n    return post"
+          },
+      
+          {
+            "type": "p",
+            "text": "この更新 API では、`Post.get(id=post_id, user_id=user_id)` とすることで「指定ユーザーに属する投稿だけ編集できる」形になります。単に `Post.get(id=post_id)` にすると、他人の投稿も編集できてしまう可能性があるため注意が必要です。"
+          },
+      
+          {
+            "type": "p",
+            "text": "補足：更新には別の書き方もあります。例えば、取得した後に代入して save するのではなく、条件指定で一括更新する方法です（戻り値は更新件数になります）。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "update_alternative.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\nfrom models import User\n\napp = FastAPI()\n\n\nclass UserUpdate(BaseModel):\n    name: str\n    email: str\n\n\n@app.put(\"/users/{user_id}\")\nasync def update_user(user_id: int, payload: UserUpdate):\n    await User.filter(id=user_id).update(\n        name=payload.name,\n        email=payload.email,\n    )\n    user = await User.get(id=user_id)\n    return user"
+          },
+      
+          {
+            "type": "p",
+            "text": "この方法は短く書けますが、更新対象が存在しない場合の扱いや、更新後の値を返すために再取得が必要になる点があるため、学習段階では「取得 → 代入 → save」の流れが分かりやすいです。"
+          }
+        ]
+      },
+      {
+        "id": "fastapi-tortoise-delete",
+        "title": "ORM クエリ実践：データを削除（Delete）する",
+        "summary": "この小節では、Tortoise ORM を使ってデータを削除（Delete）する方法を学びます。まずは 1件（User）の削除を行い、次に 1対多（User → Post）の子データ（Post）を削除する API を作ります。",
+        "content": [
+          {
+            "type": "p",
+            "text": "ここまでで、取得（Read）・追加（Create）・編集（Update）を実装しました。最後に CRUD の D（Delete）である「削除」を実装します。"
+          },
+          {
+            "type": "p",
+            "text": "削除の基本は「対象データを特定する → 削除する」です。更新と同じく、API ではパスパラメータ（id）で対象を特定します。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "models.py",
+            "lang": "python",
+            "code": "from tortoise import models, fields\n\n\nclass User(models.Model):\n    id = fields.IntField(pk=True)\n    name = fields.CharField(max_length=100)\n    email = fields.CharField(max_length=255, unique=True)\n\n\nclass Post(models.Model):\n    id = fields.IntField(pk=True)\n    title = fields.CharField(max_length=200)\n    content = fields.TextField()\n\n    user = fields.ForeignKeyField(\n        \"models.User\",\n        related_name=\"posts\",\n        on_delete=fields.CASCADE,\n    )"
+          },
+      
+          {
+            "type": "p",
+            "text": "まずはユーザー（User）を 1 件削除する API です。RESTful では、特定リソースの削除は `DELETE /users/{user_id}` の形が基本です。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main_delete_user.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\n\nfrom models import User\n\napp = FastAPI()\n\n\n@app.delete(\"/users/{user_id}\")\nasync def delete_user(user_id: int):\n    user = await User.get(id=user_id)\n    await user.delete()\n    return {\"deleted\": True, \"user_id\": user_id}"
+          },
+      
+          {
+            "type": "p",
+            "text": "`await user.delete()` により、対象ユーザーがデータベースから削除されます。ここでは結果が分かりやすいように、削除できたことを示す JSON を返しています。"
+          },
+      
+          {
+            "type": "p",
+            "text": "次に、1対多（User → Posts）の「子データ」を削除します。典型例は「特定ユーザーの特定投稿を削除する」です。"
+          },
+          {
+            "type": "p",
+            "text": "URL は更新と同様に `/users/{user_id}/posts/{post_id}` のように親子の ID を含めます。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "main_delete_post.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\n\nfrom models import Post\n\napp = FastAPI()\n\n\n@app.delete(\"/users/{user_id}/posts/{post_id}\")\nasync def delete_user_post(user_id: int, post_id: int):\n    post = await Post.get(id=post_id, user_id=user_id)\n    await post.delete()\n    return {\"deleted\": True, \"user_id\": user_id, \"post_id\": post_id}"
+          },
+      
+          {
+            "type": "p",
+            "text": "ここでも `Post.get(id=post_id, user_id=user_id)` として、「このユーザーに属する投稿だけ削除できる」条件にしています。"
+          },
+      
+          {
+            "type": "p",
+            "text": "補足：削除にも別の書き方があります。例えば、モデルを取得せずに条件指定で削除する方法です（戻り値は削除件数になります）。"
+          },
+      
+          {
+            "type": "code",
+            "filename": "delete_alternative.py",
+            "lang": "python",
+            "code": "from fastapi import FastAPI\n\nfrom models import User\n\napp = FastAPI()\n\n\n@app.delete(\"/users/{user_id}\")\nasync def delete_user(user_id: int):\n    deleted_count = await User.filter(id=user_id).delete()\n    return {\"deleted\": deleted_count > 0, \"user_id\": user_id}"
+          },
+      
+          {
+            "type": "p",
+            "text": "この方法は短く書けますが、学習段階では「取得 → delete」のほうが流れが分かりやすいです。次の小節では、存在しない ID のときに 404 を返すなど、削除時のエラー処理を整理していきます。"
+          }
+        ]
       }
+      
+      
       
       
       
